@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="menu.js" defer></script>
 </head>
 <body>
 
@@ -18,7 +19,8 @@
       <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
       ShopLink <small>NG</small>
     </a>
-    <nav class="links" aria-label="Main">
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
+    <nav class="links" id="menu" aria-label="Main">
       <a href="how-it-works.html">How it works</a>
       <a href="why-shoplink.html">Why ShopLink</a>
       <a class="btn btn-main btn-sm" href="/signup">Create your store</a>
@@ -105,58 +107,110 @@
       <h2>What vendors and buyers say</h2>
       <p>Small sellers and their customers on how ordering through WhatsApp feels.</p>
     </div>
-    <div class="reviews">
-      <figure class="review" style="margin-inline:0">
+    <div class="marquee"><div class="track">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“I used to pay a developer every month just to keep my shop online. Now my orders come straight to WhatsApp and I pay nothing.”</p>
         <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">NO</div><div><b>Ngozi Okafor</b><small>Bag seller, Lagos</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“My customers can see every product and price before they message me. I answer far fewer “how much is this?” chats.”</p>
         <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">KA</div><div><b>Kemi Adeyemi</b><small>Food supplier, Ibadan</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“I set up my store on my phone while waiting for a customer. It took less than ten minutes.”</p>
         <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">TB</div><div><b>Tunde Bakare</b><small>Thrift seller, Abuja</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“No more sending product screenshots one by one. I send my link and people pick what they want.”</p>
         <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">AY</div><div><b>Amina Yusuf</b><small>Beauty products, Kano</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“I picked three items, tapped send, and my order was already written out in WhatsApp. No account, no stress.”</p>
         <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">CE</div><div><b>Chiamaka Eze</b><small>Buyer, Enugu</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I used to pay a developer every month just to keep my shop online. Now my orders come straight to WhatsApp and I pay nothing.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">NO</div><div><b>Ngozi Okafor</b><small>Bag seller, Lagos</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“My customers can see every product and price before they message me. I answer far fewer “how much is this?” chats.”</p>
+        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">KA</div><div><b>Kemi Adeyemi</b><small>Food supplier, Ibadan</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I set up my store on my phone while waiting for a customer. It took less than ten minutes.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">TB</div><div><b>Tunde Bakare</b><small>Thrift seller, Abuja</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“No more sending product screenshots one by one. I send my link and people pick what they want.”</p>
+        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">AY</div><div><b>Amina Yusuf</b><small>Beauty products, Kano</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I picked three items, tapped send, and my order was already written out in WhatsApp. No account, no stress.”</p>
+        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">CE</div><div><b>Chiamaka Eze</b><small>Buyer, Enugu</small></div></figcaption>
+      </figure>
+</div></div>
+<div class="marquee rev"><div class="track">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
         <p>“The message arrives with the customer’s name and address, so I do not have to ask twice.”</p>
         <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">BS</div><div><b>Bola Salami</b><small>Caterer, Abeokuta</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“The store opened fast even on my small phone with bad network.”</p>
         <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">IM</div><div><b>Ibrahim Musa</b><small>Buyer, Kaduna</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
         <p>“I would like to pay inside the app, but paying the seller directly is how I already do it, so it works for me.”</p>
         <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">FJ</div><div><b>Folake Johnson</b><small>Buyer, Port Harcourt</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“I put the link in my Instagram bio and people now order without DMing me five times.”</p>
         <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">SW</div><div><b>Sade Williams</b><small>Hair vendor, Lagos</small></div></figcaption>
       </figure>
-      <figure class="review" style="margin-inline:0">
+<figure class="review" style="margin-inline:0">
         <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
         <p>“I sell snacks to students and could not afford a monthly plan. This is the first one that fits my budget.”</p>
         <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">EN</div><div><b>Emeka Nwosu</b><small>Snack seller, Nsukka</small></div></figcaption>
       </figure>
-    </div>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
+        <p>“The message arrives with the customer’s name and address, so I do not have to ask twice.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">BS</div><div><b>Bola Salami</b><small>Caterer, Abeokuta</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“The store opened fast even on my small phone with bad network.”</p>
+        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">IM</div><div><b>Ibrahim Musa</b><small>Buyer, Kaduna</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
+        <p>“I would like to pay inside the app, but paying the seller directly is how I already do it, so it works for me.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">FJ</div><div><b>Folake Johnson</b><small>Buyer, Port Harcourt</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I put the link in my Instagram bio and people now order without DMing me five times.”</p>
+        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">SW</div><div><b>Sade Williams</b><small>Hair vendor, Lagos</small></div></figcaption>
+      </figure>
+<figure class="review dup" aria-hidden="true" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I sell snacks to students and could not afford a monthly plan. This is the first one that fits my budget.”</p>
+        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">EN</div><div><b>Emeka Nwosu</b><small>Snack seller, Nsukka</small></div></figcaption>
+      </figure>
+</div></div>
   </div>
 </section>
 

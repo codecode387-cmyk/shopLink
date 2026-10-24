@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="menu.js" defer></script>
 </head>
 <body>
 <header>
@@ -17,7 +18,8 @@
       <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
       ShopLink <small>NG</small>
     </a>
-    <nav class="links" aria-label="Main">
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
+    <nav class="links" id="menu" aria-label="Main">
       <a href="how-it-works.html" aria-current="page">How it works</a>
       <a href="why-shoplink.html">Why ShopLink</a>
       <a class="btn btn-main btn-sm" href="/signup">Create your store</a>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Create your free store – ShopLink NG</title>
+<meta name="description" content="Open a free ShopLink NG store in two minutes and receive orders on WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="menu.js" defer></script>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="ShopLink NG home">
+      <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
+      ShopLink <small>NG</small>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
+    <nav class="links" id="menu" aria-label="Main">
+      <a href="how-it-works.html">How it works</a>
+      <a href="why-shoplink.html">Why ShopLink</a>
+      <a class="btn btn-main btn-sm" href="signup.html" aria-current="page">Create your store</a>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="page-hero"><div class="wrap">
+  <h1>Create your free store</h1>
+  <p class="lead">Takes about two minutes. No card and no monthly fee.</p>
+</div></section>
+<section style="padding-top:1rem"><div class="wrap auth">
+  <form class="card" id="f" novalidate>
+    <label class="field">Store name<input id="store" autocomplete="organization" maxlength="50" placeholder="Mama Ngozi Bags"></label>
+    <label class="field">Store link
+      <span class="slug"><span class="pre">shoplink.ng/</span><input id="slug" maxlength="30" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="mama-ngozi"></span>
+      <small class="hint" id="slugHint" aria-live="polite"></small>
+    </label>
+    <label class="field">WhatsApp number<input id="wa" type="tel" inputmode="tel" autocomplete="tel" placeholder="0903 247 3005"><small class="hint">Your orders will be sent to this number.</small></label>
+    <label class="field">Email<input id="email" type="email" autocomplete="email" placeholder="you@gmail.com"></label>
+    <label class="field">Password<input id="pw" type="password" autocomplete="new-password" placeholder="At least 8 characters"></label>
+    <label class="check"><input type="checkbox" id="show"> <span>Show password</span></label>
+    <label class="check"><input type="checkbox" id="agree"> <span>I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy policy</a></span></label>
+    <p class="msg" id="msg" role="alert"></p>
+    <button class="btn btn-main" id="go" type="submit" style="width:100%;margin-top:.8rem">Create my store</button>
+    <p class="alt-link">Already have a store? <a href="login.html">Log in</a></p>
+  </form>
+
+  <div class="card" id="done" hidden>
+    <h2>Your store is ready</h2>
+    <p style="color:var(--muted);margin-top:.4rem">Your store link is:</p>
+    <div class="done-url" id="doneUrl"></div>
+    <div class="done-actions">
+      <a class="btn btn-main" href="dashboard.html">Go to my dashboard</a>
+      <button class="btn btn-ghost" type="button" id="copy">Copy my link</button>
+    </div>
+  </div>
+
+  <aside class="side">
+    <h2>What you get</h2>
+    <ul>
+      <li>Your own store link to share anywhere</li>
+      <li>Add products with photos and prices in naira</li>
+      <li>Every order sent to your WhatsApp</li>
+      <li>No monthly fee and no cut of your sales</li>
+    </ul>
+  </aside>
+</div></section>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> ShopLink NG. Made in Nigeria.</span>
+    <nav aria-label="Footer"><a href="about.html">About</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav>
+  </div>
+</footer>
+<script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script>
+(function () {
+  var URL_ = "https://grrotfpoalxvkkrkgzpg.supabase.co", KEY = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
+  var RESERVED = ["about", "terms", "privacy", "contact", "signup", "login", "logout", "dashboard", "admin", "api", "how-it-works", "why-shoplink", "index", "styles", "menu", "settings", "store", "stores", "shop", "help", "support", "www", "app"];
+  var $ = function (id) { return document.getElementById(id); };
+  var sb = window.supabase ? window.supabase.createClient(URL_, KEY) : null;
+  var slugTouched = false, slugBad = false, timer;
+
+  function slugify(s) {
+    return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 30).replace(/-+$/, "");
+  }
+  function slugFormat(s) { return s.length >= 3 && s.length <= 30 && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(s); }
+  function normPhone(v) {
+    var d = v.replace(/\D/g, "");
+    if (d.indexOf("234") === 0) return d;
+    if (d.charAt(0) === "0") return "234" + d.slice(1);
+    if (d.length === 10) return "234" + d;
+    return d;
+  }
+  function phoneOk(p) { return /^234[789][01]\d{8}$/.test(p); }
+  function hint(t, c) { var h = $("slugHint"); h.textContent = t; h.className = "hint " + (c || ""); }
+  function fail(t, id) { $("msg").textContent = t; if (id) $(id).focus(); return false; }
+  function busy(b) { $("go").disabled = b; $("go").textContent = b ? "Creating your store…" : "Create my store"; }
+
+  function checkSlug() {
+    var s = $("slug").value; slugBad = false; clearTimeout(timer);
+    if (!s) { hint(""); return; }
+    if (!slugFormat(s)) { slugBad = true; hint("Use 3 to 30 letters, numbers, or single hyphens.", "bad"); return; }
+    if (RESERVED.indexOf(s) > -1) { slugBad = true; hint("That link is reserved. Try another.", "bad"); return; }
+    if (!sb) { hint(""); return; }
+    hint("Checking…");
+    timer = setTimeout(function () {
+      sb.from("vendors").select("slug").eq("slug", s).limit(1).then(function (r) {
+        if ($("slug").value !== s) return;
+        if (r.error) { hint(""); return; }
+        if (r.data && r.data.length) { slugBad = true; hint("That link is taken. Try another.", "bad"); }
+        else hint("shoplink.ng/" + s + " is available", "ok");
+      });
+    }, 400);
+  }
+
+  $("store").addEventListener("input", function () {
+    if (!slugTouched) { $("slug").value = slugify($("store").value); checkSlug(); }
+  });
+  $("slug").addEventListener("input", function () {
+    slugTouched = true;
+    $("slug").value = $("slug").value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    checkSlug();
+  });
+  $("show").addEventListener("change", function () { $("pw").type = this.checked ? "text" : "password"; });
+
+  function friendly(e) {
+    var m = (e.message || "").toLowerCase();
+    if (m.indexOf("already registered") > -1 || m.indexOf("already been registered") > -1) return "This email already has an account. Log in instead.";
+    if (m.indexOf("password") > -1) return e.message;
+    if (m.indexOf("rate") > -1 || m.indexOf("too many") > -1) return "Too many attempts. Please wait a minute and try again.";
+    if (m.indexOf("database error") > -1) return "We could not create your store. Try a different store link.";
+    return e.message || "Something went wrong. Please try again.";
+  }
+
+  function showDone(slug) {
+    var url = "shoplink.ng/" + slug;
+    $("doneUrl").textContent = url;
+    $("f").hidden = true; $("done").hidden = false;
+    $("copy").onclick = function () {
+      var b = this;
+      (navigator.clipboard ? navigator.clipboard.writeText("https://" + url) : Promise.reject())
+        .then(function () { b.textContent = "Copied"; }, function () { b.textContent = "Copy not available"; });
+    };
+  }
+
+  $("f").addEventListener("submit", function (e) {
+    e.preventDefault(); $("msg").textContent = "";
+    var store = $("store").value.trim(), slug = $("slug").value, wa = normPhone($("wa").value),
+        email = $("email").value.trim(), pw = $("pw").value;
+    if (store.length < 2) return fail("Enter your store name.", "store");
+    if (!slugFormat(slug) || RESERVED.indexOf(slug) > -1 || slugBad) return fail("Choose a valid, available store link.", "slug");
+    if (!phoneOk(wa)) return fail("Enter a valid Nigerian WhatsApp number, for example 0903 247 3005.", "wa");
+    if (!/^\S+@\S+\.\S+$/.test(email)) return fail("Enter a valid email address.", "email");
+    if (pw.length < 8) return fail("Your password needs at least 8 characters.", "pw");
+    if (!$("agree").checked) return fail("Please accept the Terms and Privacy policy to continue.", "agree");
+    if (!sb) return fail("Could not load the sign-up service. Check your internet connection and refresh the page.");
+    busy(true);
+    sb.auth.signUp({ email: email, password: pw, options: { data: { store_name: store, slug: slug, whatsapp_number: wa } } })
+      .then(function (r) {
+        if (r.error) { busy(false); return fail(friendly(r.error)); }
+        if (!r.data.session) { busy(false); return fail("Account created, but email confirmation is still on in Supabase. Turn it off under Authentication settings, then log in."); }
+        return sb.from("vendors").select("slug").eq("owner_id", r.data.user.id).maybeSingle()
+          .then(function (q) { showDone((q.data && q.data.slug) || slug); });
+      })
+      .catch(function () { busy(false); fail("Network problem. Check your connection and try again."); });
+  });
+})();
+</script>
+</body>
+</html>

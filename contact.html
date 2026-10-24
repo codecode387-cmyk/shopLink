@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact – ShopLink NG</title>
+<meta name="description" content="Contact ShopLink NG on WhatsApp for vendor support, order problems, or feedback.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="menu.js" defer></script>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="ShopLink NG home">
+      <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
+      ShopLink <small>NG</small>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
+    <nav class="links" id="menu" aria-label="Main">
+      <a href="how-it-works.html">How it works</a>
+      <a href="why-shoplink.html">Why ShopLink</a>
+      <a class="btn btn-main btn-sm" href="/signup">Create your store</a>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="page-hero"><div class="wrap"><h1>Talk to us on WhatsApp</h1><p class="lead">Tap the button and your message is ready to send. We reply on WhatsApp.</p></div></section>
+<section style="padding-top:1rem"><div class="wrap split" style="align-items:start">
+  <div class="card">
+    <h2>Chat with us now</h2>
+    <div class="big-num">0903 247 3005</div>
+    <a class="btn btn-main" href="https://wa.me/2349032473005?text=Hello%20ShopLink%20NG%2C%20I%20would%20like%20to%20ask%20about..." rel="noopener">Open WhatsApp</a>
+  </div>
+  <form class="card" id="cf" novalidate>
+    <h2>Or write your message here</h2>
+    <label class="field">Your name<input id="n" name="name" autocomplete="name" required></label>
+    <label class="field">What is it about?
+      <select id="t"><option>Vendor support</option><option>Problem with an order</option><option>Report a store</option><option>Feedback or partnership</option><option>Something else</option></select>
+    </label>
+    <label class="field">Message<textarea id="m" required></textarea></label>
+    <button class="btn btn-main" type="submit" style="margin-top:1.2rem">Send on WhatsApp</button>
+  </form>
+</div></section>
+<section class="alt"><div class="wrap">
+  <div class="sec-head"><h2>How we can help</h2></div>
+  <div class="reasons">
+    <div class="reason"><h3>Vendor support</h3><p>Help with setting up your store, adding products, or sharing your link.</p></div>
+    <div class="reason"><h3>Order problems</h3><p>Please contact the vendor first, since they handle payment and delivery. Message us if you cannot reach them.</p></div>
+    <div class="reason"><h3>Report a store</h3><p>Tell us about a fake listing, scam, or anything that breaks our terms and we will look into it.</p></div>
+  </div>
+</div></section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> ShopLink NG. Made in Nigeria.</span>
+    <nav aria-label="Footer"><a href="about.html">About</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav>
+  </div>
+</footer>
+<script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+<script>
+document.getElementById("cf").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var n = document.getElementById("n").value.trim(), m = document.getElementById("m").value.trim();
+  if (!n || !m) { (n ? document.getElementById("m") : document.getElementById("n")).focus(); return; }
+  var t = document.getElementById("t").value;
+  var text = "Hello ShopLink NG, my name is " + n + ".\nTopic: " + t + "\n" + m;
+  window.open("https://wa.me/2349032473005?text=" + encodeURIComponent(text), "_blank", "noopener");
+});
+</script>
+</body>
+</html>

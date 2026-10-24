@@ -208,3 +208,12 @@ th.us,td.us{background:color-mix(in srgb,var(--wa) 16%,transparent);font-weight:
 .side li::before{content:"✓";position:absolute;left:0;color:var(--wa);font-weight:800}
 .done-url{font:800 clamp(1.3rem,4vw,1.8rem) var(--display);word-break:break-all;margin:.8rem 0 1.2rem}
 .done-actions{display:flex;flex-wrap:wrap;gap:.8rem}
+
+/* dashboard */
+.dash-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1.2rem}
+@media(max-width:820px){.dash-grid{grid-template-columns:1fr}}
+.badge{display:inline-block;padding:.35rem .9rem;border-radius:999px;font-weight:700;background:var(--sun);color:#10231b}
+.badge.ok{background:var(--wa)}
+.badge.warn{background:#e0533f;color:#fff}
+.notice{background:color-mix(in srgb,var(--wa) 18%,transparent);border:1px solid var(--wa);border-radius:16px;padding:1rem 1.2rem;margin-bottom:1.5rem;font-weight:500}
+.btn:disabled{opacity:.6;cursor:not-allowed}

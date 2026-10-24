@@ -170,3 +170,19 @@ th.us,td.us{background:color-mix(in srgb,var(--wa) 16%,transparent);font-weight:
   .track{animation:none;width:auto;flex-wrap:wrap;justify-content:center}
   .track .dup{display:none}
 }
+
+/* legal + contact */
+.legal{max-width:46rem}
+.legal h2{font-size:1.5rem;margin:2.4rem 0 .5rem}
+.legal p,.legal li{margin-top:.6rem;color:color-mix(in srgb,var(--ink) 86%,transparent)}
+.legal ul{padding-left:1.3rem}
+.legal a{color:var(--leaf);font-weight:700}
+.updated{color:var(--muted);margin-top:1rem}
+.card{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:1.8rem}
+.card h2{font-size:1.6rem}
+.big-num{font:800 clamp(1.8rem,5vw,2.6rem) var(--display);letter-spacing:-.01em;margin:.5rem 0 1.2rem}
+.field{display:block;margin-top:1rem;font-weight:700;font-size:.95rem}
+.field input,.field select,.field textarea{display:block;width:100%;margin-top:.4rem;font:400 1rem var(--body);color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:.8rem .9rem}
+.field textarea{min-height:120px;resize:vertical}
+.prose{max-width:40rem;font-size:1.1rem}
+.prose p+p{margin-top:1rem}

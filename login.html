@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Log in – ShopLink NG</title>
+<meta name="description" content="Log in to manage your ShopLink NG store.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="menu.js" defer></script>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="ShopLink NG home">
+      <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
+      ShopLink <small>NG</small>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
+    <nav class="links" id="menu" aria-label="Main">
+      <a href="how-it-works.html">How it works</a>
+      <a href="why-shoplink.html">Why ShopLink</a>
+      <a href="login.html" aria-current="page">Log in</a>
+      <a class="btn btn-main btn-sm" href="signup.html">Create your store</a>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="page-hero"><div class="wrap">
+  <h1>Welcome back</h1>
+  <p class="lead">Log in to manage your store.</p>
+</div></section>
+<section style="padding-top:1rem"><div class="wrap auth">
+  <form class="card" id="f" novalidate>
+    <label class="field">Email<input id="email" type="email" autocomplete="email" placeholder="you@gmail.com"></label>
+    <label class="field">Password<input id="pw" type="password" autocomplete="current-password"></label>
+    <label class="check"><input type="checkbox" id="show"> <span>Show password</span></label>
+    <p class="msg" id="msg" role="alert"></p>
+    <button class="btn btn-main" id="go" type="submit" style="width:100%;margin-top:.8rem">Log in</button>
+    <p class="alt-link">Forgot your password? <a href="contact.html">Message us on WhatsApp</a></p>
+    <p class="alt-link">New here? <a href="signup.html">Create your store</a></p>
+  </form>
+  <aside class="side">
+    <h2>Your dashboard</h2>
+    <ul>
+      <li>See your store link and plan</li>
+      <li>Share your link in your bio</li>
+      <li>Products and store settings are coming next</li>
+    </ul>
+  </aside>
+</div></section>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> ShopLink NG. Made in Nigeria.</span>
+    <nav aria-label="Footer"><a href="about.html">About</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav>
+  </div>
+</footer>
+<script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script>
+var SUPABASE_URL = "https://grrotfpoalxvkkrkgzpg.supabase.co", SUPABASE_KEY = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+  function nextPage() {
+    var n = new URLSearchParams(location.search).get("next");
+    return n && /^[a-z0-9-]+\.html$/.test(n) ? n : "dashboard.html";
+  }
+  function fail(t, id) { $("msg").textContent = t; if (id) $(id).focus(); }
+  function busy(b) { $("go").disabled = b; $("go").textContent = b ? "Logging in…" : "Log in"; }
+
+  // already logged in? go straight to the dashboard
+  if (sb) sb.auth.getSession().then(function (r) {
+    if (r.data && r.data.session) location.replace(nextPage());
+  });
+
+  $("show").addEventListener("change", function () { $("pw").type = this.checked ? "text" : "password"; });
+
+  $("f").addEventListener("submit", function (e) {
+    e.preventDefault(); $("msg").textContent = "";
+    var email = $("email").value.trim(), pw = $("pw").value;
+    if (!/^\S+@\S+\.\S+$/.test(email)) return fail("Enter a valid email address.", "email");
+    if (!pw) return fail("Enter your password.", "pw");
+    if (!sb) return fail("Could not load the login service. Check your internet and refresh the page.");
+    busy(true);
+    sb.auth.signInWithPassword({ email: email, password: pw }).then(function (r) {
+      if (r.error) {
+        busy(false);
+        var m = (r.error.message || "").toLowerCase();
+        if (m.indexOf("invalid login") > -1) return fail("Wrong email or password.");
+        if (m.indexOf("not confirmed") > -1) return fail("This email is not confirmed yet. Turn off email confirmation in Supabase, then try again.");
+        if (m.indexOf("rate") > -1 || m.indexOf("too many") > -1) return fail("Too many attempts. Please wait a minute and try again.");
+        return fail(r.error.message);
+      }
+      location.href = nextPage();
+    }).catch(function () { busy(false); fail("Network problem. Check your connection and try again."); });
+  });
+})();
+</script>
+</body>
+</html>

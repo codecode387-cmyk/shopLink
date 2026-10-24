@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard – ShopLink NG</title>
+<meta name="description" content="Your ShopLink NG store dashboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="menu.js" defer></script>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="ShopLink NG home">
+      <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
+      ShopLink <small>NG</small>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
+    <nav class="links" id="menu" aria-label="Main">
+      <a href="how-it-works.html">How it works</a>
+      <a href="why-shoplink.html">Why ShopLink</a>
+      <a href="login.html">Log in</a>
+      <a class="btn btn-main btn-sm" href="signup.html">Create your store</a>
+    </nav>
+  </div>
+</header>
+<main>
+<section class="page-hero"><div class="wrap">
+  <h1 id="title">Loading…</h1>
+  <p class="lead" id="sub">Your store dashboard</p>
+</div></section>
+<section style="padding-top:1rem"><div class="wrap" id="app" hidden>
+  <div class="notice" id="welcome" hidden>Your store is created and your free month has started.</div>
+  <div class="dash-grid">
+    <div class="card">
+      <h2>Your store link</h2>
+      <div class="done-url" id="url"></div>
+      <div class="done-actions"><button class="btn btn-ghost" type="button" id="copy">Copy my link</button></div>
+    </div>
+    <div class="card">
+      <h2>Your plan</h2>
+      <p style="margin:.8rem 0"><span class="badge" id="badge"></span></p>
+      <p style="color:var(--muted)">After your free month, the plan is ₦2,000 per month.</p>
+    </div>
+  </div>
+  <div class="sec-head" style="margin:2.5rem 0 1.2rem"><h2>Get your store ready</h2></div>
+  <div class="steps">
+    <div class="step"><h3>Set up your store</h3><p>Add your logo, description, and city. Coming next.</p></div>
+    <div class="step"><h3>Add your products</h3><p>Upload up to 5 photos per product and set your prices. Coming next.</p></div>
+    <div class="step"><h3>Share your link</h3><p>Copy your store link above and put it in your WhatsApp status and Instagram bio.</p></div>
+  </div>
+  <div class="done-actions" style="margin-top:2.5rem">
+    <button class="btn btn-ghost" type="button" id="out">Log out</button>
+    <a class="btn btn-ghost" href="contact.html">Need help?</a>
+  </div>
+</div></section>
+</main>
+<footer>
+  <div class="wrap">
+    <span>© <span id="yr">2026</span> ShopLink NG. Made in Nigeria.</span>
+    <nav aria-label="Footer"><a href="about.html">About</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav>
+  </div>
+</footer>
+<script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script>
+var SUPABASE_URL = "https://grrotfpoalxvkkrkgzpg.supabase.co", SUPABASE_KEY = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+  if (!sb) { $("title").textContent = "Could not load. Please refresh the page."; return; }
+
+  $("out").addEventListener("click", function () {
+    sb.auth.signOut().then(function () { location.href = "index.html"; });
+  });
+
+  function render(vendor, billing) {
+    var url = "shoplink.ng/" + vendor.slug;
+    $("title").textContent = vendor.store_name;
+    $("url").textContent = url;
+    var status = billing ? billing.subscription_status : "trialing";
+    var days = billing ? Math.max(0, Math.ceil((new Date(billing.trial_ends_at).getTime() - Date.now()) / 86400000)) : 30;
+    var b = $("badge");
+    if (status === "active") { b.textContent = "Active"; b.className = "badge ok"; }
+    else if (status === "past_due") { b.textContent = "Payment needed"; b.className = "badge warn"; }
+    else if (status === "expired" || days === 0) { b.textContent = "Trial ended"; b.className = "badge warn"; }
+    else { b.textContent = "Free trial: " + days + " day" + (days === 1 ? "" : "s") + " left"; b.className = "badge"; }
+    if (new URLSearchParams(location.search).get("welcome")) $("welcome").hidden = false;
+    $("copy").addEventListener("click", function () {
+      var btn = this;
+      (navigator.clipboard ? navigator.clipboard.writeText("https://" + url) : Promise.reject())
+        .then(function () { btn.textContent = "Copied"; }, function () { btn.textContent = "Copy not available"; });
+    });
+    $("app").hidden = false;
+  }
+
+  sb.auth.getSession().then(function (r) {
+    var session = r.data && r.data.session;
+    if (!session) { location.replace("login.html?next=dashboard.html"); return; }
+    return sb.from("vendors").select("id,store_name,slug").eq("owner_id", session.user.id).maybeSingle().then(function (v) {
+      if (v.error || !v.data) {
+        $("title").textContent = "We could not find your store";
+        $("sub").textContent = "Please message us on WhatsApp and we will fix it quickly.";
+        return;
+      }
+      return sb.from("vendor_billing").select("trial_ends_at,subscription_status").eq("vendor_id", v.data.id).maybeSingle()
+        .then(function (b) { render(v.data, b.data); });
+    });
+  }).catch(function () { $("title").textContent = "Network problem. Please refresh the page."; });
+})();
+</script>
+</body>
+</html>

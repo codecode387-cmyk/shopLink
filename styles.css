@@ -31,7 +31,21 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper
 .btn-ghost{border-color:var(--ink);color:var(--ink);background:transparent}
 .btn-ghost:hover{background:var(--ink);color:var(--paper)}
 .btn-sm{padding:.55rem 1.1rem;font-size:.92rem}
-@media(max-width:720px){.nav{height:auto;padding:.6rem 0;flex-wrap:wrap;row-gap:.3rem}.links{width:100%;justify-content:space-between;gap:.8rem;font-size:.92rem}}
+.menu-btn{display:none;width:44px;height:44px;border:0;background:transparent;cursor:pointer;border-radius:12px;position:relative}
+.menu-btn span,.menu-btn span::before,.menu-btn span::after{content:"";position:absolute;width:22px;height:2.5px;border-radius:2px;background:var(--ink);transition:transform .25s,top .25s,background .2s}
+.menu-btn span{top:21px;left:11px}
+.menu-btn span::before{top:-7px;left:0}
+.menu-btn span::after{top:7px;left:0}
+.nav.open .menu-btn span{background:transparent}
+.nav.open .menu-btn span::before{top:0;transform:rotate(45deg)}
+.nav.open .menu-btn span::after{top:0;transform:rotate(-45deg)}
+@media(max-width:720px){
+  .menu-btn{display:block}
+  .links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:var(--paper);border-bottom:1px solid var(--line);padding:.4rem 4% 1.3rem;box-shadow:0 24px 30px -22px rgba(16,35,27,.4)}
+  .nav.open .links{display:flex}
+  .links a:not(.btn){padding:.95rem .2rem;font-size:1.1rem;border-bottom:1px solid var(--line)}
+  .links .btn{margin-top:1.1rem;padding:.95rem}
+}
 
 /* hero */
 .hero{padding:clamp(2.5rem,7vw,5.5rem) 0 clamp(3rem,7vw,5rem);overflow:hidden}
@@ -135,9 +149,6 @@ th{font:700 1rem var(--display)}
 th.us,td.us{background:color-mix(in srgb,var(--wa) 16%,transparent);font-weight:700}
 .fit{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 @media(max-width:720px){.fit{grid-template-columns:1fr}}
-.reviews{column-count:3;column-gap:1.2rem}
-@media(max-width:960px){.reviews{column-count:2}}
-@media(max-width:620px){.reviews{column-count:1}}
 .review{break-inside:avoid;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:1.4rem;margin-bottom:1.2rem}
 .stars{color:#e8a800;letter-spacing:2px;font-size:1.05rem}
 .review p{margin:.6rem 0 1rem}
@@ -145,3 +156,17 @@ th.us,td.us{background:color-mix(in srgb,var(--wa) 16%,transparent);font-weight:
 .who .av{width:40px;height:40px;font-size:.95rem;flex:none}
 .who b{display:block;line-height:1.2}
 .who small{color:var(--muted)}
+
+/* animated reviews */
+.marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.marquee+.marquee{margin-top:1.2rem}
+.track{display:flex;gap:1.2rem;width:max-content;animation:slide 50s linear infinite}
+.marquee.rev .track{animation-direction:reverse;animation-duration:58s}
+.marquee:hover .track{animation-play-state:paused}
+@keyframes slide{to{transform:translateX(calc(-50% - .6rem))}}
+.marquee .review{width:min(330px,80vw);flex:none;margin:0}
+@media(prefers-reduced-motion:reduce){
+  .marquee{-webkit-mask-image:none;mask-image:none}
+  .track{animation:none;width:auto;flex-wrap:wrap;justify-content:center}
+  .track .dup{display:none}
+}

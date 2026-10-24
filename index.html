@@ -8,120 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --ink:#10231b; --leaf:#1b7a4b; --wa:#25d366; --sun:#ffc83d; --paper:#f3f7f1; --white:#fff; --muted:#52645a; --line:#d9e4d9;
-  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
-  --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--ink:#eaf3ec;--paper:#0c1812;--white:#13251c;--muted:#9bb3a5;--line:#244034;--leaf:#3fc07e}
-}
-*{box-sizing:border-box;margin:0}
-html{scroll-behavior:smooth;scroll-padding-top:72px}
-body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.6;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);-webkit-font-smoothing:antialiased}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:6px}
-.wrap{width:min(1120px,92%);margin-inline:auto}
-h1,h2,h3{font-family:var(--display);line-height:1.05;letter-spacing:-.02em}
-
-/* nav */
-header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
-.logo{font-family:var(--display);font-weight:800;font-size:1.35rem;text-decoration:none;display:flex;align-items:center;gap:.5rem}
-.logo i{width:30px;height:30px;border-radius:9px;background:var(--wa);display:grid;place-items:center}
-.logo i svg{width:18px;height:18px}
-.logo small{font-size:.7rem;font-weight:700;background:var(--sun);color:#10231b;padding:2px 6px;border-radius:6px}
-.links{display:flex;align-items:center;gap:1.5rem;font-weight:500}
-.links a{text-decoration:none;color:var(--muted)}
-.links a:hover{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font:700 1rem var(--body);padding:.85rem 1.4rem;border-radius:999px;border:2px solid transparent;text-decoration:none;cursor:pointer;transition:transform .15s,background .15s}
-.btn:active{transform:scale(.97)}
-.btn-main{background:var(--wa);color:#06210f}
-.btn-main:hover{background:#3be37a}
-.btn-ghost{border-color:var(--ink);color:var(--ink);background:transparent}
-.btn-ghost:hover{background:var(--ink);color:var(--paper)}
-.btn-sm{padding:.55rem 1.1rem;font-size:.92rem}
-@media(max-width:720px){.links a:not(.btn){display:none}}
-
-/* hero */
-.hero{padding:clamp(2.5rem,7vw,5.5rem) 0 clamp(3rem,7vw,5rem);overflow:hidden}
-.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center}
-.hero h1{font-size:clamp(2.6rem,6.4vw,5.1rem);font-weight:800}
-.hero h1 span{display:block;color:var(--leaf)}
-.hero p.lead{font-size:1.2rem;color:var(--muted);max-width:34ch;margin:1.4rem 0 2rem}
-.cta{display:flex;flex-wrap:wrap;gap:.8rem}
-.proof{display:flex;gap:1.6rem;margin-top:2.2rem;color:var(--muted);font-size:.95rem;flex-wrap:wrap}
-.proof b{color:var(--ink)}
-@media(max-width:860px){.hero .wrap{grid-template-columns:1fr}}
-
-/* phone demo */
-.stage{position:relative;display:grid;place-items:center;min-height:540px}
-.stage::before{content:"";position:absolute;width:min(420px,90%);aspect-ratio:1;border-radius:46% 54% 50% 50%/55% 45% 55% 45%;background:var(--sun);transform:rotate(-8deg)}
-.phone{position:relative;width:min(300px,78vw);background:#0b1510;border-radius:38px;padding:10px;box-shadow:0 30px 60px -20px rgba(16,35,27,.55);transform:rotate(3deg)}
-.screen{background:#e7ddd0;border-radius:29px;overflow:hidden;height:500px;display:flex;flex-direction:column}
-.chat-top{background:#075e54;color:#fff;padding:.9rem 1rem;display:flex;align-items:center;gap:.7rem}
-.av{width:36px;height:36px;border-radius:50%;background:var(--sun);color:#10231b;font:800 .95rem var(--display);display:grid;place-items:center}
-.chat-top b{display:block;font-size:.95rem;line-height:1.2}
-.chat-top span{font-size:.72rem;opacity:.8}
-.chat{flex:1;padding:1rem .8rem;display:flex;flex-direction:column;justify-content:flex-end;gap:.5rem}
-.bubble{align-self:flex-end;background:#d9fdd3;color:#10231b;border-radius:12px 12px 2px 12px;padding:.6rem .75rem;font-size:.8rem;line-height:1.45;max-width:92%;box-shadow:0 1px 1px rgba(0,0,0,.12)}
-.bubble div{opacity:0;transform:translateY(4px)}
-.bubble div.on{opacity:1;transform:none;transition:opacity .35s,transform .35s}
-.bubble .tot{font-weight:700;margin-top:.2rem}
-.bubble .tick{text-align:right;font-size:.65rem;color:#53bdeb;margin-top:.2rem}
-.reply{align-self:flex-start;background:#fff;border-radius:12px 12px 12px 2px;padding:.5rem .75rem;font-size:.8rem;box-shadow:0 1px 1px rgba(0,0,0,.12);opacity:0;transition:opacity .4s}
-.reply.on{opacity:1}
-.input{background:#f0f0f0;padding:.6rem .8rem;font-size:.75rem;color:#777;display:flex;justify-content:space-between}
-.pill{position:absolute;left:-6px;bottom:70px;background:var(--ink);color:var(--paper);font-weight:700;font-size:.85rem;padding:.55rem .9rem;border-radius:14px;transform:rotate(-4deg);box-shadow:0 10px 24px -8px rgba(0,0,0,.4)}
-@media(prefers-reduced-motion:reduce){.bubble div,.reply{opacity:1;transform:none;transition:none}}
-
-/* sections */
-section{padding:clamp(3.5rem,8vw,6rem) 0}
-.sec-head{max-width:36rem;margin-bottom:2.6rem}
-.sec-head h2{font-size:clamp(2rem,4.4vw,3.2rem);font-weight:800}
-.sec-head p{color:var(--muted);margin-top:.8rem;font-size:1.1rem}
-
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;counter-reset:s}
-.step{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:1.8rem;counter-increment:s}
-.step:nth-child(2){border-radius:22px 22px 22px 60px}
-.step:nth-child(3){border-radius:22px 60px 22px 22px}
-.step::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--sun);color:#10231b;font:800 1.2rem var(--display);margin-bottom:1.2rem}
-.step h3{font-size:1.5rem;margin-bottom:.5rem}
-.step p{color:var(--muted)}
-@media(max-width:820px){.steps{grid-template-columns:1fr}}
-
-.why{background:var(--ink);color:#eaf3ec}
-.why .sec-head p{color:#a9c2b3}
-.why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 3rem}
-.why-item{padding:1.5rem 0;border-top:1px solid #2f4b3d}
-.why-item h3{font-size:1.4rem;margin-bottom:.4rem;color:var(--sun)}
-.why-item p{color:#a9c2b3}
-@media(max-width:720px){.why-grid{grid-template-columns:1fr}}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .why{background:#07110c}}
-
-.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem}
-.store{display:flex;flex-direction:column;gap:.8rem;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:1.3rem;text-decoration:none;transition:border-color .15s,transform .15s}
-.store:hover{border-color:var(--leaf);transform:translateY(-3px)}
-.store .row{display:flex;align-items:center;gap:.8rem}
-.store .av{width:48px;height:48px;font-size:1.1rem;flex:none;overflow:hidden}
-.store .av img{width:100%;height:100%;object-fit:cover}
-.store h3{font-size:1.15rem;letter-spacing:-.01em}
-.store small{color:var(--muted)}
-.store p{color:var(--muted);font-size:.95rem}
-.store .go{margin-top:auto;font-weight:700;color:var(--leaf)}
-.note{margin-top:1.4rem;color:var(--muted);font-size:.92rem}
-
-.final{background:var(--wa);color:#06210f;border-radius:34px;padding:clamp(2.2rem,6vw,4.5rem);text-align:center}
-.final h2{font-size:clamp(2rem,5vw,3.6rem);font-weight:800;max-width:16ch;margin:0 auto 1rem}
-.final p{max-width:34rem;margin:0 auto 2rem;font-size:1.1rem}
-.final .btn{background:#06210f;color:#fff}
-.final .btn:hover{background:#10231b}
-
-footer{padding:2.5rem 0 3rem;border-top:1px solid var(--line);color:var(--muted);font-size:.95rem}
-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem}
-footer nav{display:flex;gap:1.4rem}
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -132,9 +19,8 @@ footer nav{display:flex;gap:1.4rem}
       ShopLink <small>NG</small>
     </a>
     <nav class="links" aria-label="Main">
-      <a href="#how">How it works</a>
-      <a href="#why">Why ShopLink</a>
-      <a href="#stores">Stores</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="why-shoplink.html">Why ShopLink</a>
       <a class="btn btn-main btn-sm" href="/signup">Create your store</a>
     </nav>
   </div>
@@ -148,7 +34,7 @@ footer nav{display:flex;gap:1.4rem}
       <p class="lead">Add your products, share your store link, and get every order in your WhatsApp. Free to start, with no monthly fees.</p>
       <div class="cta">
         <a class="btn btn-main" href="/signup">Create your free store</a>
-        <a class="btn btn-ghost" href="#stores">Browse stores</a>
+        <a class="btn btn-ghost" href="how-it-works.html">See how it works</a>
       </div>
       <div class="proof">
         <span><b>₦0</b> monthly fee</span>
@@ -186,6 +72,7 @@ footer nav{display:flex;gap:1.4rem}
     <div class="sec-head">
       <h2>Set up in the time it takes to boil rice</h2>
       <p>No website skills, no card payments to configure, no developer.</p>
+      <a class="more" href="how-it-works.html">See the full guide for vendors and buyers</a>
     </div>
     <div class="steps">
       <div class="step"><h3>Add your products</h3><p>Upload a photo, set a price, and mark what is in stock. Do it all from your phone.</p></div>
@@ -200,6 +87,7 @@ footer nav{display:flex;gap:1.4rem}
     <div class="sec-head">
       <h2>Built for sellers who cannot afford monthly bills</h2>
       <p>Most store builders charge every month before you make a sale. We do not.</p>
+      <a class="more" href="why-shoplink.html">See all the reasons</a>
     </div>
     <div class="why-grid">
       <div class="why-item"><h3>Free to start</h3><p>List your first products and open your store without paying anything.</p></div>
@@ -210,14 +98,65 @@ footer nav{display:flex;gap:1.4rem}
   </div>
 </section>
 
-<section id="stores">
+<!-- SAMPLE REVIEWS: replace with real customer reviews before launch -->
+<section id="reviews">
   <div class="wrap">
     <div class="sec-head">
-      <h2>Shops on ShopLink</h2>
-      <p>Visit a store and see how ordering works.</p>
+      <h2>What vendors and buyers say</h2>
+      <p>Small sellers and their customers on how ordering through WhatsApp feels.</p>
     </div>
-    <div class="stores" id="storeGrid"></div>
-    <p class="note" id="storeNote"></p>
+    <div class="reviews">
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I used to pay a developer every month just to keep my shop online. Now my orders come straight to WhatsApp and I pay nothing.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">NO</div><div><b>Ngozi Okafor</b><small>Bag seller, Lagos</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“My customers can see every product and price before they message me. I answer far fewer “how much is this?” chats.”</p>
+        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">KA</div><div><b>Kemi Adeyemi</b><small>Food supplier, Ibadan</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I set up my store on my phone while waiting for a customer. It took less than ten minutes.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">TB</div><div><b>Tunde Bakare</b><small>Thrift seller, Abuja</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“No more sending product screenshots one by one. I send my link and people pick what they want.”</p>
+        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">AY</div><div><b>Amina Yusuf</b><small>Beauty products, Kano</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I picked three items, tapped send, and my order was already written out in WhatsApp. No account, no stress.”</p>
+        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">CE</div><div><b>Chiamaka Eze</b><small>Buyer, Enugu</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
+        <p>“The message arrives with the customer’s name and address, so I do not have to ask twice.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">BS</div><div><b>Bola Salami</b><small>Caterer, Abeokuta</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“The store opened fast even on my small phone with bad network.”</p>
+        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">IM</div><div><b>Ibrahim Musa</b><small>Buyer, Kaduna</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
+        <p>“I would like to pay inside the app, but paying the seller directly is how I already do it, so it works for me.”</p>
+        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">FJ</div><div><b>Folake Johnson</b><small>Buyer, Port Harcourt</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I put the link in my Instagram bio and people now order without DMing me five times.”</p>
+        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">SW</div><div><b>Sade Williams</b><small>Hair vendor, Lagos</small></div></figcaption>
+      </figure>
+      <figure class="review" style="margin-inline:0">
+        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p>“I sell snacks to students and could not afford a monthly plan. This is the first one that fits my budget.”</p>
+        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">EN</div><div><b>Emeka Nwosu</b><small>Snack seller, Nsukka</small></div></figcaption>
+      </figure>
+    </div>
   </div>
 </section>
 
@@ -251,47 +190,6 @@ document.getElementById("yr").textContent = new Date().getFullYear();
   setTimeout(()=>reply.classList.add("on"), 700 + lines.length*650 + 500);
 })();
 
-/* Featured stores from Supabase (falls back to samples) */
-const SUPABASE_URL = "https://grrotfpoalxvkkrkgzpg.supabase.co";
-const SUPABASE_KEY = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
-
-const SAMPLES = [
-  {store_name:"Mama Ngozi Bags", slug:"mama-ngozi", description:"Ankara tote bags, purses, and beaded accessories.", city:"Lagos"},
-  {store_name:"Kemi Fresh Foods", slug:"kemi-fresh", description:"Fresh peppers, tomatoes, and farm produce delivered.", city:"Ibadan"},
-  {store_name:"Tunde Thrift", slug:"tunde-thrift", description:"Clean, affordable thrift wears for men and women.", city:"Abuja"},
-  {store_name:"Amina Beauty Hub", slug:"amina-beauty", description:"Skincare, hair oils, and fragrance oils.", city:"Kano"}
-];
-
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const initials = n => n.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
-const tints = ["#ffc83d","#7be0a4","#ffb29a","#a9d4ff","#e4c1ff"];
-
-function render(list, isSample){
-  const grid = document.getElementById("storeGrid");
-  grid.innerHTML = list.map((v,i)=>`
-    <a class="store" href="/${encodeURIComponent(v.slug)}">
-      <div class="row">
-        <div class="av" style="background:${tints[i%tints.length]}">${v.logo_url ? `<img src="${esc(v.logo_url)}" alt="">` : esc(initials(v.store_name))}</div>
-        <div><h3>${esc(v.store_name)}</h3><small>${esc(v.city || "Nigeria")}</small></div>
-      </div>
-      <p>${esc(v.description || "")}</p>
-      <span class="go">Visit store</span>
-    </a>`).join("");
-  document.getElementById("storeNote").textContent = isSample ? "These are sample stores. Real vendors will appear here once they sign up." : "";
-}
-
-async function loadStores(){
-  render(SAMPLES, true);
-  try{
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vendors?select=store_name,slug,description,city,logo_url&is_active=eq.true&order=created_at.desc&limit=8`, {
-      headers:{ apikey: SUPABASE_KEY }
-    });
-    if(!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    if(Array.isArray(data) && data.length) render(data, false);
-  }catch(e){ /* keep samples if table is missing or offline */ }
-}
-loadStores();
 </script>
 </body>
 </html>

@@ -186,3 +186,25 @@ th.us,td.us{background:color-mix(in srgb,var(--wa) 16%,transparent);font-weight:
 .field textarea{min-height:120px;resize:vertical}
 .prose{max-width:40rem;font-size:1.1rem}
 .prose p+p{margin-top:1rem}
+
+/* signup */
+.auth{display:grid;grid-template-columns:1.15fr .85fr;gap:2rem;align-items:start}
+@media(max-width:860px){.auth{grid-template-columns:1fr}}
+.slug{display:flex;align-items:stretch;margin-top:.4rem;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.slug .pre{display:grid;place-items:center;padding:0 .8rem;background:var(--line);font-weight:500;color:var(--muted);white-space:nowrap}
+.field .slug input{margin:0;border:0;border-radius:0;background:transparent;min-width:0}
+.hint{display:block;font-weight:400;color:var(--muted);margin-top:.35rem;min-height:1.2em}
+.hint.ok{color:var(--leaf)}
+.hint.bad,.msg{color:#e0533f}
+.msg{margin-top:1rem;font-weight:700}
+.check{display:flex;gap:.6rem;align-items:flex-start;margin-top:1rem;font-size:.95rem}
+.check input{margin-top:.2rem;width:18px;height:18px;flex:none;accent-color:var(--leaf)}
+.check a,.alt-link a{color:var(--leaf);font-weight:700}
+.alt-link{text-align:center;margin-top:1rem;color:var(--muted)}
+.side{background:#10231b;color:#eaf3ec;border-radius:22px;padding:2rem}
+.side h2{font-size:1.6rem;color:var(--sun);margin-bottom:.4rem}
+.side ul{padding:0}
+.side li{list-style:none;margin-top:.9rem;padding-left:1.7rem;position:relative}
+.side li::before{content:"✓";position:absolute;left:0;color:var(--wa);font-weight:800}
+.done-url{font:800 clamp(1.3rem,4vw,1.8rem) var(--display);word-break:break-all;margin:.8rem 0 1.2rem}
+.done-actions{display:flex;flex-wrap:wrap;gap:.8rem}

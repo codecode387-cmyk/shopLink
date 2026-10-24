@@ -1,0 +1,42 @@
+
+
+export const metadata = { title: "Privacy policy", description: "How ShopLink NG collects, uses, and protects your personal information." };
+
+export default function Page() {
+  return (
+    <>
+
+<section className="page-hero"><div className="wrap"><h1>Privacy policy</h1><p className="lead">How ShopLink NG collects, uses, and protects personal information.</p><p className="updated">Last updated: 24 October 2026</p></div></section>
+<section style={{ paddingTop: "1rem" }}><div className="wrap"><div className="legal">
+<h2>1. Who we are</h2>
+<p>ShopLink NG is a Nigerian platform that helps vendors receive orders on WhatsApp. We aim to handle personal data in line with the Nigeria Data Protection Act 2023. You can reach us on <a href="https://wa.me/2349032473005" rel="noopener">WhatsApp 0903 247 3005</a>.</p>
+<h2>2. What we collect</h2>
+<p><b>Vendors:</b></p>
+<ul><li>Your name, store name, WhatsApp number, and email address.</li><li>Your login details. Passwords are handled by our authentication provider and are not visible to us.</li><li>Products you add, including photos, prices, and descriptions.</li><li>Basic technical data such as browser type, device, and IP address, which help us keep the service secure.</li></ul>
+<p><b>Buyers:</b></p>
+<p>You do not need an account. When you place an order, the name, phone number, delivery address, and note you enter are written into a WhatsApp message that you send to the vendor. If a store uses order history, those order details may also be saved so the vendor can see them.</p>
+<h2>3. How we use it</h2>
+<ul><li>To run stores and deliver orders to vendors’ WhatsApp.</li><li>To keep the platform secure and prevent fraud or abuse.</li><li>To reply to your messages and give support.</li><li>To improve how ShopLink NG works.</li></ul>
+<h2>4. Who sees your information</h2>
+<ul><li><b>Vendors</b> see the details a buyer puts in an order.</li><li><b>Service providers</b> that host our website, database, and files, such as Supabase and our web host, process data for us under their own security terms.</li><li><b>WhatsApp</b> (Meta) handles messages you send. Its own privacy policy applies to those chats.</li><li>We may share information if the law requires it.</li></ul>
+<p>We do not sell personal data.</p>
+<h2>5. How we protect it</h2>
+<p>We use trusted providers and sensible security measures such as encrypted connections and access controls. No system is completely secure, so we cannot promise absolute safety.</p>
+<h2>6. How long we keep it</h2>
+<p>We keep vendor account data while the account is active and for as long as needed afterwards for legal or security reasons. You can ask us to delete your account and data.</p>
+<h2>7. Your rights</h2>
+<p>You can ask to see the personal data we hold about you, correct it, delete it, or object to how we use it. Message us on WhatsApp and we will respond. You also have the right to complain to the Nigeria Data Protection Commission.</p>
+<h2>8. Cookies and storage</h2>
+<p>We use only the storage needed to keep you logged in and the site secure. If we add analytics or advertising tools, we will update this policy first.</p>
+<h2>9. Children</h2>
+<p>ShopLink NG is not meant for anyone under 18, and we do not knowingly collect data from children.</p>
+<h2>10. Changes to this policy</h2>
+<p>When we change this policy we will update the date at the top of the page.</p>
+<h2>11. Contact</h2>
+<p>Privacy questions or requests: <a href="https://wa.me/2349032473005" rel="noopener">WhatsApp 0903 247 3005</a>.</p>
+</div></div></section>
+
+
+    </>
+  );
+}

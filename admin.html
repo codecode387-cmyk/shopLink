@@ -9,17 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<style>
-.adm{max-width:960px;margin:0 auto;padding:1rem 0 3rem}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin:1rem 0}
-.stats div{border:1px solid #0001;border-radius:14px;padding:1rem}
-.stats strong{display:block;font:800 1.8rem/1.1 "Bricolage Grotesque",sans-serif}
-.stats span{color:var(--muted);font-size:.9rem}
-.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}
-th,td{text-align:left;padding:.6rem .5rem;border-bottom:1px solid #0001;font-size:.95rem}
-.tag{font-weight:700}.tag.ok{color:#0b5a26}.tag.bad{color:#9b1c1c}
-#q{max-width:320px;margin:.5rem 0}
-</style>
 </head>
 <body>
 <header><div class="wrap nav"><a class="logo" href="index.html">ShopLink <small>NG</small></a>
@@ -28,8 +17,8 @@ th,td{text-align:left;padding:.6rem .5rem;border-bottom:1px solid #0001;font-siz
   <h1>Admin</h1>
   <p class="msg" id="msg" role="alert"></p>
   <div class="stats" id="stats"></div>
-  <label class="field" style="max-width:320px">Search stores<input id="q" placeholder="Store name, link or number"></label>
-  <div class="tw"><table>
+  <label class="field search">Search stores<input id="q" placeholder="Store name, link or number"></label>
+  <div class="table-wrap"><table>
     <thead><tr><th>Store</th><th>WhatsApp</th><th>Joined</th><th>Paid until</th><th>Status</th></tr></thead>
     <tbody id="rows"></tbody>
   </table></div>

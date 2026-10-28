@@ -80,7 +80,10 @@
 
   function loadStats() {
     return sb.rpc("admin_stats").then(function (r) {
-      if (r.error) { location.href = "dashboard.html"; return false; }
+      if (r.error) {
+        if ((r.error.message || "").indexOf("not allowed") > -1) { location.href = "dashboard.html"; return false; }
+        say("msg", "Admin data could not load: " + (r.error.message || "unknown error") + ". Run setup.sql, setup-2.sql and setup-3.sql in order."); return false;
+      }
       var d = r.data;
       $("k1").innerHTML = kpi("Total users", num(d.total)) + kpi("Stores open", num(d.active)) + kpi("Stores closed", num(d.closed)) + kpi("Revenue", "₦" + num(d.revenue));
       $("k2").innerHTML = kpi("Visitors today", num(d.visits_today)) + kpi("Store visits, 30 days", num(d.store_30)) + kpi("Site visits, 30 days", num(d.site_30)) + kpi("New users this month", num(d.new_month)) + kpi("Stores live", num(d.live)) + kpi("Products listed", num(d.products));

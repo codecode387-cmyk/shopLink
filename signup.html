@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Create your free store – ShopLink NG</title>
-<meta name="description" content="Open a free ShopLink NG store in two minutes and receive orders on WhatsApp.">
+<meta name="description" content="Open a ShopLink NG store in two minutes and receive orders on WhatsApp.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -29,8 +29,8 @@
 </header>
 <main>
 <section class="page-hero"><div class="wrap">
-  <h1>Create your free store</h1>
-  <p class="lead">Takes about two minutes. No card and no monthly fee.</p>
+  <h1>Create your store</h1>
+  <p class="lead">Takes about two minutes. Your first 30 days are free.</p>
 </div></section>
 <section style="padding-top:1rem"><div class="wrap auth">
   <form class="card" id="f" novalidate>
@@ -49,23 +49,13 @@
     <p class="alt-link">Already have a store? <a href="login.html">Log in</a></p>
   </form>
 
-  <div class="card" id="done" hidden>
-    <h2>Your store is ready</h2>
-    <p style="color:var(--muted);margin-top:.4rem">Your store link is:</p>
-    <div class="done-url" id="doneUrl"></div>
-    <div class="done-actions">
-      <a class="btn btn-main" href="dashboard.html">Go to my dashboard</a>
-      <button class="btn btn-ghost" type="button" id="copy">Copy my link</button>
-    </div>
-  </div>
-
   <aside class="side">
     <h2>What you get</h2>
     <ul>
-      <li>Your own store link to share anywhere</li>
+      <li>Your own dashboard to manage your store</li>
       <li>Add products with photos and prices in naira</li>
       <li>Every order sent to your WhatsApp</li>
-      <li>No monthly fee and no cut of your sales</li>
+      <li>30 days free, then ₦1,000 a month</li>
     </ul>
   </aside>
 </div></section>
@@ -139,17 +129,6 @@
     return e.message || "Something went wrong. Please try again.";
   }
 
-  function showDone(slug) {
-    var url = "shoplink.ng/" + slug;
-    $("doneUrl").textContent = url;
-    $("f").hidden = true; $("done").hidden = false;
-    $("copy").onclick = function () {
-      var b = this;
-      (navigator.clipboard ? navigator.clipboard.writeText("https://" + url) : Promise.reject())
-        .then(function () { b.textContent = "Copied"; }, function () { b.textContent = "Copy not available"; });
-    };
-  }
-
   $("f").addEventListener("submit", function (e) {
     e.preventDefault(); $("msg").textContent = "";
     var store = $("store").value.trim(), slug = $("slug").value, wa = normPhone($("wa").value),
@@ -166,8 +145,7 @@
       .then(function (r) {
         if (r.error) { busy(false); return fail(friendly(r.error)); }
         if (!r.data.session) { busy(false); return fail("Account created, but email confirmation is still on in Supabase. Turn it off under Authentication settings, then log in."); }
-        return sb.from("vendors").select("slug").eq("owner_id", r.data.user.id).maybeSingle()
-          .then(function (q) { showDone((q.data && q.data.slug) || slug); });
+        location.href = "dashboard.html";
       })
       .catch(function () { busy(false); fail("Network problem. Check your connection and try again."); });
   });

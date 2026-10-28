@@ -8,18 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<style>
-.dash{display:grid;gap:1rem;max-width:760px;margin:0 auto;padding:1rem 0 3rem}
-.dash .card{margin:0}
-.status{padding:.8rem 1rem;border-radius:12px;font-weight:700}
-.status.ok{background:#e7f7ec;color:#0b5a26}.status.bad{background:#fdecec;color:#9b1c1c}
-.row{display:flex;gap:.6rem;flex-wrap:wrap}.row>*{flex:1 1 140px}
-.plist{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem}
-.plist li{display:flex;gap:.8rem;align-items:center;border:1px solid #0001;border-radius:12px;padding:.5rem}
-.plist img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#0001}
-.plist .grow{flex:1;min-width:0}.plist b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.linkbox{word-break:break-all;font-weight:700}
-</style>
 <script src="menu.js" defer></script>
 </head>
 <body>
@@ -40,7 +28,7 @@
 
   <section class="card">
     <h2>Pay for your store</h2>
-    <p style="color:var(--muted)">₦1,000 a month. Each payment adds 30 days. If your time runs out, your store shows "Store closed" until you pay again.</p>
+    <p class="sub">₦1,000 a month. Each payment adds 30 days. If your time runs out, your store shows "Store closed" until you pay again.</p>
     <button class="btn btn-main" id="pay" type="button" style="margin-top:.8rem">Pay ₦1,000</button>
     <p class="msg" id="payMsg" role="alert"></p>
   </section>
@@ -113,7 +101,7 @@
         };
         ul.appendChild(li);
       });
-      if (!ul.children.length) ul.innerHTML = '<li style="color:var(--muted)">No products yet. Add your first one above.</li>';
+      if (!ul.children.length) ul.innerHTML = '<li class="empty">No products yet. Add your first one above.</li>';
     });
   }
 

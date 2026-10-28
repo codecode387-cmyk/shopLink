@@ -294,3 +294,23 @@ body.app{--g:#1b7a4b;--ink:#14231b;--mut:#64748b;--line:#e5e9ee;--bg:#f6f8fa;--r
   .app .content{padding:1rem}
   .app .two{grid-template-columns:1fr}
 }
+
+/* ---- Dashboard + admin extras (notifications, admin) ---- */
+.app [hidden]{display:none!important}
+.app .badge{margin-left:auto;background:var(--red);color:#fff;border-radius:999px;font-size:.72rem;font-weight:700;padding:1px 8px}
+.app .note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--g);border-radius:12px;padding:1rem 1.1rem;margin-bottom:.8rem}
+.app .note h3{font-size:1.05rem;margin-bottom:.2rem}
+.app .note p{white-space:pre-line}
+.app .note small{display:block;color:var(--mut);margin-top:.4rem}
+.app .note.new{background:#f2fbf6}
+.app .pill{display:inline-block;padding:.15rem .65rem;border-radius:999px;font-size:.78rem;font-weight:700}
+.app .pill.ok{background:#e8f6ee;color:#0f5a32}.app .pill.wait{background:#fff7e0;color:#7a5a00}.app .pill.bad{background:#fdecea;color:#9b2318}
+.app .bars2{display:flex;align-items:flex-end;gap:3px;height:170px;margin-top:1rem}
+.app .bars2 div{flex:1;display:flex;align-items:flex-end;gap:1px;height:100%}
+.app .bars2 i{flex:1;border-radius:3px 3px 0 0;min-height:2px}
+.app .bars2 i.a{background:var(--g)}.app .bars2 i.b{background:#ffc83d}
+.app .legend{display:flex;gap:1.2rem;margin-top:.6rem;color:var(--mut);font-size:.85rem}
+.app .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.4rem;background:var(--g)}
+.app .legend span+span::before{background:#ffc83d}
+.app .grid.four{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.app .tip{font-size:.85rem;color:var(--mut);margin-top:.4rem}

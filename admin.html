@@ -7,53 +7,135 @@
 <title>Admin – ShopLink NG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<header><div class="wrap nav"><a class="logo" href="index.html">ShopLink <small>NG</small></a>
-<nav class="links"><a href="dashboard.html">My dashboard</a><a href="#" id="out">Log out</a></nav></div></header>
-<main><div class="wrap adm">
-  <h1>Admin</h1>
-  <p class="msg" id="msg" role="alert"></p>
-  <div class="stats" id="stats"></div>
-  <label class="field search">Search stores<input id="q" placeholder="Store name, link or number"></label>
-  <div class="table-wrap"><table>
-    <thead><tr><th>Store</th><th>WhatsApp</th><th>Joined</th><th>Paid until</th><th>Status</th></tr></thead>
-    <tbody id="rows"></tbody>
-  </table></div>
-</div></main>
+<body class="app">
+<aside class="side">
+  <a class="brand" href="index.html">ShopLink<small>Admin</small></a>
+  <button data-v="overview" class="on">Overview</button>
+  <button data-v="users">Users</button>
+  <button data-v="news">Announcements</button>
+  <span class="sp"></span>
+  <a class="nv" href="dashboard.html">My dashboard</a>
+  <a class="nv" href="#" id="out">Log out</a>
+</aside>
+<div class="main">
+  <div class="top"><h1 id="title">Overview</h1><span class="sub" id="stamp"></span></div>
+  <div class="content">
+    <p class="msg" id="msg" role="alert"></p>
+
+    <section class="view on" id="v-overview">
+      <div class="grid four" id="k1"></div>
+      <div class="grid four" id="k2"></div>
+      <div class="card">
+        <h2>Visitors, last 30 days</h2><p class="sub">Store visits are shoppers opening a vendor store. Site visits are people opening your public pages.</p>
+        <div class="bars2" id="bars" aria-label="Visitors per day"></div>
+        <div class="axis"><span>30 days ago</span><span>Today</span></div>
+        <div class="legend"><span>Store visits</span><span>Site visits</span></div>
+      </div>
+      <div class="card"><h2>Most visited stores</h2><p class="sub">Last 30 days</p>
+        <div class="tw"><table><thead><tr><th>Store</th><th>Visits</th></tr></thead><tbody id="top"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-users">
+      <div class="card">
+        <label class="f" style="max-width:340px;margin:0 0 1rem">Search users<input id="q" placeholder="Store name, email, link or number"></label>
+        <div class="tw"><table style="min-width:860px"><thead><tr><th>Store</th><th>Email</th><th>WhatsApp</th><th>Joined</th><th>Products</th><th>Visits (30d)</th><th>Paid until</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-news">
+      <form class="card" id="nf" novalidate>
+        <h2>Post an announcement</h2><p class="sub">Every vendor sees it in Notifications on their dashboard.</p>
+        <label class="f">Title<input id="n_title" maxlength="80" placeholder="Scheduled maintenance on Friday"></label>
+        <label class="f">Message<textarea id="n_body" rows="4" maxlength="600"></textarea></label>
+        <p class="msg" id="nMsg" role="alert"></p>
+        <button class="btn p" type="submit">Post announcement</button>
+      </form>
+      <div class="card"><h2>Posted announcements</h2><div id="nlist" style="margin-top:.8rem"></div></div>
+    </section>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
-  var $ = function (id) { return document.getElementById(id); }, all = [];
+  var $ = function (id) { return document.getElementById(id); }, users = [];
+  var TITLES = { overview: "Overview", users: "Users", news: "Announcements" };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+  function num(n) { return Number(n || 0).toLocaleString("en-NG"); }
   function day(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }); }
+  function say(id, t, ok) { var m = $(id); m.textContent = t; m.className = "msg" + (ok ? " ok" : ""); }
+  function kpi(label, v) { return '<div class="stat"><span>' + label + "</span><b>" + v + "</b></div>"; }
 
-  function draw() {
-    var q = $("q").value.toLowerCase().trim();
-    $("rows").innerHTML = all.filter(function (v) {
-      return !q || [v.store_name, v.slug, v.whatsapp_number].join(" ").toLowerCase().indexOf(q) > -1;
-    }).map(function (v) {
-      var open = new Date(v.paid_until) > new Date();
-      return "<tr><td><b>" + esc(v.store_name) + "</b><br><small>shoplink.ng/" + esc(v.slug) + "</small></td><td>" + esc(v.whatsapp_number) +
-        "</td><td>" + day(v.created_at) + "</td><td>" + day(v.paid_until) + '</td><td class="tag ' + (open ? "ok" : "bad") + '">' + (open ? "Open" : "Closed") + "</td></tr>";
-    }).join("") || '<tr><td colspan="5" style="color:var(--muted)">No stores found.</td></tr>';
+  function show(v) {
+    document.querySelectorAll(".view").forEach(function (s) { s.classList.toggle("on", s.id === "v-" + v); });
+    document.querySelectorAll(".side button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === v); });
+    $("title").textContent = TITLES[v]; scrollTo(0, 0);
   }
-  $("q").addEventListener("input", draw);
-  $("out").addEventListener("click", function (e) { e.preventDefault(); sb.auth.signOut().then(function () { location.href = "login.html"; }); });
+  document.querySelectorAll(".side button").forEach(function (b) { b.onclick = function () { show(b.dataset.v); }; });
+  $("out").onclick = function (e) { e.preventDefault(); sb.auth.signOut().then(function () { location.href = "login.html"; }); };
+
+  function loadStats() {
+    return sb.rpc("admin_stats").then(function (r) {
+      if (r.error) { location.href = "dashboard.html"; return false; }
+      var d = r.data;
+      $("k1").innerHTML = kpi("Total users", num(d.total)) + kpi("Stores open", num(d.active)) + kpi("Stores closed", num(d.closed)) + kpi("Revenue", "₦" + num(d.revenue));
+      $("k2").innerHTML = kpi("Visitors today", num(d.visits_today)) + kpi("Store visits, 30 days", num(d.store_30)) + kpi("Site visits, 30 days", num(d.site_30)) + kpi("New users this month", num(d.new_month)) + kpi("Stores live", num(d.live)) + kpi("Products listed", num(d.products));
+      return true;
+    });
+  }
+  function loadVisits() {
+    sb.rpc("admin_visits").then(function (r) {
+      var rows = r.data || [], max = Math.max.apply(null, rows.map(function (x) { return Math.max(Number(x.store_visits), Number(x.site_visits)); }).concat(1));
+      $("bars").innerHTML = rows.map(function (x) {
+        return '<div title="' + x.day + " · store " + x.store_visits + " · site " + x.site_visits + '"><i class="a" style="height:' + Number(x.store_visits) / max * 100 + '%"></i><i class="b" style="height:' + Number(x.site_visits) / max * 100 + '%"></i></div>';
+      }).join("");
+    });
+  }
+  function drawUsers() {
+    var q = $("q").value.toLowerCase().trim();
+    var list = users.filter(function (u) { return !q || [u.store_name, u.email, u.slug, u.whatsapp_number].join(" ").toLowerCase().indexOf(q) > -1; });
+    $("rows").innerHTML = list.map(function (u) {
+      var open = new Date(u.paid_until) > new Date(), st = !open ? ["Closed", "bad"] : u.is_live ? ["Live", "ok"] : ["Setting up", "wait"];
+      return "<tr><td><b>" + esc(u.store_name) + "</b><br><span class='sub'>/" + esc(u.slug) + "</span></td><td>" + esc(u.email) + "</td><td>" + esc(u.whatsapp_number) + "</td><td>" + day(u.created_at) + "</td><td>" + u.products + "</td><td>" + u.visits_30 + "</td><td>" + day(u.paid_until) + '</td><td><span class="pill ' + st[1] + '">' + st[0] + "</span></td></tr>";
+    }).join("") || '<tr><td colspan="8" class="sub" style="padding:1.4rem">No users found.</td></tr>';
+    var top = users.slice().sort(function (a, b) { return b.visits_30 - a.visits_30; }).filter(function (u) { return u.visits_30 > 0; }).slice(0, 5);
+    $("top").innerHTML = top.map(function (u) { return "<tr><td>" + esc(u.store_name) + "</td><td>" + u.visits_30 + "</td></tr>"; }).join("") || '<tr><td colspan="2" class="sub" style="padding:1.2rem">No store visits yet.</td></tr>';
+  }
+  $("q").addEventListener("input", drawUsers);
+  function loadUsers() { sb.rpc("admin_users").then(function (r) { if (r.error) return say("msg", "Could not load users."); users = r.data || []; drawUsers(); }); }
+
+  function loadNews() {
+    sb.from("announcements").select("*").order("created_at", { ascending: false }).then(function (r) {
+      var box = $("nlist"); box.innerHTML = "";
+      (r.data || []).forEach(function (a) {
+        var el = document.createElement("div"); el.className = "note";
+        el.innerHTML = "<h3>" + esc(a.title) + "</h3><p>" + esc(a.body) + "</p><small>" + day(a.created_at) + '</small><button class="btn d sm" type="button" style="margin-top:.6rem">Delete</button>';
+        el.querySelector("button").onclick = function () { if (confirm("Delete this announcement? Vendors will no longer see it.")) sb.from("announcements").delete().eq("id", a.id).then(loadNews); };
+        box.appendChild(el);
+      });
+      if (!box.children.length) box.innerHTML = '<p class="sub">No announcements yet.</p>';
+    });
+  }
+  $("nf").addEventListener("submit", function (e) {
+    e.preventDefault(); say("nMsg", "");
+    var t = $("n_title").value.trim(), b = $("n_body").value.trim();
+    if (!t || !b) return say("nMsg", "Enter a title and a message.");
+    sb.from("announcements").insert({ title: t, body: b }).then(function (r) {
+      if (r.error) return say("nMsg", "Could not post. Try again.");
+      $("nf").reset(); say("nMsg", "Posted. Vendors can now see it.", true); loadNews();
+    });
+  });
 
   sb.auth.getSession().then(function (r) {
     if (!r.data.session) { location.href = "login.html"; return; }
-    sb.rpc("admin_stats").then(function (s) {
-      if (s.error) { location.href = "dashboard.html"; return; }
-      var d = s.data, items = [["Total stores", d.total], ["Open stores", d.active], ["Closed stores", d.closed], ["Joined this month", d.new_month], ["Products listed", d.products], ["Revenue", "₦" + Number(d.revenue).toLocaleString("en-NG")]];
-      $("stats").innerHTML = items.map(function (i) { return "<div><strong>" + i[1] + "</strong><span>" + i[0] + "</span></div>"; }).join("");
-      sb.from("vendors").select("store_name,slug,whatsapp_number,created_at,paid_until").order("created_at", { ascending: false }).then(function (v) {
-        if (v.error) { $("msg").textContent = "Could not load stores."; return; }
-        all = v.data; draw();
-      });
+    loadStats().then(function (ok) {
+      if (!ok) return;
+      $("stamp").textContent = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" });
+      loadVisits(); loadUsers(); loadNews();
     });
   });
 })();

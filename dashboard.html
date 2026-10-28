@@ -4,112 +4,179 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dashboard – ShopLink NG</title>
-<meta name="description" content="Your ShopLink NG store dashboard.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+.dash{display:grid;gap:1rem;max-width:760px;margin:0 auto;padding:1rem 0 3rem}
+.dash .card{margin:0}
+.status{padding:.8rem 1rem;border-radius:12px;font-weight:700}
+.status.ok{background:#e7f7ec;color:#0b5a26}.status.bad{background:#fdecec;color:#9b1c1c}
+.row{display:flex;gap:.6rem;flex-wrap:wrap}.row>*{flex:1 1 140px}
+.plist{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.6rem}
+.plist li{display:flex;gap:.8rem;align-items:center;border:1px solid #0001;border-radius:12px;padding:.5rem}
+.plist img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#0001}
+.plist .grow{flex:1;min-width:0}.plist b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linkbox{word-break:break-all;font-weight:700}
+</style>
 <script src="menu.js" defer></script>
 </head>
 <body>
 <header>
   <div class="wrap nav">
-    <a class="logo" href="index.html" aria-label="ShopLink NG home">
-      <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></i>
-      ShopLink <small>NG</small>
-    </a>
+    <a class="logo" href="index.html">ShopLink <small>NG</small></a>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
     <nav class="links" id="menu" aria-label="Main">
-      <a href="how-it-works.html">How it works</a>
-      <a href="why-shoplink.html">Why ShopLink</a>
-      <a href="login.html">Log in</a>
-      <a class="btn btn-main btn-sm" href="signup.html">Create your store</a>
+      <a id="storeLink" href="#">View my store</a>
+      <a href="#" id="out">Log out</a>
     </nav>
   </div>
 </header>
-<main>
-<section class="page-hero"><div class="wrap">
-  <h1 id="title">Loading…</h1>
-  <p class="lead" id="sub">Your store dashboard</p>
-</div></section>
-<section style="padding-top:1rem"><div class="wrap" id="app" hidden>
-  <div class="notice" id="welcome" hidden>Your store is created and your free month has started.</div>
-  <div class="dash-grid">
-    <div class="card">
-      <h2>Your store link</h2>
-      <div class="done-url" id="url"></div>
-      <div class="done-actions"><button class="btn btn-ghost" type="button" id="copy">Copy my link</button></div>
+<main><div class="wrap dash">
+  <h1 id="hi">Your dashboard</h1>
+
+  <div id="status" class="status" role="status"></div>
+
+  <section class="card">
+    <h2>Pay for your store</h2>
+    <p style="color:var(--muted)">₦1,000 a month. Each payment adds 30 days. If your time runs out, your store shows "Store closed" until you pay again.</p>
+    <button class="btn btn-main" id="pay" type="button" style="margin-top:.8rem">Pay ₦1,000</button>
+    <p class="msg" id="payMsg" role="alert"></p>
+  </section>
+
+  <form class="card" id="biz" novalidate>
+    <h2>About your business</h2>
+    <label class="field">Store name<input id="store_name" maxlength="50"></label>
+    <label class="field">What do you sell?<textarea id="description" rows="3" maxlength="300" placeholder="Handmade bags, delivered across Lagos"></textarea></label>
+    <div class="row">
+      <label class="field">City<input id="city" maxlength="40" placeholder="Lagos"></label>
+      <label class="field">WhatsApp number<input id="whatsapp_number" type="tel" inputmode="tel" placeholder="0903 247 3005"></label>
     </div>
-    <div class="card">
-      <h2>Your plan</h2>
-      <p style="margin:.8rem 0"><span class="badge" id="badge"></span></p>
-      <p style="color:var(--muted)">After your free month, the plan is ₦2,000 per month.</p>
+    <p class="linkbox" id="url"></p>
+    <p class="msg" id="bizMsg" role="alert"></p>
+    <button class="btn btn-main" type="submit">Save changes</button>
+  </form>
+
+  <form class="card" id="prod" novalidate>
+    <h2>Add a product</h2>
+    <label class="field">Product name<input id="p_name" maxlength="80"></label>
+    <div class="row">
+      <label class="field">Price in naira<input id="p_price" type="number" inputmode="numeric" min="0"></label>
+      <label class="field">Photo<input id="p_img" type="file" accept="image/*"></label>
     </div>
-  </div>
-  <div class="sec-head" style="margin:2.5rem 0 1.2rem"><h2>Get your store ready</h2></div>
-  <div class="steps">
-    <div class="step"><h3>Set up your store</h3><p>Add your logo, description, and city. Coming next.</p></div>
-    <div class="step"><h3>Add your products</h3><p>Upload up to 5 photos per product and set your prices. Coming next.</p></div>
-    <div class="step"><h3>Share your link</h3><p>Copy your store link above and put it in your WhatsApp status and Instagram bio.</p></div>
-  </div>
-  <div class="done-actions" style="margin-top:2.5rem">
-    <button class="btn btn-ghost" type="button" id="out">Log out</button>
-    <a class="btn btn-ghost" href="contact.html">Need help?</a>
-  </div>
-</div></section>
-</main>
-<footer>
-  <div class="wrap">
-    <span>© <span id="yr">2026</span> ShopLink NG. Made in Nigeria.</span>
-    <nav aria-label="Footer"><a href="about.html">About</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav>
-  </div>
-</footer>
-<script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+    <label class="field">Description<textarea id="p_desc" rows="2" maxlength="300"></textarea></label>
+    <p class="msg" id="pMsg" role="alert"></p>
+    <button class="btn btn-main" type="submit">Add product</button>
+    <ul class="plist" id="plist"></ul>
+  </form>
+</div></main>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
-var SUPABASE_URL = "https://grrotfpoalxvkkrkgzpg.supabase.co", SUPABASE_KEY = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
 (function () {
+  var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
+  var PAYSTACK_KEY = "pk_live_383a0e2b83c984d24a655080a848924537c4f3bc";
   var $ = function (id) { return document.getElementById(id); };
-  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-  if (!sb) { $("title").textContent = "Could not load. Please refresh the page."; return; }
+  var user, vendor;
 
-  $("out").addEventListener("click", function () {
-    sb.auth.signOut().then(function () { location.href = "index.html"; });
-  });
+  function normPhone(v) { var d = v.replace(/\D/g, ""); if (d.indexOf("234") === 0) return d; if (d.charAt(0) === "0") return "234" + d.slice(1); return d.length === 10 ? "234" + d : d; }
+  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
 
-  function render(vendor, billing) {
-    var url = "shoplink.ng/" + vendor.slug;
-    $("title").textContent = vendor.store_name;
-    $("url").textContent = url;
-    var status = billing ? billing.subscription_status : "trialing";
-    var days = billing ? Math.max(0, Math.ceil((new Date(billing.trial_ends_at).getTime() - Date.now()) / 86400000)) : 30;
-    var b = $("badge");
-    if (status === "active") { b.textContent = "Active"; b.className = "badge ok"; }
-    else if (status === "past_due") { b.textContent = "Payment needed"; b.className = "badge warn"; }
-    else if (status === "expired" || days === 0) { b.textContent = "Trial ended"; b.className = "badge warn"; }
-    else { b.textContent = "Free trial: " + days + " day" + (days === 1 ? "" : "s") + " left"; b.className = "badge"; }
-    if (new URLSearchParams(location.search).get("welcome")) $("welcome").hidden = false;
-    $("copy").addEventListener("click", function () {
-      var btn = this;
-      (navigator.clipboard ? navigator.clipboard.writeText("https://" + url) : Promise.reject())
-        .then(function () { btn.textContent = "Copied"; }, function () { btn.textContent = "Copy not available"; });
-    });
-    $("app").hidden = false;
+  function showStatus() {
+    var left = Math.ceil((new Date(vendor.paid_until) - new Date()) / 864e5), s = $("status");
+    if (left > 0) { s.className = "status ok"; s.textContent = "Your store is open. " + left + (left === 1 ? " day" : " days") + " left."; }
+    else { s.className = "status bad"; s.textContent = "Your store is closed. Pay ₦1,000 to reopen it."; }
   }
 
-  sb.auth.getSession().then(function (r) {
-    var session = r.data && r.data.session;
-    if (!session) { location.replace("login.html?next=dashboard.html"); return; }
-    return sb.from("vendors").select("id,store_name,slug").eq("owner_id", session.user.id).maybeSingle().then(function (v) {
-      if (v.error || !v.data) {
-        $("title").textContent = "We could not find your store";
-        $("sub").textContent = "Please message us on WhatsApp and we will fix it quickly.";
-        return;
-      }
-      return sb.from("vendor_billing").select("trial_ends_at,subscription_status").eq("vendor_id", v.data.id).maybeSingle()
-        .then(function (b) { render(v.data, b.data); });
+  function fill() {
+    $("hi").textContent = vendor.store_name || "Your dashboard";
+    ["store_name", "description", "city"].forEach(function (k) { $(k).value = vendor[k] || ""; });
+    $("whatsapp_number").value = vendor.whatsapp_number || "";
+    var u = "shoplink.ng/" + vendor.slug;
+    $("url").textContent = "Your store link: " + u;
+    $("storeLink").href = "store.html?s=" + encodeURIComponent(vendor.slug);
+    showStatus();
+  }
+
+  function loadProducts() {
+    sb.from("products").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }).then(function (r) {
+      var ul = $("plist"); ul.innerHTML = "";
+      (r.data || []).forEach(function (p) {
+        var li = document.createElement("li");
+        li.innerHTML = (p.image_url ? '<img alt="" src="' + esc(p.image_url) + '">' : '<img alt="">') +
+          '<span class="grow"><b>' + esc(p.name) + '</b>' + naira(p.price) + '</span><button type="button" class="btn btn-ghost btn-sm">Delete</button>';
+        li.querySelector("button").onclick = function () {
+          if (confirm("Delete " + p.name + "?")) sb.from("products").delete().eq("id", p.id).then(loadProducts);
+        };
+        ul.appendChild(li);
+      });
+      if (!ul.children.length) ul.innerHTML = '<li style="color:var(--muted)">No products yet. Add your first one above.</li>';
     });
-  }).catch(function () { $("title").textContent = "Network problem. Please refresh the page."; });
+  }
+
+  $("biz").addEventListener("submit", function (e) {
+    e.preventDefault(); $("bizMsg").textContent = "";
+    var wa = normPhone($("whatsapp_number").value);
+    if ($("store_name").value.trim().length < 2) { $("bizMsg").textContent = "Enter your store name."; return; }
+    if (!/^234[789][01]\d{8}$/.test(wa)) { $("bizMsg").textContent = "Enter a valid Nigerian WhatsApp number."; return; }
+    sb.from("vendors").update({ store_name: $("store_name").value.trim(), description: $("description").value.trim(), city: $("city").value.trim(), whatsapp_number: wa })
+      .eq("owner_id", user.id).select().single().then(function (r) {
+        if (r.error) { $("bizMsg").textContent = "Could not save. Try again."; return; }
+        vendor = r.data; fill(); $("bizMsg").textContent = "Saved.";
+      });
+  });
+
+  $("prod").addEventListener("submit", function (e) {
+    e.preventDefault(); var m = $("pMsg"); m.textContent = "";
+    var name = $("p_name").value.trim(), price = parseFloat($("p_price").value), f = $("p_img").files[0];
+    if (!name) { m.textContent = "Enter the product name."; return; }
+    if (isNaN(price) || price < 0) { m.textContent = "Enter a price in naira."; return; }
+    if (f && f.size > 3e6) { m.textContent = "Photo must be under 3 MB."; return; }
+    function insert(url) {
+      sb.from("products").insert({ owner_id: user.id, name: name, price: price, description: $("p_desc").value.trim(), image_url: url }).then(function (r) {
+        if (r.error) { m.textContent = "Could not add the product. Try again."; return; }
+        $("prod").reset(); loadProducts();
+      });
+    }
+    if (!f) return insert(null);
+    var path = user.id + "/" + Date.now() + "-" + f.name.replace(/[^a-z0-9.]/gi, "_");
+    sb.storage.from("products").upload(path, f).then(function (r) {
+      if (r.error) { m.textContent = "Photo upload failed. Try again."; return; }
+      insert(sb.storage.from("products").getPublicUrl(path).data.publicUrl);
+    });
+  });
+
+  $("pay").addEventListener("click", function () {
+    var m = $("payMsg"); m.textContent = "";
+    if (!window.PaystackPop) { m.textContent = "Payment could not load. Check your connection and refresh."; return; }
+    PaystackPop.setup({
+      key: PAYSTACK_KEY, email: user.email, amount: 100000, currency: "NGN",
+      ref: "SL" + Date.now() + Math.floor(Math.random() * 1e5),
+      metadata: { owner_id: user.id },
+      callback: function (res) {
+        m.textContent = "Confirming your payment…";
+        sb.functions.invoke("verify-payment", { body: { reference: res.reference } }).then(function (r) {
+          if (r.error) { m.textContent = "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference; return; }
+          return sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; showStatus(); m.textContent = "Payment confirmed. Thank you."; });
+        });
+      },
+      onClose: function () {}
+    }).openIframe();
+  });
+
+  $("out").addEventListener("click", function (e) { e.preventDefault(); sb.auth.signOut().then(function () { location.href = "login.html"; }); });
+
+  sb.auth.getSession().then(function (r) {
+    if (!r.data.session) { location.href = "login.html"; return; }
+    user = r.data.session.user;
+    sb.from("vendors").select("*").eq("owner_id", user.id).maybeSingle().then(function (q) {
+      if (!q.data) { $("status").className = "status bad"; $("status").textContent = "We could not find your store. Contact us on WhatsApp."; return; }
+      vendor = q.data; fill(); loadProducts();
+    });
+  });
 })();
 </script>
 </body>

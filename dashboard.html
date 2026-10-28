@@ -3,62 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
 <title>Dashboard – ShopLink NG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<script src="menu.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dashboard.css">
 </head>
-<body>
-<header>
-  <div class="wrap nav">
-    <a class="logo" href="index.html">ShopLink <small>NG</small></a>
-    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button>
-    <nav class="links" id="menu" aria-label="Main">
-      <a id="storeLink" href="#">View my store</a>
-      <a href="#" id="out">Log out</a>
-    </nav>
+<body class="app">
+<aside class="side">
+  <a class="brand" href="index.html">ShopLink<small>NG</small></a>
+  <button data-v="overview" class="on">Overview</button>
+  <button data-v="products">Products</button>
+  <button data-v="settings">Store settings</button>
+  <button data-v="billing">Billing</button>
+  <span class="sp"></span>
+  <a class="nv" href="#" id="out">Log out</a>
+</aside>
+<div class="main">
+  <div class="top"><h1 id="title">Overview</h1>
+    <div class="who"><span id="uname"></span><span id="av" class="ph"></span>
+    <a class="btn o sm" id="view" href="#" target="_blank" rel="noopener">View store</a></div></div>
+  <div class="content">
+    <div id="status" class="banner" role="status"></div>
+
+    <section class="view on" id="v-overview">
+      <div class="card" id="setup">
+        <h2>Finish setting up your store</h2>
+        <p class="sub" id="setupSub"></p>
+        <div class="prog"><i id="progBar"></i></div>
+        <ul class="check" id="steps"></ul>
+      </div>
+      <div class="grid">
+        <div class="stat"><span>Visits, last 30 days</span><b id="s30">0</b></div>
+        <div class="stat"><span>Visits today</span><b id="sToday">0</b></div>
+        <div class="stat"><span>Products</span><b id="sProd">0</b></div>
+        <div class="stat"><span>Subscription</span><b id="sDays">–</b></div>
+      </div>
+      <div class="card">
+        <h2>Store visitors</h2><p class="sub">People who opened your store each day, last 30 days. Your own visits are not counted.</p>
+        <div class="bars" id="bars" aria-label="Visits per day"></div>
+        <div class="axis"><span>30 days ago</span><span>Today</span></div>
+      </div>
+      <div class="card">
+        <h2>Your store link</h2><p class="sub">Share this on WhatsApp, Instagram and your bio.</p>
+        <div class="link"><code id="url"></code><button class="btn o sm" id="copy" type="button">Copy link</button></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-products">
+      <form class="card" id="prod" novalidate>
+        <h2 id="pTitle">Add a product</h2>
+        <input type="hidden" id="p_id">
+        <div class="two">
+          <label class="f">Product name<input id="p_name" maxlength="80"></label>
+          <label class="f">Price in naira<input id="p_price" type="number" inputmode="numeric" min="0"></label>
+        </div>
+        <label class="f">Description (optional)<textarea id="p_desc" rows="2" maxlength="300"></textarea></label>
+        <label class="f">Photo<input id="p_img" type="file" accept="image/*"></label>
+        <p class="msg" id="pMsg" role="alert"></p>
+        <button class="btn p" id="pGo" type="submit">Add product</button>
+        <button class="btn o" id="pCancel" type="button" hidden>Cancel</button>
+      </form>
+      <div class="card"><h2>Your products</h2>
+        <div class="tw"><table><thead><tr><th></th><th>Name</th><th>Price</th><th></th></tr></thead><tbody id="plist"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-settings">
+      <form class="card" id="biz" novalidate>
+        <h2>Store settings</h2><p class="sub">This is what shoppers see at the top of your store.</p>
+        <div class="logo-row"><span id="logoBox"></span><label class="f" style="margin:0;flex:1">Store logo<input id="logo" type="file" accept="image/*"></label></div>
+        <label class="f">Store name<input id="store_name" maxlength="50"></label>
+        <label class="f">What do you sell?<textarea id="description" rows="3" maxlength="300" placeholder="Handmade bags, delivered across Lagos"></textarea></label>
+        <div class="two">
+          <label class="f">City<input id="city" maxlength="40" placeholder="Lagos"></label>
+          <label class="f">WhatsApp number for orders<input id="whatsapp_number" type="tel" inputmode="tel" placeholder="0903 247 3005"></label>
+        </div>
+        <p class="msg" id="bizMsg" role="alert"></p>
+        <button class="btn p" type="submit">Save changes</button>
+      </form>
+    </section>
+
+    <section class="view" id="v-billing">
+      <div class="card"><h2>Pay for your store</h2>
+        <p class="sub">₦1,000 a month. Each payment adds 30 days. When your time runs out your store shows "Store closed" until you pay again.</p>
+        <p style="margin:1rem 0" id="paidUntil"></p>
+        <button class="btn p" id="pay" type="button">Pay ₦1,000</button>
+        <p class="msg" id="payMsg" role="alert"></p>
+      </div>
+    </section>
   </div>
-</header>
-<main><div class="wrap dash">
-  <h1 id="hi">Your dashboard</h1>
-
-  <div id="status" class="status" role="status"></div>
-
-  <section class="card">
-    <h2>Pay for your store</h2>
-    <p class="sub">₦1,000 a month. Each payment adds 30 days. If your time runs out, your store shows "Store closed" until you pay again.</p>
-    <button class="btn btn-main" id="pay" type="button" style="margin-top:.8rem">Pay ₦1,000</button>
-    <p class="msg" id="payMsg" role="alert"></p>
-  </section>
-
-  <form class="card" id="biz" novalidate>
-    <h2>About your business</h2>
-    <label class="field">Store name<input id="store_name" maxlength="50"></label>
-    <label class="field">What do you sell?<textarea id="description" rows="3" maxlength="300" placeholder="Handmade bags, delivered across Lagos"></textarea></label>
-    <div class="row">
-      <label class="field">City<input id="city" maxlength="40" placeholder="Lagos"></label>
-      <label class="field">WhatsApp number<input id="whatsapp_number" type="tel" inputmode="tel" placeholder="0903 247 3005"></label>
-    </div>
-    <p class="linkbox" id="url"></p>
-    <p class="msg" id="bizMsg" role="alert"></p>
-    <button class="btn btn-main" type="submit">Save changes</button>
-  </form>
-
-  <form class="card" id="prod" novalidate>
-    <h2>Add a product</h2>
-    <label class="field">Product name<input id="p_name" maxlength="80"></label>
-    <div class="row">
-      <label class="field">Price in naira<input id="p_price" type="number" inputmode="numeric" min="0"></label>
-      <label class="field">Photo<input id="p_img" type="file" accept="image/*"></label>
-    </div>
-    <label class="field">Description<textarea id="p_desc" rows="2" maxlength="300"></textarea></label>
-    <p class="msg" id="pMsg" role="alert"></p>
-    <button class="btn btn-main" type="submit">Add product</button>
-    <ul class="plist" id="plist"></ul>
-  </form>
-</div></main>
+</div>
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
@@ -67,102 +103,156 @@
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var PAYSTACK_KEY = "pk_live_383a0e2b83c984d24a655080a848924537c4f3bc";
   var $ = function (id) { return document.getElementById(id); };
-  var user, vendor;
+  var user, vendor, products = [];
+  var TITLES = { overview: "Overview", products: "Products", settings: "Store settings", billing: "Billing" };
 
-  function normPhone(v) { var d = v.replace(/\D/g, ""); if (d.indexOf("234") === 0) return d; if (d.charAt(0) === "0") return "234" + d.slice(1); return d.length === 10 ? "234" + d : d; }
-  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
+  function normPhone(v) { var d = v.replace(/\D/g, ""); if (d.indexOf("234") === 0) return d; if (d.charAt(0) === "0") return "234" + d.slice(1); return d.length === 10 ? "234" + d : d; }
+  function storeUrl() { return location.origin + "/" + vendor.slug; }
+  function daysLeft() { return Math.ceil((new Date(vendor.paid_until) - new Date()) / 864e5); }
+  function say(id, t, ok) { var m = $(id); m.textContent = t; m.className = "msg" + (ok ? " ok" : ""); }
 
-  function showStatus() {
-    var left = Math.ceil((new Date(vendor.paid_until) - new Date()) / 864e5), s = $("status");
-    if (left > 0) { s.className = "status ok"; s.textContent = "Your store is open. " + left + (left === 1 ? " day" : " days") + " left."; }
-    else { s.className = "status bad"; s.textContent = "Your store is closed. Pay ₦1,000 to reopen it."; }
+  /* tabs */
+  function show(v) {
+    document.querySelectorAll(".view").forEach(function (s) { s.classList.toggle("on", s.id === "v-" + v); });
+    document.querySelectorAll(".side button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === v); });
+    $("title").textContent = TITLES[v]; scrollTo(0, 0);
+  }
+  document.querySelectorAll(".side button").forEach(function (b) { b.onclick = function () { show(b.dataset.v); }; });
+
+  /* header, status, checklist */
+  function refresh() {
+    var n = daysLeft(), s = $("status");
+    $("uname").textContent = vendor.store_name || "";
+    $("av").innerHTML = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '" style="width:34px;height:34px;border-radius:50%;object-fit:cover">' : esc((vendor.store_name || "S").charAt(0).toUpperCase());
+    $("view").href = "/" + vendor.slug; $("url").textContent = storeUrl();
+    $("sProd").textContent = products.length; $("sDays").textContent = n > 0 ? n + (n === 1 ? " day left" : " days left") : "Expired";
+    $("paidUntil").textContent = (n > 0 ? "Your store is open until " : "Your store closed on ") + new Date(vendor.paid_until).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }) + ".";
+    var steps = [["Upload your store logo", !!vendor.logo_url], ["Describe what you sell", !!(vendor.description || "").trim()], ["Add your WhatsApp number", !!vendor.whatsapp_number], ["Add your first product", products.length > 0]];
+    var done = steps.filter(function (x) { return x[1]; }).length, all = done === steps.length;
+    $("steps").innerHTML = steps.map(function (x) { return '<li class="' + (x[1] ? "done" : "") + '">' + x[0] + "</li>"; }).join("");
+    $("progBar").style.width = (done / steps.length * 100) + "%";
+    $("setupSub").textContent = all ? "All done. Your store is live and ready for customers." : done + " of " + steps.length + " steps done. Your store goes live as soon as all four are finished.";
+    if (all !== vendor.is_live) sb.from("vendors").update({ is_live: all }).eq("owner_id", user.id).then(function (r) { if (!r.error) vendor.is_live = all; });
+    if (n <= 0) { s.className = "banner bad"; s.textContent = "Your store is closed. Shoppers see \"Store closed\". Go to Billing and pay ₦1,000 to reopen it."; }
+    else if (!all) { s.className = "banner wait"; s.textContent = "Your store is not live yet. Finish the steps on the Overview page."; }
+    else { s.className = "banner ok"; s.textContent = "Your store is live and open. " + n + (n === 1 ? " day" : " days") + " left."; }
+    $("logoBox").innerHTML = vendor.logo_url ? '<img alt="Logo" src="' + esc(vendor.logo_url) + '" style="width:72px;height:72px;border-radius:16px;object-fit:cover">' : '<span class="ph" style="width:72px;height:72px;border-radius:16px">Logo</span>';
   }
 
-  function fill() {
-    $("hi").textContent = vendor.store_name || "Your dashboard";
-    ["store_name", "description", "city"].forEach(function (k) { $(k).value = vendor[k] || ""; });
-    $("whatsapp_number").value = vendor.whatsapp_number || "";
-    var u = "shoplink.ng/" + vendor.slug;
-    $("url").textContent = "Your store link: " + u;
-    $("storeLink").href = "store.html?s=" + encodeURIComponent(vendor.slug);
-    showStatus();
-  }
-
-  function loadProducts() {
-    sb.from("products").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }).then(function (r) {
-      var ul = $("plist"); ul.innerHTML = "";
-      (r.data || []).forEach(function (p) {
-        var li = document.createElement("li");
-        li.innerHTML = (p.image_url ? '<img alt="" src="' + esc(p.image_url) + '">' : '<img alt="">') +
-          '<span class="grow"><b>' + esc(p.name) + '</b>' + naira(p.price) + '</span><button type="button" class="btn btn-ghost btn-sm">Delete</button>';
-        li.querySelector("button").onclick = function () {
-          if (confirm("Delete " + p.name + "?")) sb.from("products").delete().eq("id", p.id).then(loadProducts);
-        };
-        ul.appendChild(li);
-      });
-      if (!ul.children.length) ul.innerHTML = '<li class="empty">No products yet. Add your first one above.</li>';
+  /* visits chart */
+  function loadVisits() {
+    sb.rpc("vendor_visits").then(function (r) {
+      var rows = r.data || [], max = Math.max.apply(null, rows.map(function (x) { return Number(x.visits); }).concat(1)), total = 0;
+      $("bars").innerHTML = rows.map(function (x, i) {
+        total += Number(x.visits);
+        return '<i class="' + (i === rows.length - 1 ? "t" : "") + '" style="height:' + Math.max(2, Number(x.visits) / max * 100) + '%" title="' + x.day + ": " + x.visits + ' visits"></i>';
+      }).join("");
+      $("s30").textContent = total; $("sToday").textContent = rows.length ? rows[rows.length - 1].visits : 0;
     });
   }
 
-  $("biz").addEventListener("submit", function (e) {
-    e.preventDefault(); $("bizMsg").textContent = "";
-    var wa = normPhone($("whatsapp_number").value);
-    if ($("store_name").value.trim().length < 2) { $("bizMsg").textContent = "Enter your store name."; return; }
-    if (!/^234[789][01]\d{8}$/.test(wa)) { $("bizMsg").textContent = "Enter a valid Nigerian WhatsApp number."; return; }
-    sb.from("vendors").update({ store_name: $("store_name").value.trim(), description: $("description").value.trim(), city: $("city").value.trim(), whatsapp_number: wa })
-      .eq("owner_id", user.id).select().single().then(function (r) {
-        if (r.error) { $("bizMsg").textContent = "Could not save. Try again."; return; }
-        vendor = r.data; fill(); $("bizMsg").textContent = "Saved.";
+  /* products */
+  function loadProducts() {
+    return sb.from("products").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }).then(function (r) {
+      products = r.data || [];
+      $("plist").innerHTML = products.length ? "" : '<tr><td colspan="4" class="sub" style="padding:1.4rem">No products yet. Add your first one above.</td></tr>';
+      products.forEach(function (p) {
+        var tr = document.createElement("tr");
+        tr.innerHTML = '<td>' + (p.image_url ? '<img alt="" src="' + esc(p.image_url) + '">' : '<img alt="">') + "</td><td><b>" + esc(p.name) + '</b><div class="sub">' + esc(p.description || "") + "</div></td><td>" + naira(p.price) + '</td><td class="act"><button class="btn o sm" type="button">Edit</button><button class="btn d sm" type="button">Delete</button></td>';
+        var b = tr.querySelectorAll("button");
+        b[0].onclick = function () { editProduct(p); };
+        b[1].onclick = function () { if (confirm("Delete " + p.name + "? This cannot be undone.")) sb.from("products").delete().eq("id", p.id).then(function () { loadProducts(); }); };
+        $("plist").appendChild(tr);
       });
-  });
+      if (vendor) refresh();
+    });
+  }
+  function editProduct(p) {
+    $("p_id").value = p.id; $("p_name").value = p.name; $("p_price").value = p.price; $("p_desc").value = p.description || "";
+    $("pTitle").textContent = "Edit product"; $("pGo").textContent = "Save product"; $("pCancel").hidden = false; say("pMsg", ""); scrollTo(0, 0); $("p_name").focus();
+  }
+  function resetForm() { $("prod").reset(); $("p_id").value = ""; $("pTitle").textContent = "Add a product"; $("pGo").textContent = "Add product"; $("pCancel").hidden = true; }
+  $("pCancel").onclick = resetForm;
+
+  function upload(file, prefix) {
+    var path = user.id + "/" + prefix + Date.now() + "-" + file.name.replace(/[^a-z0-9.]/gi, "_");
+    return sb.storage.from("products").upload(path, file).then(function (r) {
+      return r.error ? null : sb.storage.from("products").getPublicUrl(path).data.publicUrl;
+    });
+  }
 
   $("prod").addEventListener("submit", function (e) {
-    e.preventDefault(); var m = $("pMsg"); m.textContent = "";
-    var name = $("p_name").value.trim(), price = parseFloat($("p_price").value), f = $("p_img").files[0];
-    if (!name) { m.textContent = "Enter the product name."; return; }
-    if (isNaN(price) || price < 0) { m.textContent = "Enter a price in naira."; return; }
-    if (f && f.size > 3e6) { m.textContent = "Photo must be under 3 MB."; return; }
-    function insert(url) {
-      sb.from("products").insert({ owner_id: user.id, name: name, price: price, description: $("p_desc").value.trim(), image_url: url }).then(function (r) {
-        if (r.error) { m.textContent = "Could not add the product. Try again."; return; }
-        $("prod").reset(); loadProducts();
+    e.preventDefault(); say("pMsg", "");
+    var name = $("p_name").value.trim(), price = parseFloat($("p_price").value), f = $("p_img").files[0], id = $("p_id").value;
+    if (!name) return say("pMsg", "Enter the product name.");
+    if (isNaN(price) || price < 0) return say("pMsg", "Enter a price in naira.");
+    if (f && f.size > 3e6) return say("pMsg", "Photo must be under 3 MB.");
+    $("pGo").disabled = true;
+    (f ? upload(f, "p-") : Promise.resolve(undefined)).then(function (url) {
+      if (f && !url) { $("pGo").disabled = false; return say("pMsg", "Photo upload failed. Try again."); }
+      var row = { name: name, price: price, description: $("p_desc").value.trim() };
+      if (url) row.image_url = url;
+      var q = id ? sb.from("products").update(row).eq("id", id) : sb.from("products").insert(Object.assign({ owner_id: user.id }, row));
+      return q.then(function (r) {
+        $("pGo").disabled = false;
+        if (r.error) return say("pMsg", "Could not save the product. Try again.");
+        resetForm(); say("pMsg", "Saved.", true); loadProducts();
       });
-    }
-    if (!f) return insert(null);
-    var path = user.id + "/" + Date.now() + "-" + f.name.replace(/[^a-z0-9.]/gi, "_");
-    sb.storage.from("products").upload(path, f).then(function (r) {
-      if (r.error) { m.textContent = "Photo upload failed. Try again."; return; }
-      insert(sb.storage.from("products").getPublicUrl(path).data.publicUrl);
     });
   });
 
-  $("pay").addEventListener("click", function () {
-    var m = $("payMsg"); m.textContent = "";
-    if (!window.PaystackPop) { m.textContent = "Payment could not load. Check your connection and refresh."; return; }
-    PaystackPop.setup({
-      key: PAYSTACK_KEY, email: user.email, amount: 100000, currency: "NGN",
-      ref: "SL" + Date.now() + Math.floor(Math.random() * 1e5),
-      metadata: { owner_id: user.id },
-      callback: function (res) {
-        m.textContent = "Confirming your payment…";
-        sb.functions.invoke("verify-payment", { body: { reference: res.reference } }).then(function (r) {
-          if (r.error) { m.textContent = "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference; return; }
-          return sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; showStatus(); m.textContent = "Payment confirmed. Thank you."; });
-        });
-      },
-      onClose: function () {}
-    }).openIframe();
+  /* store settings */
+  $("biz").addEventListener("submit", function (e) {
+    e.preventDefault(); say("bizMsg", "");
+    var wa = normPhone($("whatsapp_number").value), f = $("logo").files[0];
+    if ($("store_name").value.trim().length < 2) return say("bizMsg", "Enter your store name.");
+    if (!/^234[789][01]\d{8}$/.test(wa)) return say("bizMsg", "Enter a valid Nigerian WhatsApp number.");
+    if (f && f.size > 2e6) return say("bizMsg", "Logo must be under 2 MB.");
+    (f ? upload(f, "logo-") : Promise.resolve(undefined)).then(function (url) {
+      if (f && !url) return say("bizMsg", "Logo upload failed. Try again.");
+      var row = { store_name: $("store_name").value.trim(), description: $("description").value.trim(), city: $("city").value.trim(), whatsapp_number: wa };
+      if (url) row.logo_url = url;
+      sb.from("vendors").update(row).eq("owner_id", user.id).select().single().then(function (r) {
+        if (r.error) return say("bizMsg", "Could not save. Try again.");
+        vendor = r.data; $("logo").value = ""; refresh(); say("bizMsg", "Saved.", true);
+      });
+    });
   });
 
-  $("out").addEventListener("click", function (e) { e.preventDefault(); sb.auth.signOut().then(function () { location.href = "login.html"; }); });
+  $("copy").onclick = function () {
+    var b = this; (navigator.clipboard ? navigator.clipboard.writeText(storeUrl()) : Promise.reject()).then(function () { b.textContent = "Copied"; }, function () { b.textContent = "Copy not available"; });
+  };
 
+  /* payment */
+  $("pay").onclick = function () {
+    say("payMsg", "");
+    if (!window.PaystackPop) return say("payMsg", "Payment could not load. Check your connection and refresh.");
+    PaystackPop.setup({
+      key: PAYSTACK_KEY, email: user.email, amount: 100000, currency: "NGN",
+      ref: "SL" + Date.now() + Math.floor(Math.random() * 1e5), metadata: { owner_id: user.id },
+      callback: function (res) {
+        say("payMsg", "Confirming your payment…", true);
+        sb.functions.invoke("verify-payment", { body: { reference: res.reference } }).then(function (r) {
+          if (r.error) return say("payMsg", "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference);
+          sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; refresh(); say("payMsg", "Payment confirmed. Thank you.", true); });
+        });
+      }, onClose: function () {}
+    }).openIframe();
+  };
+
+  $("out").onclick = function (e) { e.preventDefault(); sb.auth.signOut().then(function () { location.href = "login.html"; }); };
+
+  /* start */
   sb.auth.getSession().then(function (r) {
     if (!r.data.session) { location.href = "login.html"; return; }
     user = r.data.session.user;
     sb.from("vendors").select("*").eq("owner_id", user.id).maybeSingle().then(function (q) {
-      if (!q.data) { $("status").className = "status bad"; $("status").textContent = "We could not find your store. Contact us on WhatsApp."; return; }
-      vendor = q.data; fill(); loadProducts();
+      if (!q.data) { $("status").className = "banner bad"; $("status").textContent = "We could not find your store. Contact us on WhatsApp."; return; }
+      vendor = q.data;
+      ["store_name", "description", "city", "whatsapp_number"].forEach(function (k) { $(k).value = vendor[k] || ""; });
+      loadProducts().then(refresh); loadVisits();
     });
   });
 })();

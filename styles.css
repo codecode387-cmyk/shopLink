@@ -217,3 +217,43 @@ th.us,td.us{background:color-mix(in srgb,var(--wa) 16%,transparent);font-weight:
 .badge.warn{background:#e0533f;color:#fff}
 .notice{background:color-mix(in srgb,var(--wa) 18%,transparent);border:1px solid var(--wa);border-radius:16px;padding:1rem 1.2rem;margin-bottom:1.5rem;font-weight:500}
 .btn:disabled{opacity:.6;cursor:not-allowed}
+
+
+/* ===== Vendor dashboard + admin: paste at the very end of styles.css ===== */
+.dash,.adm{margin-inline:auto;padding:1rem 0 3.5rem}
+.dash{display:grid;gap:1.2rem;max-width:760px}
+.dash .card{margin:0}
+.dash h1,.adm h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:800}
+.dash .card h2{margin-bottom:.2rem}
+.dash .card p.sub{color:var(--muted);margin-top:.4rem}
+
+.status{padding:.9rem 1.1rem;border-radius:16px;font-weight:700;border:1px solid transparent}
+.status.ok{background:color-mix(in srgb,var(--wa) 18%,transparent);border-color:var(--wa)}
+.status.bad{background:color-mix(in srgb,#e0533f 14%,transparent);border-color:#e0533f}
+
+.row{display:flex;gap:.8rem;flex-wrap:wrap}
+.row>*{flex:1 1 150px}
+.field textarea{font-family:var(--body)}
+.field input[type="file"]{padding:.6rem}
+.linkbox{margin-top:1rem;font-weight:700;word-break:break-all;color:var(--leaf)}
+
+.plist{list-style:none;padding:0;margin:1.4rem 0 0;display:grid;gap:.7rem}
+.plist li{display:flex;gap:.9rem;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:.6rem}
+.plist img{width:58px;height:58px;object-fit:cover;border-radius:10px;background:var(--line);flex:none}
+.plist .grow{flex:1;min-width:0;color:var(--muted)}
+.plist .grow b{display:block;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plist .empty{color:var(--muted);justify-content:center;padding:1.2rem}
+
+/* admin */
+.adm{max-width:1040px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.9rem;margin:1.4rem 0 2rem}
+.stats div{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:1.2rem}
+.stats strong{display:block;font:800 clamp(1.7rem,4vw,2.3rem)/1.1 var(--display);letter-spacing:-.02em}
+.stats span{color:var(--muted);font-size:.92rem}
+.stats div:first-child{background:var(--sun);border-color:var(--sun);color:#10231b}
+.stats div:first-child span{color:#10231b}
+.adm .field.search{max-width:340px;margin:0 0 1rem}
+.tag{font-weight:700}
+.tag.ok{color:var(--leaf)}
+.tag.bad{color:#e0533f}
+td small{color:var(--muted)}

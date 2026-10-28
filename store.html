@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Store – ShopLink NG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--g:#1b7a4b;--wa:#25d366;--ink:#14231b;--mut:#64748b;--line:#e5e9ee}
+body{font:400 15px/1.55 "DM Sans",system-ui,sans-serif;color:var(--ink);background:#fff;padding-bottom:6rem}
+h1,h2{font-family:"Bricolage Grotesque","DM Sans",sans-serif;letter-spacing:-.01em}
+.w{width:min(1000px,92%);margin-inline:auto}
+.head{border-bottom:1px solid var(--line);padding:1.6rem 0}
+.head .w{display:flex;gap:1rem;align-items:center}
+.head img,.head .ph{width:76px;height:76px;border-radius:18px;object-fit:cover;background:#e8f6ee;color:var(--g);font:800 1.8rem "Bricolage Grotesque";display:grid;place-items:center;flex:none}
+.head h1{font-size:clamp(1.5rem,5vw,2.2rem)}.head p{color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.1rem;margin-top:1.6rem}
+.p{border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.p img,.p .ph2{width:100%;aspect-ratio:1;object-fit:cover;background:#f1f4f2}
+.p div{padding:.8rem;display:flex;flex-direction:column;gap:.2rem;flex:1}
+.p b{font-weight:700}.p small{color:var(--mut)}.p .pr{font-weight:800;color:var(--g)}
+.qty{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:.6rem}
+button{font:700 .95rem inherit;font-family:inherit;cursor:pointer;border:0;border-radius:10px}
+.add{background:#e8f6ee;color:var(--g);padding:.55rem;width:100%}.add:hover{background:#d4eedf}
+.qty button{width:36px;height:36px;background:var(--g);color:#fff;font-size:1.2rem}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:.8rem 0 calc(.8rem + env(safe-area-inset-bottom,0px))}
+.bar .w{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.go{background:var(--wa);color:#06210f;padding:.8rem 1.3rem}
+.sheet{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;justify-content:center;z-index:9}
+.sheet.on{display:flex}
+.sheet form{background:#fff;width:min(520px,100%);border-radius:20px 20px 0 0;padding:1.4rem;max-height:90vh;overflow:auto}
+.sheet label{display:block;font-weight:700;font-size:.88rem;margin-top:.9rem}
+.sheet input{display:block;width:100%;margin-top:.3rem;font:400 1rem inherit;font-family:inherit;border:1px solid #cfd6de;border-radius:10px;padding:.65rem .8rem}
+.sheet ul{list-style:none;padding:0;margin:.8rem 0;display:grid;gap:.3rem;color:var(--mut)}
+.note{text-align:center;padding:5rem 1rem}.note h1{font-size:2rem;margin-bottom:.6rem}.note p{color:var(--mut);max-width:30rem;margin:0 auto}
+.foot{text-align:center;color:var(--mut);font-size:.85rem;margin-top:2.5rem}.foot a{color:var(--g);font-weight:700}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script>
+(function () {
+  var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
+  var app = document.getElementById("app"), cart = {}, vendor, products = [];
+  var slug = (new URLSearchParams(location.search).get("s") || location.pathname.split("/").filter(Boolean).pop() || "").replace(/\.html$/, "").toLowerCase();
+
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
+  function note(h, p) { app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + '</p><p class="foot"><a href="/">Open your own store on ShopLink NG</a></p></div>'; }
+
+  function count() { return Object.keys(cart).reduce(function (a, k) { return a + cart[k]; }, 0); }
+  function total() { return products.reduce(function (a, p) { return a + (cart[p.id] || 0) * Number(p.price); }, 0); }
+
+  function draw() {
+    var logo = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '">' : '<span class="ph">' + esc(vendor.store_name.charAt(0).toUpperCase()) + "</span>";
+    app.innerHTML = '<div class="head"><div class="w">' + logo + "<div><h1>" + esc(vendor.store_name) + "</h1><p>" + esc(vendor.description || "") + (vendor.city ? "<br>" + esc(vendor.city) : "") + '</p></div></div></div><div class="w"><div class="grid" id="g"></div><p class="foot">Store powered by <a href="/">ShopLink NG</a></p></div>' +
+      '<div class="bar" id="bar" hidden><div class="w"><b id="sum"></b><button class="go" id="open" type="button">Order on WhatsApp</button></div></div>' +
+      '<div class="sheet" id="sheet"><form id="of"><h2>Your order</h2><ul id="lines"></ul><b id="tot"></b><label>Your name<input id="cn" autocomplete="name"></label><label>Delivery address<input id="ca" autocomplete="street-address"></label><p id="err" style="color:#d93f2f;font-weight:700;margin-top:.6rem"></p><button class="go" style="width:100%;margin-top:1rem" type="submit">Send order on WhatsApp</button><button type="button" id="close" style="width:100%;margin-top:.5rem;padding:.7rem;background:#f1f4f2">Back</button></form></div>';
+    var g = document.getElementById("g");
+    if (!products.length) g.innerHTML = '<p style="color:var(--mut)">No products yet.</p>';
+    products.forEach(function (p) {
+      var c = document.createElement("div"); c.className = "p";
+      c.innerHTML = (p.image_url ? '<img alt="" loading="lazy" src="' + esc(p.image_url) + '">' : '<div class="ph2"></div>') + "<div><b>" + esc(p.name) + "</b><small>" + esc(p.description || "") + '</small><span class="pr">' + naira(p.price) + '</span><span class="qty"></span></div>';
+      g.appendChild(c); p.el = c.querySelector(".qty"); qty(p);
+    });
+    document.getElementById("open").onclick = openSheet;
+    document.getElementById("close").onclick = function () { document.getElementById("sheet").classList.remove("on"); };
+    document.getElementById("of").onsubmit = send;
+  }
+
+  function qty(p) {
+    var n = cart[p.id] || 0;
+    p.el.innerHTML = n ? '<button type="button" aria-label="Remove one">−</button><b>' + n + '</b><button type="button" aria-label="Add one">+</button>' : '<button class="add" type="button">Add to order</button>';
+    var b = p.el.querySelectorAll("button");
+    if (n) { b[0].onclick = function () { set(p, n - 1); }; b[1].onclick = function () { set(p, n + 1); }; } else b[0].onclick = function () { set(p, 1); };
+  }
+  function set(p, n) {
+    if (n <= 0) delete cart[p.id]; else cart[p.id] = n;
+    qty(p); var bar = document.getElementById("bar"); bar.hidden = !count();
+    document.getElementById("sum").textContent = count() + (count() === 1 ? " item · " : " items · ") + naira(total());
+  }
+  function openSheet() {
+    document.getElementById("lines").innerHTML = products.filter(function (p) { return cart[p.id]; }).map(function (p) { return "<li>" + cart[p.id] + " × " + esc(p.name) + " · " + naira(cart[p.id] * p.price) + "</li>"; }).join("");
+    document.getElementById("tot").textContent = "Total: " + naira(total());
+    document.getElementById("sheet").classList.add("on");
+  }
+  function send(e) {
+    e.preventDefault();
+    var name = document.getElementById("cn").value.trim(), addr = document.getElementById("ca").value.trim();
+    if (!name) { document.getElementById("err").textContent = "Enter your name."; return; }
+    var lines = products.filter(function (p) { return cart[p.id]; }).map(function (p) { return "- " + cart[p.id] + " x " + p.name + " (" + naira(cart[p.id] * p.price) + ")"; });
+    var msg = "Hello " + vendor.store_name + ", I would like to order:\n" + lines.join("\n") + "\nTotal: " + naira(total()) + "\nName: " + name + (addr ? "\nAddress: " + addr : "");
+    location.href = "https://wa.me/" + vendor.whatsapp_number + "?text=" + encodeURIComponent(msg);
+  }
+
+  function countVisit() {
+    try {
+      var k = "v:" + slug + ":" + new Date().toISOString().slice(0, 10);
+      if (localStorage.getItem(k)) return; localStorage.setItem(k, "1");
+    } catch (e) {}
+    sb.rpc("record_visit", { p_slug: slug });
+  }
+
+  if (!slug) return note("Store not found", "Check the link and try again.");
+  sb.from("vendors").select("store_name,description,city,logo_url,whatsapp_number,paid_until,is_live").eq("slug", slug).maybeSingle().then(function (r) {
+    if (!r.data) return note("Store not found", "This store link does not exist. Check the link and try again.");
+    vendor = r.data; document.title = vendor.store_name + " – ShopLink NG";
+    if (new Date(vendor.paid_until) <= new Date()) return note("Store closed", esc(vendor.store_name) + " is closed for now. Please check back later.");
+    if (!vendor.is_live) return note(esc(vendor.store_name), "This store is being set up. Please check back soon.");
+    sb.rpc("store_products", { p_slug: slug }).then(function (q) { products = q.data || []; draw(); countVisit(); });
+  });
+})();
+</script>
+</body>
+</html>

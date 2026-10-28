@@ -17,6 +17,7 @@
   <button data-v="products">Products</button>
   <button data-v="settings">Store settings</button>
   <button data-v="billing">Billing</button>
+  <button data-v="notices">Notifications <span class="badge" id="nb" hidden></span></button>
   <span class="sp"></span>
   <a class="nv" href="#" id="out">Log out</a>
 </aside>
@@ -26,6 +27,7 @@
     <a class="btn o sm" id="view" href="#" target="_blank" rel="noopener">View store</a></div></div>
   <div class="content">
     <div id="status" class="banner" role="status"></div>
+    <div id="annTop"></div>
 
     <section class="view on" id="v-overview">
       <div class="card" id="setup">
@@ -85,6 +87,8 @@
       </form>
     </section>
 
+    <section class="view" id="v-notices"><div id="nlist"></div></section>
+
     <section class="view" id="v-billing">
       <div class="card"><h2>Pay for your store</h2>
         <p class="sub">₦1,000 a month. Each payment adds 30 days. When your time runs out your store shows "Store closed" until you pay again.</p>
@@ -104,7 +108,7 @@
   var PAYSTACK_KEY = "pk_live_383a0e2b83c984d24a655080a848924537c4f3bc";
   var $ = function (id) { return document.getElementById(id); };
   var user, vendor, products = [];
-  var TITLES = { overview: "Overview", products: "Products", settings: "Store settings", billing: "Billing" };
+  var TITLES = { overview: "Overview", products: "Products", settings: "Store settings", billing: "Billing", notices: "Notifications" };
 
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
@@ -117,7 +121,7 @@
   function show(v) {
     document.querySelectorAll(".view").forEach(function (s) { s.classList.toggle("on", s.id === "v-" + v); });
     document.querySelectorAll(".side button").forEach(function (b) { b.classList.toggle("on", b.dataset.v === v); });
-    $("title").textContent = TITLES[v]; scrollTo(0, 0);
+    $("title").textContent = TITLES[v]; scrollTo(0, 0); if (v === "notices") markSeen();
   }
   document.querySelectorAll(".side button").forEach(function (b) { b.onclick = function () { show(b.dataset.v); }; });
 
@@ -150,6 +154,37 @@
         return '<i class="' + (i === rows.length - 1 ? "t" : "") + '" style="height:' + Math.max(2, Number(x.visits) / max * 100) + '%" title="' + x.day + ": " + x.visits + ' visits"></i>';
       }).join("");
       $("s30").textContent = total; $("sToday").textContent = rows.length ? rows[rows.length - 1].visits : 0;
+    });
+  }
+
+
+  /* announcements from the admin */
+  var notices = [];
+  function seenKey() { return "ann_seen_" + user.id; }
+  function lastSeen() { try { return localStorage.getItem(seenKey()) || ""; } catch (e) { return ""; } }
+  function unread() { var s = lastSeen(); return notices.filter(function (a) { return !s || a.created_at > s; }); }
+  function markSeen() {
+    if (!notices.length) return;
+    try { localStorage.setItem(seenKey(), notices[0].created_at); } catch (e) {}
+    $("nb").hidden = true; $("annTop").innerHTML = ""; drawNotices(true);
+  }
+  function drawNotices(keep) {
+    var s = keep ? "" : lastSeen(), box = $("nlist");
+    box.innerHTML = notices.length ? "" : '<div class="card"><p class="sub">No announcements yet.</p></div>';
+    notices.forEach(function (a) {
+      var el = document.createElement("div"); el.className = "note" + (s === "" || a.created_at > s ? "" : "") + (!keep && (!s || a.created_at > s) ? " new" : "");
+      el.innerHTML = "<h3>" + esc(a.title) + "</h3><p>" + esc(a.body) + "</p><small>" + new Date(a.created_at).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }) + "</small>";
+      box.appendChild(el);
+    });
+  }
+  function loadNotices() {
+    sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(20).then(function (r) {
+      notices = r.data || []; var u = unread();
+      drawNotices(false);
+      if (u.length) {
+        $("nb").textContent = u.length; $("nb").hidden = false;
+        $("annTop").innerHTML = '<div class="note new"><h3>' + esc(u[0].title) + "</h3><p>" + esc(u[0].body) + '</p><small>New announcement. Open Notifications to mark it as read.</small></div>';
+      }
     });
   }
 
@@ -252,7 +287,7 @@
       if (!q.data) { $("status").className = "banner bad"; $("status").textContent = "We could not find your store. Contact us on WhatsApp."; return; }
       vendor = q.data;
       ["store_name", "description", "city", "whatsapp_number"].forEach(function (k) { $(k).value = vendor[k] || ""; });
-      loadProducts().then(refresh); loadVisits();
+      loadProducts().then(refresh); loadVisits(); loadNotices();
     });
   });
 })();

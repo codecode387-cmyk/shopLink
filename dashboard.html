@@ -20,6 +20,8 @@
   <button data-v="products">Products</button>
   <button data-v="settings">Store settings</button>
   <button data-v="billing">Billing</button>
+  <button data-v="verify">Get verified</button>
+  <button data-v="ads">Advertise</button>
   <button data-v="notices">Notifications <span class="badge" id="nb" hidden></span></button>
   <span class="sp"></span>
   <a class="nv" href="#" id="out">Log out</a>
@@ -67,6 +69,7 @@
     <section class="view" id="v-products">
       <form class="card" id="prod" novalidate>
         <h2 id="pTitle">Add a product</h2>
+        <p class="sub" id="pCount"></p>
         <input type="hidden" id="p_id">
         <div class="two">
           <label class="f">Product name<input id="p_name" maxlength="80"></label>
@@ -108,6 +111,26 @@
         <p class="msg" id="payMsg" role="alert"></p>
       </div>
     </section>
+
+    <section class="view" id="v-verify">
+      <div class="card">
+        <h2>Get verified</h2>
+        <p class="sub">Optional. Pay ₦3,000 for 6 months. After we approve it, your store shows a "Top &amp; Trusted Seller" badge with 5 stars at the top, so shoppers trust you more.</p>
+        <p style="margin:1rem 0" id="vState"></p>
+        <button class="btn p" id="vPay" type="button">Pay ₦3,000 to get verified</button>
+        <p class="msg" id="vMsg" role="alert"></p>
+      </div>
+    </section>
+
+    <section class="view" id="v-ads">
+      <form class="card" id="adf" novalidate>
+        <h2>Advertise with ShopLink NG</h2>
+        <p class="sub">Choose how many days you want your ad to run. Your request opens on WhatsApp and goes straight to us.</p>
+        <label class="f">Number of days<input id="adDays" type="number" inputmode="numeric" min="1" max="90" value="7"></label>
+        <p class="msg" id="adMsg" role="alert"></p>
+        <button class="btn p" type="submit">Send request on WhatsApp</button>
+      </form>
+    </section>
   </div>
 </div>
 
@@ -118,9 +141,11 @@
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var PAYSTACK_KEY = "pk_live_383a0e2b83c984d24a655080a848924537c4f3bc";
   var STORE_DOMAIN = "https://shoplinkng.shop";
+  var ADS_WHATSAPP = "2349032473005";
+  var MAX_PRODUCTS = 100;
   var $ = function (id) { return document.getElementById(id); };
   var user, vendor, products = [];
-  var TITLES = { overview: "Overview", products: "Products", settings: "Store settings", billing: "Billing", notices: "Notifications" };
+  var TITLES = { overview: "Overview", products: "Products", settings: "Store settings", billing: "Billing", verify: "Get verified", ads: "Advertise", notices: "Notifications" };
 
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
@@ -128,6 +153,8 @@
   function storeUrl() { return STORE_DOMAIN + "/" + vendor.slug; }
   function daysLeft() { return Math.ceil((new Date(vendor.paid_until) - new Date()) / 864e5); }
   function say(id, t, ok) { var m = $(id); m.textContent = t; m.className = "msg" + (ok ? " ok" : ""); }
+  function fmtDate(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }); }
+  function isVerified() { return vendor.verify_status === "approved" && vendor.verified_until && new Date(vendor.verified_until) > new Date(); }
 
   /* tabs */
   function show(v) {
@@ -136,6 +163,21 @@
     $("title").textContent = TITLES[v]; scrollTo(0, 0); if (v === "notices") markSeen();
   }
   document.querySelectorAll(".side button").forEach(function (b) { b.onclick = function () { show(b.dataset.v); }; });
+
+  /* verification tab */
+  function drawVerify() {
+    var s = $("vState"), b = $("vPay");
+    if (isVerified()) {
+      s.textContent = "★★★★★ You are verified until " + fmtDate(vendor.verified_until) + ".";
+      b.hidden = true;
+    } else if (vendor.verify_status === "pending") {
+      s.textContent = "Payment received. We are reviewing your store and will approve your badge soon.";
+      b.hidden = true;
+    } else {
+      s.textContent = vendor.verify_status === "approved" ? "Your verification has expired. Pay again to renew." : "You are not verified yet.";
+      b.hidden = false;
+    }
+  }
 
   /* header, status, checklist */
   function refresh() {
@@ -149,8 +191,10 @@
     $("shTg").href = "https://t.me/share/url?url=" + u + "&text=" + t;
     $("shX").href = "https://twitter.com/intent/tweet?text=" + t + "&url=" + u;
     if (navigator.share) { $("shMore").hidden = false; $("shMore").onclick = function () { navigator.share({ title: vendor.store_name, text: vendor.store_name + " – shop with us here:", url: storeUrl() }).catch(function () {}); }; }
-    $("sProd").textContent = products.length; $("sDays").textContent = n > 0 ? n + (n === 1 ? " day left" : " days left") : "Expired";
-    $("paidUntil").textContent = (n > 0 ? "Your store is open until " : "Your store closed on ") + new Date(vendor.paid_until).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }) + ".";
+    $("sProd").textContent = products.length + " / " + MAX_PRODUCTS;
+    $("pCount").textContent = products.length + " of " + MAX_PRODUCTS + " products used.";
+    $("sDays").textContent = n > 0 ? n + (n === 1 ? " day left" : " days left") : "Expired";
+    $("paidUntil").textContent = (n > 0 ? "Your store is open until " : "Your store closed on ") + fmtDate(vendor.paid_until) + ".";
     var steps = [["Upload your store logo", !!vendor.logo_url], ["Describe what you sell", !!(vendor.description || "").trim()], ["Add your WhatsApp number", !!vendor.whatsapp_number], ["Add your first product", products.length > 0]];
     var done = steps.filter(function (x) { return x[1]; }).length, all = done === steps.length;
     $("steps").innerHTML = steps.map(function (x) { return '<li class="' + (x[1] ? "done" : "") + '">' + x[0] + "</li>"; }).join("");
@@ -161,6 +205,7 @@
     else if (!all) { s.className = "banner wait"; s.textContent = "Your store is not live yet. Finish the steps on the Overview page."; }
     else { s.className = "banner ok"; s.textContent = "Your store is live and open. " + n + (n === 1 ? " day" : " days") + " left."; }
     $("logoBox").innerHTML = vendor.logo_url ? '<img alt="Logo" src="' + esc(vendor.logo_url) + '" style="width:72px;height:72px;border-radius:16px;object-fit:cover">' : '<span class="ph" style="width:72px;height:72px;border-radius:16px">Logo</span>';
+    drawVerify();
   }
 
   /* visits chart */
@@ -174,7 +219,6 @@
       $("s30").textContent = total; $("sToday").textContent = rows.length ? rows[rows.length - 1].visits : 0;
     });
   }
-
 
   /* announcements from the admin */
   var notices = [];
@@ -190,8 +234,8 @@
     var s = keep ? "" : lastSeen(), box = $("nlist");
     box.innerHTML = notices.length ? "" : '<div class="card"><p class="sub">No announcements yet.</p></div>';
     notices.forEach(function (a) {
-      var el = document.createElement("div"); el.className = "note" + (s === "" || a.created_at > s ? "" : "") + (!keep && (!s || a.created_at > s) ? " new" : "");
-      el.innerHTML = "<h3>" + esc(a.title) + "</h3><p>" + esc(a.body) + "</p><small>" + new Date(a.created_at).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }) + "</small>";
+      var el = document.createElement("div"); el.className = "note" + (!keep && (!s || a.created_at > s) ? " new" : "");
+      el.innerHTML = "<h3>" + esc(a.title) + "</h3><p>" + esc(a.body) + "</p><small>" + fmtDate(a.created_at) + "</small>";
       box.appendChild(el);
     });
   }
@@ -241,6 +285,7 @@
     var name = $("p_name").value.trim(), price = parseFloat($("p_price").value), f = $("p_img").files[0], id = $("p_id").value;
     if (!name) return say("pMsg", "Enter the product name.");
     if (isNaN(price) || price < 0) return say("pMsg", "Enter a price in naira.");
+    if (!id && products.length >= MAX_PRODUCTS) return say("pMsg", "You have reached the limit of " + MAX_PRODUCTS + " products. Delete one to add another.");
     if (f && f.size > 3e6) return say("pMsg", "Photo must be under 3 MB.");
     $("pGo").disabled = true;
     (f ? upload(f, "p-") : Promise.resolve(undefined)).then(function (url) {
@@ -250,7 +295,7 @@
       var q = id ? sb.from("products").update(row).eq("id", id) : sb.from("products").insert(Object.assign({ owner_id: user.id }, row));
       return q.then(function (r) {
         $("pGo").disabled = false;
-        if (r.error) return say("pMsg", "Could not save the product. Try again.");
+        if (r.error) return say("pMsg", (r.error.message || "").indexOf("limit") > -1 ? "You have reached the limit of " + MAX_PRODUCTS + " products." : "Could not save the product. Try again.");
         resetForm(); say("pMsg", "Saved.", true); loadProducts();
       });
     });
@@ -278,7 +323,7 @@
     var b = this; (navigator.clipboard ? navigator.clipboard.writeText(storeUrl()) : Promise.reject()).then(function () { b.textContent = "Copied"; }, function () { b.textContent = "Copy not available"; });
   };
 
-  /* payment */
+  /* payment: store fee N1,000 */
   $("pay").onclick = function () {
     say("payMsg", "");
     if (!window.PaystackPop) return say("payMsg", "Payment could not load. Check your connection and refresh.");
@@ -294,6 +339,32 @@
       }, onClose: function () {}
     }).openIframe();
   };
+
+  /* payment: verification N3,000 */
+  $("vPay").onclick = function () {
+    say("vMsg", "");
+    if (!window.PaystackPop) return say("vMsg", "Payment could not load. Check your connection and refresh.");
+    PaystackPop.setup({
+      key: PAYSTACK_KEY, email: user.email, amount: 300000, currency: "NGN",
+      ref: "VF" + Date.now() + Math.floor(Math.random() * 1e5), metadata: { owner_id: user.id, kind: "verify" },
+      callback: function (res) {
+        say("vMsg", "Confirming your payment…", true);
+        sb.functions.invoke("verify-payment", { body: { reference: res.reference } }).then(function (r) {
+          if (r.error) return say("vMsg", "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference);
+          sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; refresh(); say("vMsg", "Payment confirmed. We will approve your badge soon.", true); });
+        });
+      }, onClose: function () {}
+    }).openIframe();
+  };
+
+  /* advertise: opens WhatsApp with the request */
+  $("adf").addEventListener("submit", function (e) {
+    e.preventDefault(); say("adMsg", "");
+    var d = parseInt($("adDays").value, 10);
+    if (isNaN(d) || d < 1 || d > 90) return say("adMsg", "Enter a number of days between 1 and 90.");
+    var msg = "Hello ShopLink NG, I want to advertise my store.\nStore: " + vendor.store_name + "\nLink: " + storeUrl() + "\nDays: " + d;
+    window.open("https://wa.me/" + ADS_WHATSAPP + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
+  });
 
   $("out").onclick = function (e) { e.preventDefault(); sb.auth.signOut().then(function () { location.href = "login.html"; }); };
 

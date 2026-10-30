@@ -50,6 +50,10 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .head h1{font-size:clamp(1.4rem,5vw,2.1rem);line-height:1.15}
 .head p{color:var(--mut)}
 
+/* verified badge */
+.vb{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;padding:.3rem .75rem;border-radius:999px;background:#fff8e1;border:1px solid #f2d27a;color:#7a5600;font-size:.82rem;font-weight:700;line-height:1.3}
+.vb i{font-style:normal;color:#f5a623;letter-spacing:.05em}
+
 /* search */
 .sbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:calc(.6rem + env(safe-area-inset-top,0px)) 0 .6rem;border-bottom:1px solid var(--line)}
 .search{display:flex;align-items:center;gap:.6rem;height:46px;padding:0 .8rem;background:var(--soft);border:1.5px solid transparent;border-radius:14px}
@@ -154,6 +158,8 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
   function storeUrl() { return BASE + "/" + slug; }
+  function isVerified() { return vendor.verify_status === "approved" && vendor.verified_until && new Date(vendor.verified_until) > new Date(); }
+  function badge() { return isVerified() ? '<span class="vb">✓ Top &amp; Trusted Seller <i aria-label="5 stars">★★★★★</i></span>' : ""; }
   function note(h, p, retry) {
     app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + "</p>" + (retry ? '<button type="button" onclick="location.reload()">Try again</button>' : "") + '<p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p></div>';
   }
@@ -226,7 +232,7 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
       '<div class="w"><div class="dwrap">' + picture + "<div>" +
       '<h1 class="dn">' + esc(p.name) + '</h1><div class="dp">' + naira(p.price) + '</div><div class="ctl big" data-id="' + id + '"></div>' +
       '<h2 class="dl">About this product</h2><p class="dd">' + (p.description ? esc(p.description) : "The seller has not added a description yet.") + "</p>" +
-      '<div class="sell">' + logo + "<div><b>" + esc(vendor.store_name) + "</b><small>" + (vendor.city ? esc(vendor.city) : "Seller") + '</small></div><a href="#" data-act="back-all">All products</a></div>' +
+      '<div class="sell">' + logo + "<div><b>" + esc(vendor.store_name) + "</b><small>" + (vendor.city ? esc(vendor.city) : "Seller") + "</small>" + badge() + '</div><a href="#" data-act="back-all">All products</a></div>' +
       '<ul class="tips"><li>Your order goes straight to the seller on WhatsApp.</li><li>Pay the seller directly by transfer or on delivery.</li></ul>' +
       "</div></div>" +
       (others.length ? '<div class="more"><h2>More from ' + esc(vendor.store_name) + '</h2><div class="grid">' + others.map(cardHtml).join("") + "</div></div>" : "") +
@@ -283,7 +289,7 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
     var logo = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '">' : '<span class="ph">' + esc(vendor.store_name.charAt(0).toUpperCase()) + "</span>";
     app.innerHTML =
       '<div id="listView">' +
-        '<div class="head"><div class="w">' + logo + "<div><h1>" + esc(vendor.store_name) + "</h1><p>" + esc(vendor.description || "") + (vendor.city ? "<br>" + esc(vendor.city) : "") + "</p></div></div></div>" +
+        '<div class="head"><div class="w">' + logo + "<div><h1>" + esc(vendor.store_name) + "</h1><p>" + esc(vendor.description || "") + (vendor.city ? "<br>" + esc(vendor.city) : "") + "</p>" + badge() + "</div></div></div>" +
         '<div class="sbar"><div class="w"><label class="search">' + I.search + '<input id="q" type="search" placeholder="Search products" autocomplete="off" autocorrect="off" enterkeyhint="search" aria-label="Search products"><button class="qx" id="qx" type="button" aria-label="Clear search" hidden>×</button></label></div></div>' +
         '<div class="w"><p class="count" id="count" role="status"></p><div class="grid" id="g"></div><p class="foot">Store powered by <a href="' + BASE + '/">ShopLink NG</a></p></div>' +
       "</div>" +
@@ -335,7 +341,7 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
   }
 
   if (!slug) return note("Store not found", "Check the link and try again.");
-  sb.from("vendors").select("store_name,description,city,logo_url,whatsapp_number,paid_until,is_live").eq("slug", slug).maybeSingle().then(function (r) {
+  sb.from("vendors").select("store_name,description,city,logo_url,whatsapp_number,paid_until,is_live,verify_status,verified_until").eq("slug", slug).maybeSingle().then(function (r) {
     if (r.error) return note("Could not load the store", "Check your connection and try again.", true);
     if (!r.data) return note("Store not found", "This store link does not exist. Check the link and try again.");
     vendor = r.data; document.title = vendor.store_name + " – ShopLink NG";

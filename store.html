@@ -1,42 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-NG">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Store – ShopLink NG</title>
+<meta name="description" content="Shop online and send your order straight to the seller on WhatsApp. Powered by ShopLink NG.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#1b7a4b">
+<link rel="canonical" href="https://shoplinkng.shop/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- Fallback preview for WhatsApp, Facebook, X etc. (api/store.js replaces these for each store) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ShopLink NG">
+<meta property="og:title" content="Shop on ShopLink NG">
+<meta property="og:description" content="Pick what you want and send your order straight to the seller on WhatsApp.">
+<meta property="og:image" content="https://shoplinkng.shop/og-image.jpg">
+<meta property="og:url" content="https://shoplinkng.shop/">
+<meta property="og:locale" content="en_NG">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ShopLink NG">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Shop on ShopLink NG">
+<meta name="twitter:description" content="Pick what you want and send your order straight to the seller on WhatsApp.">
+<meta name="twitter:image" content="https://shoplinkng.shop/og-image.jpg">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0}
-:root{--g:#1b7a4b;--wa:#25d366;--ink:#14231b;--mut:#64748b;--line:#e5e9ee}
-body{font:400 15px/1.55 "DM Sans",system-ui,sans-serif;color:var(--ink);background:#fff;padding-bottom:6rem}
+[hidden]{display:none!important}
+:root{--g:#1b7a4b;--gd:#145c38;--wa:#25d366;--ink:#14231b;--mut:#64748b;--line:#e5e9ee;--soft:#f1f4f2}
+html{-webkit-text-size-adjust:100%}
+body{font:400 15px/1.55 "DM Sans",system-ui,sans-serif;color:var(--ink);background:#fff;padding-bottom:6.5rem;-webkit-tap-highlight-color:transparent}
 h1,h2{font-family:"Bricolage Grotesque","DM Sans",sans-serif;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;border:0;border-radius:12px;touch-action:manipulation;color:inherit;background:none}
 .w{width:min(1000px,92%);margin-inline:auto}
-.head{border-bottom:1px solid var(--line);padding:1.6rem 0}
+
+/* store header */
+.head{border-bottom:1px solid var(--line);padding:1.4rem 0}
 .head .w{display:flex;gap:1rem;align-items:center}
-.head img,.head .ph{width:76px;height:76px;border-radius:18px;object-fit:cover;background:#e8f6ee;color:var(--g);font:800 1.8rem "Bricolage Grotesque";display:grid;place-items:center;flex:none}
-.head h1{font-size:clamp(1.5rem,5vw,2.2rem)}.head p{color:var(--mut)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.1rem;margin-top:1.6rem}
-.p{border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
-.p img,.p .ph2{width:100%;aspect-ratio:1;object-fit:cover;background:#f1f4f2}
-.p div{padding:.8rem;display:flex;flex-direction:column;gap:.2rem;flex:1}
-.p b{font-weight:700}.p small{color:var(--mut)}.p .pr{font-weight:800;color:var(--g)}
-.qty{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:.6rem}
-button{font:700 .95rem inherit;font-family:inherit;cursor:pointer;border:0;border-radius:10px}
-.add{background:#e8f6ee;color:var(--g);padding:.55rem;width:100%}.add:hover{background:#d4eedf}
-.qty button{width:36px;height:36px;background:var(--g);color:#fff;font-size:1.2rem}
-.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:.8rem 0 calc(.8rem + env(safe-area-inset-bottom,0px))}
+.head img,.head .ph{width:72px;height:72px;border-radius:18px;object-fit:cover;background:#e8f6ee;color:var(--g);font:800 1.8rem "Bricolage Grotesque";display:grid;place-items:center;flex:none}
+.head h1{font-size:clamp(1.4rem,5vw,2.1rem);line-height:1.15}
+.head p{color:var(--mut)}
+
+/* search */
+.sbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:calc(.6rem + env(safe-area-inset-top,0px)) 0 .6rem;border-bottom:1px solid var(--line)}
+.search{display:flex;align-items:center;gap:.6rem;height:46px;padding:0 .8rem;background:var(--soft);border:1.5px solid transparent;border-radius:14px}
+.search:focus-within{border-color:var(--g);background:#fff}
+.search>svg{width:20px;height:20px;flex:none;color:var(--mut)}
+.search input{flex:1;min-width:0;height:100%;border:0;background:none;outline:0;font-family:inherit;font-size:1rem;color:var(--ink);-webkit-appearance:none;appearance:none}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.qx{width:28px;height:28px;flex:none;border-radius:50%;background:#c5cdd6;color:#fff;font-size:1.1rem;line-height:1;display:grid;place-items:center}
+.count{color:var(--mut);font-size:.9rem;margin-top:1rem;min-height:1.2em}
+
+/* product grid: 2 columns on phones */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:.6rem}
+@media(min-width:620px){.grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.1rem}}
+.p{border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;background:#fff}
+.pimg{display:block;aspect-ratio:1;background:var(--soft)}
+.pimg img{width:100%;height:100%;object-fit:cover;display:block}
+.ph2{width:100%;height:100%;display:grid;place-items:center;font:800 2.2rem "Bricolage Grotesque";color:#7fae94;background:#e8f6ee}
+.pi{padding:.65rem .65rem .75rem;display:flex;flex-direction:column;gap:.2rem;flex:1}
+.pn{font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.pd{display:none;color:var(--mut);font-size:.85rem;line-height:1.4;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(min-width:620px){.pd{display:-webkit-box}}
+.pr{font-weight:800;color:var(--g);font-size:1.05rem}
+
+/* add / quantity controls */
+.ctl{margin-top:auto;padding-top:.55rem}
+.add{display:flex;align-items:center;justify-content:center;gap:.4rem;width:100%;height:42px;background:var(--g);color:#fff;border-radius:12px;font-size:.95rem}
+.add:active{background:var(--gd)}
+.add svg{width:17px;height:17px}
+.stp{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;height:42px;border:1.5px solid var(--g);border-radius:12px;overflow:hidden;text-align:center}
+.stp button{height:100%;border-radius:0;color:var(--g);font-size:1.5rem;line-height:1}
+.stp button:active{background:#e8f6ee}
+.stp b{font-weight:800}
+.ctl.big .add,.ctl.big .stp{height:52px;font-size:1.05rem}
+.ctl.big .stp{grid-template-columns:56px 1fr 56px}
+
+/* product page */
+.dtop{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:calc(.3rem + env(safe-area-inset-top,0px)) 0 .3rem}
+.dtop .w{display:flex;align-items:center;justify-content:space-between}
+.back,.ico{display:inline-flex;align-items:center;gap:.3rem;min-height:44px;padding:0 .4rem;font-weight:700;border-radius:12px}
+.back svg,.ico svg{width:22px;height:22px}
+.dwrap{display:grid;gap:1.2rem;margin-top:1rem}
+@media(min-width:760px){.dwrap{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2.2rem;align-items:start}}
+.dimg{display:block;position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;background:var(--soft);padding:0}
+.dimg img{width:100%;height:100%;object-fit:cover;display:block}
+.zh{position:absolute;right:.7rem;bottom:.7rem;background:rgba(0,0,0,.6);color:#fff;font-size:.78rem;font-weight:500;padding:.3rem .65rem;border-radius:999px}
+.dn{font-size:clamp(1.4rem,5vw,2rem);line-height:1.2;overflow-wrap:anywhere}
+.dp{font:800 1.7rem "Bricolage Grotesque";color:var(--g);margin:.3rem 0 1rem}
+.dl{font-size:1rem;margin:1.5rem 0 .3rem}
+.dd{color:#334155;white-space:pre-line;overflow-wrap:anywhere}
+.sell{display:flex;align-items:center;gap:.7rem;margin-top:1.4rem;padding:.8rem;border:1px solid var(--line);border-radius:14px}
+.sell img,.sell .ph{width:44px;height:44px;border-radius:12px;object-fit:cover;background:#e8f6ee;color:var(--g);font:800 1.2rem "Bricolage Grotesque";display:grid;place-items:center;flex:none}
+.sell small{display:block;color:var(--mut)}
+.sell a{margin-left:auto;color:var(--g);font-weight:700;white-space:nowrap}
+.tips{list-style:none;padding:0;margin:1rem 0 0;display:grid;gap:.4rem;color:var(--mut);font-size:.9rem}
+.tips li:before{content:"✓";color:var(--g);font-weight:800;margin-right:.5rem}
+.more h2{font-size:1.25rem;margin-top:2.2rem}
+
+/* order bar + sheet */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);padding:.7rem 0 calc(.7rem + env(safe-area-inset-bottom,0px))}
 .bar .w{display:flex;justify-content:space-between;align-items:center;gap:1rem}
-.go{background:var(--wa);color:#06210f;padding:.8rem 1.3rem}
-.sheet{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;justify-content:center;z-index:9}
+.go{background:var(--wa);color:#06210f;padding:0 1.2rem;height:46px;border-radius:12px;font-size:.95rem}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:9}
 .sheet.on{display:flex}
-.sheet form{background:#fff;width:min(520px,100%);border-radius:20px 20px 0 0;padding:1.4rem;max-height:90vh;overflow:auto}
+.sheet form{background:#fff;width:min(520px,100%);border-radius:20px 20px 0 0;padding:1.4rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom,0px));max-height:90vh;overflow:auto}
 .sheet label{display:block;font-weight:700;font-size:.88rem;margin-top:.9rem}
-.sheet input{display:block;width:100%;margin-top:.3rem;font:400 1rem inherit;font-family:inherit;border:1px solid #cfd6de;border-radius:10px;padding:.65rem .8rem}
+.sheet input{display:block;width:100%;margin-top:.3rem;font-family:inherit;font-size:1rem;font-weight:400;border:1px solid #cfd6de;border-radius:10px;padding:.7rem .8rem}
 .sheet ul{list-style:none;padding:0;margin:.8rem 0;display:grid;gap:.3rem;color:var(--mut)}
+.sheet .go{width:100%;margin-top:1rem}
+.sheet .back2{width:100%;margin-top:.5rem;height:46px;background:var(--soft)}
+
 .note{text-align:center;padding:5rem 1rem}.note h1{font-size:2rem;margin-bottom:.6rem}.note p{color:var(--mut);max-width:30rem;margin:0 auto}
+.note button{margin-top:1rem;background:var(--g);color:#fff;padding:.7rem 1.3rem}
 .foot{text-align:center;color:var(--mut);font-size:.85rem;margin-top:2.5rem}.foot a{color:var(--g);font-weight:700}
+
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:20;display:flex;align-items:center;justify-content:center;padding:1rem}
+.lb img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
+.lb button{position:absolute;top:calc(.8rem + env(safe-area-inset-top,0px));right:.8rem;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:1.6rem;line-height:1}
+.toast{position:fixed;left:50%;bottom:6rem;transform:translate(-50%,10px);background:#14231b;color:#fff;padding:.6rem 1rem;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:30;font-size:.9rem}
+.toast.on{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -44,57 +136,194 @@ button{font:700 .95rem inherit;font-family:inherit;cursor:pointer;border:0;borde
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
 (function () {
+  var BASE = "https://shoplinkng.shop";
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
-  var app = document.getElementById("app"), cart = {}, vendor, products = [];
+  var app = document.getElementById("app");
+  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT;
   var slug = (new URLSearchParams(location.search).get("s") || location.pathname.split("/").filter(Boolean).pop() || "").replace(/\.html$/, "").toLowerCase();
 
-  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
-  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
-  function note(h, p) { app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + '</p><p class="foot"><a href="/">Open your own store on ShopLink NG</a></p></div>'; }
+  var SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  var I = {
+    plus: SVG + '<path d="M12 5v14M5 12h14"/></svg>',
+    search: SVG + '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+    back: SVG + '<path d="M15 18l-6-6 6-6"/></svg>',
+    share: SVG + '<path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>'
+  };
 
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
+  function storeUrl() { return BASE + "/" + slug; }
+  function note(h, p, retry) {
+    app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + "</p>" + (retry ? '<button type="button" onclick="location.reload()">Try again</button>' : "") + '<p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p></div>';
+  }
   function count() { return Object.keys(cart).reduce(function (a, k) { return a + cart[k]; }, 0); }
   function total() { return products.reduce(function (a, p) { return a + (cart[p.id] || 0) * Number(p.price); }, 0); }
+  function toast(t) { var el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function () { el.classList.remove("on"); }, 1800); }
 
-  function draw() {
+  /* page title and link-preview tags (for Google and other crawlers that run JavaScript) */
+  function setMeta(sel, v) { var el = document.querySelector(sel); if (el) el.setAttribute(el.tagName === "LINK" ? "href" : "content", v); }
+  function seo(title, desc, img) {
+    desc = String(desc || "").replace(/\s+/g, " ").slice(0, 155);
+    document.title = title;
+    setMeta('meta[name="description"]', desc);
+    setMeta('meta[property="og:title"]', title);
+    setMeta('meta[property="og:description"]', desc);
+    setMeta('meta[property="og:url"]', storeUrl());
+    setMeta('link[rel="canonical"]', storeUrl());
+    if (img) setMeta('meta[property="og:image"]', img);
+  }
+
+  /* ---------- add / quantity controls ---------- */
+  function ctlHtml(id, big) {
+    var n = cart[id] || 0;
+    if (!n) return '<button class="add" type="button" data-act="add" data-id="' + esc(id) + '">' + I.plus + (big ? "Add to order" : "Add") + "</button>";
+    return '<div class="stp"><button type="button" data-act="dec" data-id="' + esc(id) + '" aria-label="Remove one">−</button><b aria-live="polite">' + n + '</b><button type="button" data-act="inc" data-id="' + esc(id) + '" aria-label="Add one">+</button></div>';
+  }
+  function fillCtl(root) {
+    root.querySelectorAll(".ctl").forEach(function (c) { c.innerHTML = ctlHtml(c.dataset.id, c.classList.contains("big")); });
+  }
+  function setQty(id, n) {
+    n = Math.max(0, Math.min(99, n));
+    if (n) cart[id] = n; else delete cart[id];
+    document.querySelectorAll(".ctl").forEach(function (c) { if (c.dataset.id === id) c.innerHTML = ctlHtml(id, c.classList.contains("big")); });
+    updateBar();
+  }
+  function updateBar() {
+    var c = count();
+    $("bar").hidden = !c;
+    $("sum").textContent = c + (c === 1 ? " item · " : " items · ") + naira(total());
+  }
+
+  /* ---------- product cards ---------- */
+  function imgHtml(p) {
+    return p.image_url ? '<img alt="' + esc(p.name) + '" loading="lazy" src="' + esc(p.image_url) + '">' : '<span class="ph2">' + esc(String(p.name).charAt(0).toUpperCase()) + "</span>";
+  }
+  function cardHtml(p) {
+    var id = esc(p.id), href = "#p=" + encodeURIComponent(p.id);
+    return '<article class="p"><a class="pimg" href="' + href + '" aria-label="View ' + esc(p.name) + '">' + imgHtml(p) + '</a><div class="pi"><a class="pn" href="' + href + '">' + esc(p.name) + "</a>" +
+      (p.description ? '<span class="pd">' + esc(p.description) + "</span>" : "") + '<span class="pr">' + naira(p.price) + '</span><div class="ctl" data-id="' + id + '"></div></div></article>';
+  }
+
+  /* ---------- search ---------- */
+  function applyFilter() {
+    var s = query.trim().toLowerCase(), g = $("g"), c = $("count");
+    var list = !s ? products : products.filter(function (p) { return (p.name + " " + (p.description || "")).toLowerCase().indexOf(s) > -1; });
+    if (!products.length) { g.innerHTML = '<p style="color:var(--mut);grid-column:1/-1">No products yet.</p>'; c.textContent = ""; return; }
+    if (!list.length) { g.innerHTML = '<p style="color:var(--mut);grid-column:1/-1;padding:1.5rem 0;text-align:center">No product matches “' + esc(query.trim()) + '”. Try a different word.</p>'; c.textContent = ""; return; }
+    g.innerHTML = list.map(cardHtml).join(""); fillCtl(g);
+    c.textContent = s ? list.length + (list.length === 1 ? " result" : " results") : "";
+  }
+
+  /* ---------- product page ---------- */
+  function detailHtml(p) {
+    var id = esc(p.id), others = products.filter(function (x) { return String(x.id) !== String(p.id); }).slice(0, 6);
+    var picture = p.image_url
+      ? '<button class="dimg" type="button" data-act="zoom" aria-label="Enlarge photo"><img alt="' + esc(p.name) + '" src="' + esc(p.image_url) + '"><span class="zh">Tap to enlarge</span></button>'
+      : '<div class="dimg"><span class="ph2" style="font-size:4rem">' + esc(String(p.name).charAt(0).toUpperCase()) + "</span></div>";
     var logo = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '">' : '<span class="ph">' + esc(vendor.store_name.charAt(0).toUpperCase()) + "</span>";
-    app.innerHTML = '<div class="head"><div class="w">' + logo + "<div><h1>" + esc(vendor.store_name) + "</h1><p>" + esc(vendor.description || "") + (vendor.city ? "<br>" + esc(vendor.city) : "") + '</p></div></div></div><div class="w"><div class="grid" id="g"></div><p class="foot">Store powered by <a href="/">ShopLink NG</a></p></div>' +
-      '<div class="bar" id="bar" hidden><div class="w"><b id="sum"></b><button class="go" id="open" type="button">Order on WhatsApp</button></div></div>' +
-      '<div class="sheet" id="sheet"><form id="of"><h2>Your order</h2><ul id="lines"></ul><b id="tot"></b><label>Your name<input id="cn" autocomplete="name"></label><label>Delivery address<input id="ca" autocomplete="street-address"></label><p id="err" style="color:#d93f2f;font-weight:700;margin-top:.6rem"></p><button class="go" style="width:100%;margin-top:1rem" type="submit">Send order on WhatsApp</button><button type="button" id="close" style="width:100%;margin-top:.5rem;padding:.7rem;background:#f1f4f2">Back</button></form></div>';
-    var g = document.getElementById("g");
-    if (!products.length) g.innerHTML = '<p style="color:var(--mut)">No products yet.</p>';
-    products.forEach(function (p) {
-      var c = document.createElement("div"); c.className = "p";
-      c.innerHTML = (p.image_url ? '<img alt="" loading="lazy" src="' + esc(p.image_url) + '">' : '<div class="ph2"></div>') + "<div><b>" + esc(p.name) + "</b><small>" + esc(p.description || "") + '</small><span class="pr">' + naira(p.price) + '</span><span class="qty"></span></div>';
-      g.appendChild(c); p.el = c.querySelector(".qty"); qty(p);
-    });
-    document.getElementById("open").onclick = openSheet;
-    document.getElementById("close").onclick = function () { document.getElementById("sheet").classList.remove("on"); };
-    document.getElementById("of").onsubmit = send;
+    return '<div class="dtop"><div class="w"><a class="back" href="#" data-act="back">' + I.back + 'Back</a><button class="ico" type="button" data-act="share" aria-label="Share this product">' + I.share + "</button></div></div>" +
+      '<div class="w"><div class="dwrap">' + picture + "<div>" +
+      '<h1 class="dn">' + esc(p.name) + '</h1><div class="dp">' + naira(p.price) + '</div><div class="ctl big" data-id="' + id + '"></div>' +
+      '<h2 class="dl">About this product</h2><p class="dd">' + (p.description ? esc(p.description) : "The seller has not added a description yet.") + "</p>" +
+      '<div class="sell">' + logo + "<div><b>" + esc(vendor.store_name) + "</b><small>" + (vendor.city ? esc(vendor.city) : "Seller") + '</small></div><a href="#" data-act="back-all">All products</a></div>' +
+      '<ul class="tips"><li>Your order goes straight to the seller on WhatsApp.</li><li>Pay the seller directly by transfer or on delivery.</li></ul>' +
+      "</div></div>" +
+      (others.length ? '<div class="more"><h2>More from ' + esc(vendor.store_name) + '</h2><div class="grid">' + others.map(cardHtml).join("") + "</div></div>" : "") +
+      "</div>";
+  }
+  function showProduct(id) {
+    var p = byId[id], d = $("detail");
+    $("listView").hidden = true; d.hidden = false;
+    if (!p) {
+      cur = null;
+      d.innerHTML = '<div class="dtop"><div class="w"><a class="back" href="#" data-act="back-all">' + I.back + 'Back to store</a></div></div><div class="note"><h1>Product not found</h1><p>This product may have been removed by the seller.</p></div>';
+      scrollTo(0, 0); return;
+    }
+    cur = p;
+    d.innerHTML = detailHtml(p); fillCtl(d);
+    seo(p.name + " – " + vendor.store_name, (p.description || p.name) + " · " + naira(p.price), p.image_url || vendor.logo_url);
+    scrollTo(0, 0);
+  }
+  function showList() {
+    cur = null; $("detail").hidden = true; $("listView").hidden = false;
+    seo(vendor.store_name + " – ShopLink NG", vendor.description || ("Shop " + vendor.store_name + " online and send your order on WhatsApp."), vendor.logo_url);
+    scrollTo(0, listY);
+  }
+  function route() {
+    var m = location.hash.match(/^#p=(.+)$/);
+    if (m) { var id; try { id = decodeURIComponent(m[1]); } catch (e) { id = m[1]; } showProduct(id); } else showList();
+  }
+  function share() {
+    if (!cur) return;
+    var url = location.href, data = { title: cur.name + " – " + vendor.store_name, text: cur.name + " · " + naira(cur.price), url: url };
+    if (navigator.share) { navigator.share(data).catch(function () {}); }
+    else if (navigator.clipboard) { navigator.clipboard.writeText(url).then(function () { toast("Link copied"); }, function () { toast("Copy not available"); }); }
+    else toast("Copy not available");
   }
 
-  function qty(p) {
-    var n = cart[p.id] || 0;
-    p.el.innerHTML = n ? '<button type="button" aria-label="Remove one">−</button><b>' + n + '</b><button type="button" aria-label="Add one">+</button>' : '<button class="add" type="button">Add to order</button>';
-    var b = p.el.querySelectorAll("button");
-    if (n) { b[0].onclick = function () { set(p, n - 1); }; b[1].onclick = function () { set(p, n + 1); }; } else b[0].onclick = function () { set(p, 1); };
-  }
-  function set(p, n) {
-    if (n <= 0) delete cart[p.id]; else cart[p.id] = n;
-    qty(p); var bar = document.getElementById("bar"); bar.hidden = !count();
-    document.getElementById("sum").textContent = count() + (count() === 1 ? " item · " : " items · ") + naira(total());
-  }
+  /* ---------- order sheet ---------- */
   function openSheet() {
-    document.getElementById("lines").innerHTML = products.filter(function (p) { return cart[p.id]; }).map(function (p) { return "<li>" + cart[p.id] + " × " + esc(p.name) + " · " + naira(cart[p.id] * p.price) + "</li>"; }).join("");
-    document.getElementById("tot").textContent = "Total: " + naira(total());
-    document.getElementById("sheet").classList.add("on");
+    $("lines").innerHTML = products.filter(function (p) { return cart[p.id]; }).map(function (p) { return "<li>" + cart[p.id] + " × " + esc(p.name) + " · " + naira(cart[p.id] * p.price) + "</li>"; }).join("");
+    $("tot").textContent = "Total: " + naira(total());
+    $("sheet").classList.add("on"); document.body.style.overflow = "hidden";
   }
+  function closeSheet() { $("sheet").classList.remove("on"); document.body.style.overflow = ""; }
   function send(e) {
     e.preventDefault();
-    var name = document.getElementById("cn").value.trim(), addr = document.getElementById("ca").value.trim();
-    if (!name) { document.getElementById("err").textContent = "Enter your name."; return; }
+    var name = $("cn").value.trim(), addr = $("ca").value.trim();
+    if (!name) { $("err").textContent = "Enter your name."; return; }
     var lines = products.filter(function (p) { return cart[p.id]; }).map(function (p) { return "- " + cart[p.id] + " x " + p.name + " (" + naira(cart[p.id] * p.price) + ")"; });
-    var msg = "Hello " + vendor.store_name + ", I would like to order:\n" + lines.join("\n") + "\nTotal: " + naira(total()) + "\nName: " + name + (addr ? "\nAddress: " + addr : "");
+    var msg = "Hello " + vendor.store_name + ", I would like to order:\n" + lines.join("\n") + "\nTotal: " + naira(total()) + "\nName: " + name + (addr ? "\nAddress: " + addr : "") + "\nStore: " + storeUrl();
     location.href = "https://wa.me/" + vendor.whatsapp_number + "?text=" + encodeURIComponent(msg);
+  }
+
+  /* ---------- page shell ---------- */
+  function draw() {
+    var logo = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '">' : '<span class="ph">' + esc(vendor.store_name.charAt(0).toUpperCase()) + "</span>";
+    app.innerHTML =
+      '<div id="listView">' +
+        '<div class="head"><div class="w">' + logo + "<div><h1>" + esc(vendor.store_name) + "</h1><p>" + esc(vendor.description || "") + (vendor.city ? "<br>" + esc(vendor.city) : "") + "</p></div></div></div>" +
+        '<div class="sbar"><div class="w"><label class="search">' + I.search + '<input id="q" type="search" placeholder="Search products" autocomplete="off" autocorrect="off" enterkeyhint="search" aria-label="Search products"><button class="qx" id="qx" type="button" aria-label="Clear search" hidden>×</button></label></div></div>' +
+        '<div class="w"><p class="count" id="count" role="status"></p><div class="grid" id="g"></div><p class="foot">Store powered by <a href="' + BASE + '/">ShopLink NG</a></p></div>' +
+      "</div>" +
+      '<div id="detail" hidden></div>' +
+      '<div class="bar" id="bar" hidden><div class="w"><b id="sum"></b><button class="go" id="open" type="button">Order on WhatsApp</button></div></div>' +
+      '<div class="sheet" id="sheet"><form id="of" role="dialog" aria-modal="true" aria-label="Your order"><h2>Your order</h2><ul id="lines"></ul><b id="tot"></b><label>Your name<input id="cn" autocomplete="name"></label><label>Delivery address<input id="ca" autocomplete="street-address"></label><p id="err" style="color:#d93f2f;font-weight:700;margin-top:.6rem"></p><button class="go" type="submit">Send order on WhatsApp</button><button class="back2" type="button" id="close">Back</button></form></div>' +
+      '<div class="lb" id="lb" hidden><button type="button" aria-label="Close photo">×</button><img alt=""></div>' +
+      '<div class="toast" id="toast" role="status"></div>';
+
+    products.forEach(function (p) { byId[String(p.id)] = p; });
+    applyFilter();
+
+    $("q").addEventListener("input", function () { query = this.value; $("qx").hidden = !query; applyFilter(); });
+    $("qx").onclick = function () { query = ""; $("q").value = ""; this.hidden = true; applyFilter(); $("q").focus(); };
+    $("open").onclick = openSheet;
+    $("close").onclick = closeSheet;
+    $("sheet").addEventListener("click", function (e) { if (e.target === this) closeSheet(); });
+    $("of").onsubmit = send;
+
+    var lb = $("lb");
+    lb.onclick = function () { lb.hidden = true; };
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { lb.hidden = true; closeSheet(); } });
+
+    /* one click handler for every button and link in the store */
+    app.addEventListener("click", function (e) {
+      var link = e.target.closest('a[href^="#p="]');
+      if (link) { if (!$("listView").hidden) listY = window.pageYOffset; depth++; return; }
+      var b = e.target.closest("[data-act]"); if (!b) return;
+      var id = b.dataset.id, n = cart[id] || 0, a = b.dataset.act;
+      if (a === "add") setQty(id, 1);
+      else if (a === "inc") setQty(id, n + 1);
+      else if (a === "dec") setQty(id, n - 1);
+      else if (a === "share") share();
+      else if (a === "zoom") { lb.querySelector("img").src = cur.image_url; lb.querySelector("img").alt = cur.name; lb.hidden = false; }
+      else if (a === "back") { e.preventDefault(); if (depth > 0) { depth--; history.back(); } else location.hash = ""; }
+      else if (a === "back-all") { e.preventDefault(); location.hash = ""; depth = 0; }
+    });
+
+    window.addEventListener("hashchange", route);
+    route();
   }
 
   function countVisit() {
@@ -107,12 +336,16 @@ button{font:700 .95rem inherit;font-family:inherit;cursor:pointer;border:0;borde
 
   if (!slug) return note("Store not found", "Check the link and try again.");
   sb.from("vendors").select("store_name,description,city,logo_url,whatsapp_number,paid_until,is_live").eq("slug", slug).maybeSingle().then(function (r) {
+    if (r.error) return note("Could not load the store", "Check your connection and try again.", true);
     if (!r.data) return note("Store not found", "This store link does not exist. Check the link and try again.");
     vendor = r.data; document.title = vendor.store_name + " – ShopLink NG";
     if (new Date(vendor.paid_until) <= new Date()) return note("Store closed", esc(vendor.store_name) + " is closed for now. Please check back later.");
     if (!vendor.is_live) return note(esc(vendor.store_name), "This store is being set up. Please check back soon.");
-    sb.rpc("store_products", { p_slug: slug }).then(function (q) { products = q.data || []; draw(); countVisit(); });
-  });
+    sb.rpc("store_products", { p_slug: slug }).then(function (q) {
+      if (q.error) return note("Could not load products", "Check your connection and try again.", true);
+      products = q.data || []; draw(); countVisit();
+    });
+  }, function () { note("Could not load the store", "Check your connection and try again.", true); });
 })();
 </script>
 </body>

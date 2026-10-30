@@ -53,6 +53,14 @@
       <div class="card">
         <h2>Your store link</h2><p class="sub">Share this on WhatsApp, Instagram and your bio.</p>
         <div class="link"><code id="url"></code><button class="btn o sm" id="copy" type="button">Copy link</button></div>
+        <div id="share" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem">
+          <a class="btn o sm" id="shWa" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="btn o sm" id="shFb" target="_blank" rel="noopener">Facebook</a>
+          <a class="btn o sm" id="shTg" target="_blank" rel="noopener">Telegram</a>
+          <a class="btn o sm" id="shX" target="_blank" rel="noopener">X</a>
+          <button class="btn o sm" id="shMore" type="button" hidden>More…</button>
+        </div>
+        <p class="sub" style="margin-top:.7rem">For Instagram, copy the link and paste it in your bio. Your logo shows in the preview on every app.</p>
       </div>
     </section>
 
@@ -135,6 +143,12 @@
     $("uname").textContent = vendor.store_name || "";
     $("av").innerHTML = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '" style="width:34px;height:34px;border-radius:50%;object-fit:cover">' : esc((vendor.store_name || "S").charAt(0).toUpperCase());
     $("view").href = storeUrl(); $("url").textContent = storeUrl();
+    var u = encodeURIComponent(storeUrl()), t = encodeURIComponent(vendor.store_name + " – shop with us here:");
+    $("shWa").href = "https://wa.me/?text=" + t + "%20" + u;
+    $("shFb").href = "https://www.facebook.com/sharer/sharer.php?u=" + u;
+    $("shTg").href = "https://t.me/share/url?url=" + u + "&text=" + t;
+    $("shX").href = "https://twitter.com/intent/tweet?text=" + t + "&url=" + u;
+    if (navigator.share) { $("shMore").hidden = false; $("shMore").onclick = function () { navigator.share({ title: vendor.store_name, text: vendor.store_name + " – shop with us here:", url: storeUrl() }).catch(function () {}); }; }
     $("sProd").textContent = products.length; $("sDays").textContent = n > 0 ? n + (n === 1 ? " day left" : " days left") : "Expired";
     $("paidUntil").textContent = (n > 0 ? "Your store is open until " : "Your store closed on ") + new Date(vendor.paid_until).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }) + ".";
     var steps = [["Upload your store logo", !!vendor.logo_url], ["Describe what you sell", !!(vendor.description || "").trim()], ["Add your WhatsApp number", !!vendor.whatsapp_number], ["Add your first product", products.length > 0]];

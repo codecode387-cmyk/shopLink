@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Dashboard – ShopLink NG</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -106,6 +109,7 @@
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var PAYSTACK_KEY = "pk_live_383a0e2b83c984d24a655080a848924537c4f3bc";
+  var STORE_DOMAIN = "https://shoplinkng.shop";
   var $ = function (id) { return document.getElementById(id); };
   var user, vendor, products = [];
   var TITLES = { overview: "Overview", products: "Products", settings: "Store settings", billing: "Billing", notices: "Notifications" };
@@ -113,7 +117,7 @@
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
   function normPhone(v) { var d = v.replace(/\D/g, ""); if (d.indexOf("234") === 0) return d; if (d.charAt(0) === "0") return "234" + d.slice(1); return d.length === 10 ? "234" + d : d; }
-  function storeUrl() { return location.origin + "/" + vendor.slug; }
+  function storeUrl() { return STORE_DOMAIN + "/" + vendor.slug; }
   function daysLeft() { return Math.ceil((new Date(vendor.paid_until) - new Date()) / 864e5); }
   function say(id, t, ok) { var m = $(id); m.textContent = t; m.className = "msg" + (ok ? " ok" : ""); }
 
@@ -130,7 +134,7 @@
     var n = daysLeft(), s = $("status");
     $("uname").textContent = vendor.store_name || "";
     $("av").innerHTML = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '" style="width:34px;height:34px;border-radius:50%;object-fit:cover">' : esc((vendor.store_name || "S").charAt(0).toUpperCase());
-    $("view").href = "/" + vendor.slug; $("url").textContent = storeUrl();
+    $("view").href = storeUrl(); $("url").textContent = storeUrl();
     $("sProd").textContent = products.length; $("sDays").textContent = n > 0 ? n + (n === 1 ? " day left" : " days left") : "Expired";
     $("paidUntil").textContent = (n > 0 ? "Your store is open until " : "Your store closed on ") + new Date(vendor.paid_until).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }) + ".";
     var steps = [["Upload your store logo", !!vendor.logo_url], ["Describe what you sell", !!(vendor.description || "").trim()], ["Add your WhatsApp number", !!vendor.whatsapp_number], ["Add your first product", products.length > 0]];

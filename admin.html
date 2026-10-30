@@ -15,6 +15,7 @@
   <a class="brand" href="index.html">ShopLink<small>Admin</small></a>
   <button data-v="overview" class="on">Overview</button>
   <button data-v="users">Users</button>
+  <button data-v="verify">Verification <span class="badge" id="vb" hidden></span></button>
   <button data-v="news">Announcements</button>
   <span class="sp"></span>
   <a class="nv" href="dashboard.html">My dashboard</a>
@@ -46,6 +47,14 @@
       </div>
     </section>
 
+    <section class="view" id="v-verify">
+      <div class="card">
+        <h2>Verification requests</h2>
+        <p class="sub">Vendors who paid ₦3,000. Approve to give them the "Top &amp; Trusted Seller" badge for 6 months. If you reject, refund the vendor from your Paystack dashboard.</p>
+        <div class="tw"><table style="min-width:780px"><thead><tr><th>Store</th><th>Email</th><th>Paid</th><th>Reference</th><th>Status</th><th></th></tr></thead><tbody id="vrows"></tbody></table></div>
+      </div>
+    </section>
+
     <section class="view" id="v-news">
       <form class="card" id="nf" novalidate>
         <h2>Post an announcement</h2><p class="sub">Every vendor sees it in Notifications on their dashboard.</p>
@@ -63,7 +72,7 @@
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var $ = function (id) { return document.getElementById(id); }, users = [];
-  var TITLES = { overview: "Overview", users: "Users", news: "Announcements" };
+  var TITLES = { overview: "Overview", users: "Users", verify: "Verification", news: "Announcements" };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function num(n) { return Number(n || 0).toLocaleString("en-NG"); }
   function day(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }); }
@@ -82,7 +91,7 @@
     return sb.rpc("admin_stats").then(function (r) {
       if (r.error) {
         if ((r.error.message || "").indexOf("not allowed") > -1) { location.href = "dashboard.html"; return false; }
-        say("msg", "Admin data could not load: " + (r.error.message || "unknown error") + ". Run setup.sql, setup-2.sql and setup-3.sql in order."); return false;
+        say("msg", "Admin data could not load: " + (r.error.message || "unknown error") + ". Run setup.sql, setup-2.sql, setup-3.sql and setup-4.sql in order."); return false;
       }
       var d = r.data;
       $("k1").innerHTML = kpi("Total users", num(d.total)) + kpi("Stores open", num(d.active)) + kpi("Stores closed", num(d.closed)) + kpi("Revenue", "₦" + num(d.revenue));
@@ -111,6 +120,31 @@
   $("q").addEventListener("input", drawUsers);
   function loadUsers() { sb.rpc("admin_users").then(function (r) { if (r.error) return say("msg", "Could not load users."); users = r.data || []; drawUsers(); }); }
 
+  /* verification requests */
+  function loadVerify() {
+    sb.rpc("admin_verifications").then(function (r) {
+      if (r.error) return say("msg", "Could not load verification requests. Run setup-4.sql.");
+      var rows = r.data || [], pending = rows.filter(function (v) { return v.verify_status === "pending"; }).length;
+      $("vb").textContent = pending; $("vb").hidden = !pending;
+      $("vrows").innerHTML = rows.map(function (v) {
+        var pend = v.verify_status === "pending";
+        return "<tr><td><b>" + esc(v.store_name) + "</b><br><span class='sub'>/" + esc(v.slug) + "</span></td><td>" + esc(v.email) + "</td><td>" + (v.verify_paid_at ? day(v.verify_paid_at) : "") + "</td><td>" + esc(v.verify_ref) + "</td><td>" +
+          (pend ? '<span class="pill wait">Pending</span>' : '<span class="pill ok">Verified until ' + day(v.verified_until) + "</span>") + "</td><td class='act'>" +
+          (pend ? '<button class="btn p sm" type="button" data-a="1" data-o="' + esc(v.owner_id) + '">Approve</button><button class="btn d sm" type="button" data-a="0" data-o="' + esc(v.owner_id) + '">Reject</button>' : "") + "</td></tr>";
+      }).join("") || '<tr><td colspan="6" class="sub" style="padding:1.4rem">No verification requests yet.</td></tr>';
+    });
+  }
+  $("vrows").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-a]"); if (!b) return;
+    var approve = b.dataset.a === "1";
+    if (!confirm(approve ? "Approve this store for 6 months?" : "Reject this request? Remember to refund the vendor on Paystack.")) return;
+    sb.rpc("admin_set_verified", { p_owner: b.dataset.o, p_approve: approve }).then(function (r) {
+      if (r.error) return say("msg", "Could not update. Try again.");
+      say("msg", approve ? "Approved. The badge is now live on their store." : "Request rejected.", true);
+      loadVerify();
+    });
+  });
+
   function loadNews() {
     sb.from("announcements").select("*").order("created_at", { ascending: false }).then(function (r) {
       var box = $("nlist"); box.innerHTML = "";
@@ -138,7 +172,7 @@
     loadStats().then(function (ok) {
       if (!ok) return;
       $("stamp").textContent = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" });
-      loadVisits(); loadUsers(); loadNews();
+      loadVisits(); loadUsers(); loadVerify(); loadNews();
     });
   });
 })();

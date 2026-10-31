@@ -304,18 +304,23 @@
     var s = keep ? "" : lastSeen(), box = $("nlist");
     box.innerHTML = notices.length ? "" : '<div class="card"><p class="sub">No announcements yet.</p></div>';
     notices.forEach(function (a) {
-      var el = document.createElement("div"); el.className = "note" + (!keep && (!s || a.created_at > s) ? " new" : "");
+      var el = document.createElement("div"); el.className = "note" + (!keep && isNew(a, s) ? " new" : "");
       el.innerHTML = "<h3>" + esc(a.title) + "</h3><p>" + esc(a.body) + "</p><small>" + fmtDate(a.created_at) + "</small>";
       box.appendChild(el);
     });
   }
   function loadNotices() {
-    sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(20).then(function (r) {
-      notices = r.data || []; var u = unread();
+    Promise.all([
+      sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(20),
+      sb.from("vendor_notices").select("*").eq("owner_id", user.id).order("created_at", { ascending: false }).limit(20)
+    ]).then(function (res) {
+      notices = (res[0].data || []).concat(res[1].data || [])
+        .sort(function (x, y) { return new Date(y.created_at) - new Date(x.created_at); }).slice(0, 30);
+      var u = unread();
       drawNotices(false);
       if (u.length) {
         $("nb").textContent = u.length; $("nb").hidden = false;
-        $("annTop").innerHTML = '<div class="note new"><h3>' + esc(u[0].title) + "</h3><p>" + esc(u[0].body) + '</p><small>New announcement. Open Notifications to mark it as read.</small></div>';
+        $("annTop").innerHTML = '<div class="note new"><h3>' + esc(u[0].title) + "</h3><p>" + esc(u[0].body) + '</p><small>New notification. Open Notifications to mark it as read.</small></div>';
       }
     });
   }
@@ -407,7 +412,7 @@
         say("payMsg", "Confirming your payment…", true);
         sb.functions.invoke("verify-payment", { body: { reference: res.reference } }).then(function (r) {
           if (r.error) return say("payMsg", "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference);
-          sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; refresh(); say("payMsg", "Payment confirmed. Thank you.", true); });
+          sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; refresh(); loadNotices(); var n = daysLeft(); say("payMsg", "Congratulations! Your store will be open for the next " + n + (n === 1 ? " day" : " days") + ", until " + fmtDate(vendor.paid_until) + ".", true); });
         });
       }, onClose: function () {}
     }).openIframe();

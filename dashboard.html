@@ -139,8 +139,8 @@
     <section class="view" id="v-notices"><div id="nlist"></div></section>
 
     <section class="view" id="v-billing">
-      <div class="card"><h2>Pay for your store</h2>
-        <p class="sub">₦1,000 a month. Each payment adds 30 days. When your time runs out your store shows "Store closed" until you pay again.</p>
+      <div class="card"><h2>Subscribe to keep your store open</h2>
+        <p class="sub">₦1,000 for 30 days. Each payment adds 30 days. When your time runs out your store shows "Store closed" to shoppers until you subscribe again.</p>
         <p style="margin:1rem 0" id="paidUntil"></p>
         <button class="btn p" id="pay" type="button">Pay ₦1,000</button>
         <p class="msg" id="payMsg" role="alert"></p>
@@ -293,7 +293,8 @@
   var notices = [];
   function seenKey() { return "ann_seen_" + user.id; }
   function lastSeen() { try { return localStorage.getItem(seenKey()) || ""; } catch (e) { return ""; } }
-  function unread() { var s = lastSeen(); return notices.filter(function (a) { return !s || a.created_at > s; }); }
+  function isNew(a, s) { return !s || new Date(a.created_at) > new Date(s); }
+  function unread() { var s = lastSeen(); return notices.filter(function (a) { return isNew(a, s); }); }
   function markSeen() {
     if (!notices.length) return;
     try { localStorage.setItem(seenKey(), notices[0].created_at); } catch (e) {}
@@ -448,7 +449,8 @@
       if (!q.data) { $("status").className = "banner bad"; $("status").textContent = "We could not find your store. Contact us on WhatsApp."; return; }
       vendor = q.data;
       ["store_name", "description", "city", "whatsapp_number"].forEach(function (k) { $(k).value = vendor[k] || ""; });
-      loadProducts().then(refresh); loadVisits(); loadNotices();
+      loadProducts().then(function () { refresh(); if (location.hash === "#billing" || daysLeft() <= 0) show("billing"); });
+      loadVisits(); loadNotices();
     });
   });
 })();

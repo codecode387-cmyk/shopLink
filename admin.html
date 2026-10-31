@@ -10,6 +10,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="menu.css">
+<style>
+/* manage-store dialog */
+.mdl{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:1rem}
+.mdl[hidden]{display:none}
+.mbox{background:#fff;border-radius:18px;padding:1.3rem;width:min(430px,100%);max-height:90vh;overflow:auto;display:grid;gap:.7rem}
+.mbox h2{margin:0}
+.mquick{display:flex;flex-wrap:wrap;gap:.5rem}
+.mbox .btn{width:100%}
+.mbox .mquick .btn{width:auto;flex:1}
+</style>
 </head>
 <body class="app">
 <aside class="side">
@@ -45,7 +55,8 @@
     <section class="view" id="v-users">
       <div class="card">
         <label class="f" style="max-width:340px;margin:0 0 1rem">Search users<input id="q" placeholder="Store name, email, link or number"></label>
-        <div class="tw"><table style="min-width:860px"><thead><tr><th>Store</th><th>Email</th><th>WhatsApp</th><th>Joined</th><th>Products</th><th>Visits (30d)</th><th>Paid until</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <p class="sub" style="margin-bottom:.8rem">Tap Manage to open or close a store by hand, or to correct the paid-until date after a payment.</p>
+        <div class="tw"><table style="min-width:940px"><thead><tr><th>Store</th><th>Email</th><th>WhatsApp</th><th>Joined</th><th>Products</th><th>Visits (30d)</th><th>Paid until</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
       </div>
     </section>
 
@@ -69,11 +80,29 @@
     </section>
   </div>
 </div>
+<!-- manage store dialog -->
+<div class="mdl" id="mdl" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <h2 id="mTitle"></h2>
+    <p class="sub" id="mInfo"></p>
+    <label class="f">Store open until<input type="date" id="mDate"></label>
+    <div class="mquick">
+      <button class="btn o sm" type="button" id="mP30">+30 days</button>
+      <button class="btn o sm" type="button" id="mP1M">+1 month</button>
+    </div>
+    <p class="sub">The buttons add time from today, or from the current end date if the store is still open. Check the date, then save.</p>
+    <p class="msg" id="mMsg" role="alert"></p>
+    <button class="btn p" type="button" id="mSave">Save date and open store</button>
+    <button class="btn d" type="button" id="mShut">Close store now</button>
+    <button class="btn o" type="button" id="mCancel">Cancel</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
-  var $ = function (id) { return document.getElementById(id); }, users = [];
+  var $ = function (id) { return document.getElementById(id); }, users = [], managing = null;
   var TITLES = { overview: "Overview", users: "Users", verify: "Verification", news: "Announcements" };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function num(n) { return Number(n || 0).toLocaleString("en-NG"); }
@@ -114,13 +143,56 @@
     var list = users.filter(function (u) { return !q || [u.store_name, u.email, u.slug, u.whatsapp_number].join(" ").toLowerCase().indexOf(q) > -1; });
     $("rows").innerHTML = list.map(function (u) {
       var open = new Date(u.paid_until) > new Date(), st = !open ? ["Closed", "bad"] : u.is_live ? ["Live", "ok"] : ["Setting up", "wait"];
-      return "<tr><td><b>" + esc(u.store_name) + "</b><br><span class='sub'>/" + esc(u.slug) + "</span></td><td>" + esc(u.email) + "</td><td>" + esc(u.whatsapp_number) + "</td><td>" + day(u.created_at) + "</td><td>" + u.products + "</td><td>" + u.visits_30 + "</td><td>" + day(u.paid_until) + '</td><td><span class="pill ' + st[1] + '">' + st[0] + "</span></td></tr>";
-    }).join("") || '<tr><td colspan="8" class="sub" style="padding:1.4rem">No users found.</td></tr>';
+      return "<tr><td><b>" + esc(u.store_name) + "</b><br><span class='sub'>/" + esc(u.slug) + "</span></td><td>" + esc(u.email) + "</td><td>" + esc(u.whatsapp_number) + "</td><td>" + day(u.created_at) + "</td><td>" + u.products + "</td><td>" + u.visits_30 + "</td><td>" + day(u.paid_until) + '</td><td><span class="pill ' + st[1] + '">' + st[0] + '</span></td><td class="act"><button class="btn o sm" type="button" data-slug="' + esc(u.slug) + '">Manage</button></td></tr>';
+    }).join("") || '<tr><td colspan="9" class="sub" style="padding:1.4rem">No users found.</td></tr>';
     var top = users.slice().sort(function (a, b) { return b.visits_30 - a.visits_30; }).filter(function (u) { return u.visits_30 > 0; }).slice(0, 5);
     $("top").innerHTML = top.map(function (u) { return "<tr><td>" + esc(u.store_name) + "</td><td>" + u.visits_30 + "</td></tr>"; }).join("") || '<tr><td colspan="2" class="sub" style="padding:1.2rem">No store visits yet.</td></tr>';
   }
   $("q").addEventListener("input", drawUsers);
   function loadUsers() { sb.rpc("admin_users").then(function (r) { if (r.error) return say("msg", "Could not load users."); users = r.data || []; drawUsers(); }); }
+
+  /* ---------- manage a store: open / close / set paid-until date ---------- */
+  function ymd(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function baseDate() {
+    var now = new Date(), cur = new Date(managing.paid_until);
+    return cur > now ? cur : now;
+  }
+  function openManage(slug) {
+    managing = users.filter(function (u) { return u.slug === slug; })[0]; if (!managing) return;
+    var open = new Date(managing.paid_until) > new Date();
+    $("mTitle").textContent = managing.store_name;
+    $("mInfo").textContent = "/" + managing.slug + " · " + (open ? "Open until " : "Closed since ") + day(managing.paid_until);
+    $("mDate").value = ymd(baseDate());
+    say("mMsg", ""); $("mdl").hidden = false;
+  }
+  function closeManage() { $("mdl").hidden = true; managing = null; }
+  function applyUntil(until, okText) {
+    if (!managing) return;
+    var slug = managing.slug;
+    $("mSave").disabled = $("mShut").disabled = true; say("mMsg", "Saving…", true);
+    sb.rpc("admin_set_paid_until", { p_slug: slug, p_until: until.toISOString() }).then(function (r) {
+      $("mSave").disabled = $("mShut").disabled = false;
+      if (r.error) return say("mMsg", "Could not save: " + (r.error.message || "unknown error") + ". Make sure setup-6.sql has been run.");
+      closeManage(); say("msg", okText, true); loadUsers(); loadStats();
+    });
+  }
+  $("rows").addEventListener("click", function (e) { var b = e.target.closest("button[data-slug]"); if (b) openManage(b.dataset.slug); });
+  $("mP30").onclick = function () { var d = baseDate(); d.setDate(d.getDate() + 30); $("mDate").value = ymd(d); };
+  $("mP1M").onclick = function () { var d = baseDate(); d.setMonth(d.getMonth() + 1); $("mDate").value = ymd(d); };
+  $("mCancel").onclick = closeManage;
+  $("mdl").addEventListener("click", function (e) { if (e.target === this) closeManage(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("mdl").hidden) closeManage(); });
+  $("mSave").onclick = function () {
+    var v = $("mDate").value; if (!v) return say("mMsg", "Pick a date.");
+    var p = v.split("-"), until = new Date(+p[0], +p[1] - 1, +p[2], 23, 59, 59), name = managing.store_name;
+    if (until <= new Date()) return say("mMsg", "That date has passed. Pick a future date, or use Close store now.");
+    applyUntil(until, name + " is open until " + day(until) + ".");
+  };
+  $("mShut").onclick = function () {
+    var name = managing.store_name;
+    if (!confirm("Close " + name + " now? Shoppers will see \"Store closed\". You can reopen it any time.")) return;
+    applyUntil(new Date(), name + " is now closed.");
+  };
 
   /* verification requests */
   function loadVerify() {

@@ -127,6 +127,11 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .note{text-align:center;padding:5rem 1rem}.note h1{font-size:2rem;margin-bottom:.6rem}.note p{color:var(--mut);max-width:30rem;margin:0 auto}
 .note button{margin-top:1rem;background:var(--g);color:#fff;padding:.7rem 1.3rem}
 .foot{text-align:center;color:var(--mut);font-size:.85rem;margin-top:2.5rem}.foot a{color:var(--g);font-weight:700}
+.own{max-width:26rem;margin:1.8rem auto 0;padding:1.2rem;border:1.5px dashed var(--g);border-radius:16px;background:#f3faf6}
+.own b{display:block;font-size:1.05rem}
+.own p{margin:.4rem auto 0}
+.own .subs{display:inline-block;margin-top:.9rem;background:var(--g);color:#fff;padding:.8rem 1.4rem;border-radius:12px;font-weight:700}
+.own .subs:active{background:var(--gd)}
 
 .lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:20;display:flex;align-items:center;justify-content:center;padding:1rem}
 .lb img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
@@ -234,6 +239,16 @@ body.loading{overflow:hidden}
   function badge() { return isVerified() ? '<span class="vb">✓ Top &amp; Trusted Seller <i aria-label="5 stars">★★★★★</i></span>' : ""; }
   function note(h, p, retry) {
     app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + "</p>" + (retry ? '<button type="button" onclick="location.reload()">Try again</button>' : "") + '<p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p></div>';
+    hideSplash();
+  }
+  /* shown when the store's 30 days have run out */
+  function closedNote() {
+    app.innerHTML = '<div class="note"><h1>' + esc(vendor.store_name) + ' is closed</h1>' +
+      "<p>This store is not taking orders right now. Please check back later.</p>" +
+      '<div class="own"><b>Are you the store owner?</b>' +
+      "<p>Your subscription has ended. Subscribe for the next 30 days for ₦1,000 and your store opens again straight away.</p>" +
+      '<a class="subs" href="' + BASE + '/dashboard.html#billing">Subscribe ₦1,000 for 30 days</a></div>' +
+      '<p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p></div>';
     hideSplash();
   }
   function count() { return Object.keys(cart).reduce(function (a, k) { return a + cart[k]; }, 0); }
@@ -418,7 +433,7 @@ body.loading{overflow:hidden}
     if (r.error) return note("Could not load the store", "Check your connection and try again.", true);
     if (!r.data) return note("Store not found", "This store link does not exist. Check the link and try again.");
     vendor = r.data; document.title = vendor.store_name + " – ShopLink NG";
-    if (new Date(vendor.paid_until) <= new Date()) return note("Store closed", esc(vendor.store_name) + " is closed for now. Please check back later.");
+    if (new Date(vendor.paid_until) <= new Date()) return closedNote();
     if (!vendor.is_live) return note(esc(vendor.store_name), "This store is being set up. Please check back soon.");
     sb.rpc("store_products", { p_slug: slug }).then(function (q) {
       if (q.error) return note("Could not load products", "Check your connection and try again.", true);

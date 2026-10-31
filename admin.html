@@ -26,6 +26,7 @@
   <a class="brand" href="index.html">ShopLink<small>Admin</small></a>
   <button data-v="overview" class="on">Overview</button>
   <button data-v="users">Users</button>
+  <button data-v="payments">Payments</button>
   <button data-v="verify">Verification <span class="badge" id="vb" hidden></span></button>
   <button data-v="news">Announcements</button>
   <span class="sp"></span>
@@ -60,6 +61,17 @@
       </div>
     </section>
 
+    <section class="view" id="v-payments">
+      <div class="grid four" id="pk"></div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+          <div><h2>Payments</h2><p class="sub">Every store subscription and verification payment, newest first, with the store that paid.</p></div>
+          <button class="btn o sm" id="pRefresh" type="button">Refresh</button>
+        </div>
+        <div class="tw" style="margin-top:.8rem"><table style="min-width:780px"><thead><tr><th>Date</th><th>Store</th><th>Email</th><th>Type</th><th>Amount</th><th>Source</th></tr></thead><tbody id="prows"></tbody></table></div>
+      </div>
+    </section>
+
     <section class="view" id="v-verify">
       <div class="card">
         <h2>Verification requests</h2>
@@ -90,7 +102,8 @@
       <button class="btn o sm" type="button" id="mP30">+30 days</button>
       <button class="btn o sm" type="button" id="mP1M">+1 month</button>
     </div>
-    <p class="sub">The buttons add time from today, or from the current end date if the store is still open. Check the date, then save.</p>
+    <p class="sub">The buttons add time from today, or from the current end date if the store is still open. Check the date, then save. The vendor gets a "Congratulations" notification on their dashboard with the number of days.</p>
+    <label style="display:flex;gap:.6rem;align-items:flex-start;font-weight:700;cursor:pointer"><input type="checkbox" id="mLog" style="width:20px;height:20px;accent-color:#1b7a4b;flex:none;margin-top:2px"><span>They paid ₦1,000 (for example by transfer)<small style="display:block;font-weight:400;color:#64748b">Tick this to also record it in Payments when you save.</small></span></label>
     <p class="msg" id="mMsg" role="alert"></p>
     <button class="btn p" type="button" id="mSave">Save date and open store</button>
     <button class="btn d" type="button" id="mShut">Close store now</button>
@@ -103,7 +116,7 @@
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var $ = function (id) { return document.getElementById(id); }, users = [], managing = null;
-  var TITLES = { overview: "Overview", users: "Users", verify: "Verification", news: "Announcements" };
+  var TITLES = { overview: "Overview", users: "Users", payments: "Payments", verify: "Verification", news: "Announcements" };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function num(n) { return Number(n || 0).toLocaleString("en-NG"); }
   function day(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }); }
@@ -163,17 +176,17 @@
     $("mTitle").textContent = managing.store_name;
     $("mInfo").textContent = "/" + managing.slug + " · " + (open ? "Open until " : "Closed since ") + day(managing.paid_until);
     $("mDate").value = ymd(baseDate());
-    say("mMsg", ""); $("mdl").hidden = false;
+    $("mLog").checked = false; say("mMsg", ""); $("mdl").hidden = false;
   }
   function closeManage() { $("mdl").hidden = true; managing = null; }
-  function applyUntil(until, okText) {
+  function applyUntil(until, okText, log) {
     if (!managing) return;
     var slug = managing.slug;
     $("mSave").disabled = $("mShut").disabled = true; say("mMsg", "Saving…", true);
-    sb.rpc("admin_set_paid_until", { p_slug: slug, p_until: until.toISOString() }).then(function (r) {
+    sb.rpc("admin_set_paid_until", { p_slug: slug, p_until: until.toISOString(), p_log: !!log }).then(function (r) {
       $("mSave").disabled = $("mShut").disabled = false;
-      if (r.error) return say("mMsg", "Could not save: " + (r.error.message || "unknown error") + ". Make sure setup-6.sql has been run.");
-      closeManage(); say("msg", okText, true); loadUsers(); loadStats();
+      if (r.error) return say("mMsg", "Could not save: " + (r.error.message || "unknown error") + ". Make sure setup-7.sql has been run.");
+      closeManage(); say("msg", okText, true); loadUsers(); loadStats(); loadPayments();
     });
   }
   $("rows").addEventListener("click", function (e) { var b = e.target.closest("button[data-slug]"); if (b) openManage(b.dataset.slug); });
@@ -186,13 +199,39 @@
     var v = $("mDate").value; if (!v) return say("mMsg", "Pick a date.");
     var p = v.split("-"), until = new Date(+p[0], +p[1] - 1, +p[2], 23, 59, 59), name = managing.store_name;
     if (until <= new Date()) return say("mMsg", "That date has passed. Pick a future date, or use Close store now.");
-    applyUntil(until, name + " is open until " + day(until) + ".");
+    applyUntil(until, name + " is open until " + day(until) + "." + ($("mLog").checked ? " Payment recorded." : ""), $("mLog").checked);
   };
   $("mShut").onclick = function () {
     var name = managing.store_name;
     if (!confirm("Close " + name + " now? Shoppers will see \"Store closed\". You can reopen it any time.")) return;
     applyUntil(new Date(), name + " is now closed.");
   };
+
+  /* payments list */
+  function naira(n) { return "₦" + Number(n || 0).toLocaleString("en-NG"); }
+  function loadPayments() {
+    sb.rpc("admin_payments").then(function (r) {
+      if (r.error) {
+        $("prows").innerHTML = '<tr><td colspan="6" class="sub" style="padding:1.4rem">Could not load payments. Run setup-7.sql in Supabase, then refresh.</td></tr>';
+        return;
+      }
+      var rows = r.data || [], now = new Date(), total = 0, month = 0, today = 0;
+      rows.forEach(function (p) {
+        var d = new Date(p.created_at), a = Number(p.amount);
+        total += a;
+        if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) month += a;
+        if (d.toDateString() === now.toDateString()) today += a;
+      });
+      $("pk").innerHTML = kpi("Today", naira(today)) + kpi("This month", naira(month)) + kpi("All recorded", naira(total)) + kpi("Payments", num(rows.length));
+      $("prows").innerHTML = rows.map(function (p) {
+        var when = new Date(p.created_at).toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+        return "<tr><td>" + when + "</td><td><b>" + esc(p.store_name || "Deleted store") + "</b><br><span class='sub'>/" + esc(p.slug || "") + "</span></td><td>" + esc(p.email || "") + "</td><td>" +
+          (p.kind === "verify" ? '<span class="pill wait">Verification</span>' : '<span class="pill ok">Store fee</span>') + "</td><td><b>" + naira(p.amount) + "</b></td><td>" +
+          (p.source === "manual" ? "Recorded by admin" : "Paystack" + (p.reference ? "<br><span class='sub'>" + esc(p.reference) + "</span>" : "")) + "</td></tr>";
+      }).join("") || '<tr><td colspan="6" class="sub" style="padding:1.4rem">No payments recorded yet. New payments appear here automatically.</td></tr>';
+    });
+  }
+  $("pRefresh").onclick = loadPayments;
 
   /* verification requests */
   function loadVerify() {
@@ -246,7 +285,7 @@
     loadStats().then(function (ok) {
       if (!ok) return;
       $("stamp").textContent = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" });
-      loadVisits(); loadUsers(); loadVerify(); loadNews();
+      loadVisits(); loadUsers(); loadPayments(); loadVerify(); loadNews();
     });
   });
 })();

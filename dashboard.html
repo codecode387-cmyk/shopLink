@@ -270,11 +270,13 @@
     $("progBar").style.width = (done / steps.length * 100) + "%";
     $("setupSub").textContent = all ? "All done. Your store is live and ready for customers." : done + " of " + steps.length + " steps done. Your store goes live as soon as all four are finished.";
     if (all !== vendor.is_live) sb.from("vendors").update({ is_live: all }).eq("owner_id", user.id).then(function (r) { if (!r.error) { vendor.is_live = all; drawMega(); } });
-    if (n <= 0) { s.className = "banner bad"; s.textContent = "Your store is closed. Shoppers see \"Store closed\". Go to Billing and pay ₦1,000 to reopen it."; }
+    if (vendor.disabled) { s.className = "banner bad"; s.textContent = "Your store has been permanently disabled. Please contact ShopLink NG on WhatsApp for help."; }
+    else if (n <= 0) { s.className = "banner bad"; s.textContent = "Your store is closed. Shoppers see \"Store closed\". Go to Billing and pay ₦1,000 to reopen it."; }
     else if (!all) { s.className = "banner wait"; s.textContent = "Your store is not live yet. Finish the steps on the Overview page."; }
     else { s.className = "banner ok"; s.textContent = "Your store is live and open. " + n + (n === 1 ? " day" : " days") + " left."; }
     $("logoBox").innerHTML = vendor.logo_url ? '<img alt="Logo" src="' + esc(vendor.logo_url) + '" style="width:72px;height:72px;border-radius:16px;object-fit:cover">' : '<span class="ph" style="width:72px;height:72px;border-radius:16px">Logo</span>';
     drawVerify(); drawMega();
+    if (vendor.disabled) { $("pay").hidden = true; $("vPay").hidden = true; }
   }
 
   /* visits chart */
@@ -454,7 +456,7 @@
       if (!q.data) { $("status").className = "banner bad"; $("status").textContent = "We could not find your store. Contact us on WhatsApp."; return; }
       vendor = q.data;
       ["store_name", "description", "city", "whatsapp_number"].forEach(function (k) { $(k).value = vendor[k] || ""; });
-      loadProducts().then(function () { refresh(); if (location.hash === "#billing" || daysLeft() <= 0) show("billing"); });
+      loadProducts().then(function () { refresh(); if (!vendor.disabled && (location.hash === "#billing" || daysLeft() <= 0)) show("billing"); });
       loadVisits(); loadNotices();
     });
   });

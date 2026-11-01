@@ -35,6 +35,7 @@
   <button data-v="users">Users</button>
   <button data-v="payments">Payments</button>
   <button data-v="verify">Verification <span class="badge" id="vb" hidden></span></button>
+  <button data-v="upgrades">Upgrades <span class="badge" id="ub" hidden></span></button>
   <button data-v="news">Announcements</button>
   <span class="sp"></span>
   <a class="nv" href="mega.html" target="_blank" rel="noopener">View Mega Store</a>
@@ -88,6 +89,14 @@
       </div>
     </section>
 
+    <section class="view" id="v-upgrades">
+      <div class="card">
+        <h2>Upgrade requests</h2>
+        <p class="sub">Vendors who paid ₦2,000 for 5 photos per product and 200 products. Approve to switch it on for their store. If you reject, refund the vendor from your Paystack dashboard.</p>
+        <div class="tw"><table style="min-width:780px"><thead><tr><th>Store</th><th>Email</th><th>Paid</th><th>Reference</th><th>Status</th><th></th></tr></thead><tbody id="urows"></tbody></table></div>
+      </div>
+    </section>
+
     <section class="view" id="v-news">
       <form class="card" id="nf" novalidate>
         <h2>Post an announcement</h2><p class="sub">Every vendor sees it in Notifications on their dashboard.</p>
@@ -128,7 +137,7 @@
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var $ = function (id) { return document.getElementById(id); }, users = [], managing = null;
-  var TITLES = { overview: "Overview", users: "Users", payments: "Payments", verify: "Verification", news: "Announcements" };
+  var TITLES = { overview: "Overview", users: "Users", payments: "Payments", verify: "Verification", upgrades: "Upgrades", news: "Announcements" };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function num(n) { return Number(n || 0).toLocaleString("en-NG"); }
   function day(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }); }
@@ -282,7 +291,7 @@
       $("prows").innerHTML = rows.map(function (p) {
         var when = new Date(p.created_at).toLocaleString("en-NG", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
         return "<tr><td>" + when + "</td><td><b>" + esc(p.store_name || "Deleted store") + "</b><br><span class='sub'>/" + esc(p.slug || "") + "</span></td><td>" + esc(p.email || "") + "</td><td>" +
-          (p.kind === "verify" ? '<span class="pill wait">Verification</span>' : '<span class="pill ok">Store fee</span>') + "</td><td><b>" + naira(p.amount) + "</b></td><td>" +
+          (p.kind === "verify" ? '<span class="pill wait">Verification</span>' : p.kind === "upgrade" ? '<span class="pill wait">Upgrade</span>' : '<span class="pill ok">Store fee</span>') + "</td><td><b>" + naira(p.amount) + "</b></td><td>" +
           (p.source === "manual" ? "Recorded by admin" : "Paystack" + (p.reference ? "<br><span class='sub'>" + esc(p.reference) + "</span>" : "")) + "</td></tr>";
       }).join("") || '<tr><td colspan="6" class="sub" style="padding:1.4rem">No payments recorded yet. New payments appear here automatically.</td></tr>';
     });
@@ -314,6 +323,31 @@
     });
   });
 
+  /* upgrade requests */
+  function loadUpgrades() {
+    sb.rpc("admin_upgrades").then(function (r) {
+      if (r.error) { $("urows").innerHTML = '<tr><td colspan="6" class="sub" style="padding:1.4rem">Could not load upgrade requests. Run setup-10.sql in Supabase, then refresh.</td></tr>'; return; }
+      var rows = r.data || [], pending = rows.filter(function (v) { return v.upgrade_status === "pending"; }).length;
+      $("ub").textContent = pending; $("ub").hidden = !pending;
+      $("urows").innerHTML = rows.map(function (v) {
+        var pend = v.upgrade_status === "pending";
+        return "<tr><td><b>" + esc(v.store_name) + "</b><br><span class='sub'>/" + esc(v.slug) + "</span></td><td>" + esc(v.email) + "</td><td>" + (v.upgrade_paid_at ? day(v.upgrade_paid_at) : "") + "</td><td>" + esc(v.upgrade_ref) + "</td><td>" +
+          (pend ? '<span class="pill wait">Waiting for approval</span>' : '<span class="pill ok">Upgraded ' + (v.upgraded_at ? day(v.upgraded_at) : "") + "</span>") + "</td><td class='act'>" +
+          (pend ? '<button class="btn p sm" type="button" data-u="1" data-o="' + esc(v.owner_id) + '">Approve</button><button class="btn d sm" type="button" data-u="0" data-o="' + esc(v.owner_id) + '">Reject</button>' : "") + "</td></tr>";
+      }).join("") || '<tr><td colspan="6" class="sub" style="padding:1.4rem">No upgrade requests yet.</td></tr>';
+    });
+  }
+  $("urows").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-u]"); if (!b) return;
+    var approve = b.dataset.u === "1";
+    if (!confirm(approve ? "Approve this upgrade? The store gets 5 photos per product and 200 products." : "Reject this upgrade? Remember to refund the vendor on Paystack.")) return;
+    sb.rpc("admin_set_upgrade", { p_owner: b.dataset.o, p_approve: approve }).then(function (r) {
+      if (r.error) return say("msg", "Could not update: " + (r.error.message || "try again") + ".");
+      say("msg", approve ? "Upgrade approved. The vendor has been notified." : "Upgrade rejected. The vendor has been notified.", true);
+      loadUpgrades();
+    });
+  });
+
   function loadNews() {
     sb.from("announcements").select("*").order("created_at", { ascending: false }).then(function (r) {
       var box = $("nlist"); box.innerHTML = "";
@@ -341,7 +375,7 @@
     loadStats().then(function (ok) {
       if (!ok) return;
       $("stamp").textContent = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" });
-      loadVisits(); loadUsers(); loadPayments(); loadVerify(); loadNews();
+      loadVisits(); loadUsers(); loadPayments(); loadVerify(); loadUpgrades(); loadNews();
     });
   });
 })();

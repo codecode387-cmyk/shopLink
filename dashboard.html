@@ -29,6 +29,16 @@
 .tick{display:flex;align-items:center;gap:.6rem;margin:.2rem 0 1rem;font-weight:700;cursor:pointer}
 .tick input{width:20px;height:20px;accent-color:#1b7a4b;flex:none}
 .tick small{display:block;font-weight:400;color:#64748b}
+.lockbox{display:flex;gap:.8rem;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:.9rem;border:1.5px dashed #1b7a4b;border-radius:14px;background:#f3faf6;margin-bottom:1rem}
+.lockbox[hidden]{display:none}
+.lockbox b{display:block}
+.lockbox small{color:#64748b}
+.mlist{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0}
+.mth{position:relative;width:64px;height:64px;border-radius:12px;overflow:hidden;background:#f1f4f2}
+.mth img{width:100%;height:100%;object-fit:cover;display:block}
+.mth button{position:absolute;top:2px;right:2px;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:14px;line-height:1;cursor:pointer}
+.perks{list-style:none;padding:0;margin:1rem 0;display:grid;gap:.5rem;font-weight:700}
+.perks li:before{content:"✓";color:#1b7a4b;font-weight:800;margin-right:.5rem}
 </style>
 </head>
 <body class="app">
@@ -37,6 +47,7 @@
   <button data-v="overview" class="on">Overview</button>
   <button data-v="products">Products</button>
   <button data-v="mega">Mega Store</button>
+  <button data-v="upgrade">Upgrade</button>
   <button data-v="settings">Store settings</button>
   <button data-v="billing">Billing</button>
   <button data-v="verify">Get verified</button>
@@ -96,6 +107,8 @@
         </div>
         <label class="f">Description (optional)<textarea id="p_desc" rows="2" maxlength="300"></textarea></label>
         <label class="f">Photo<input id="p_img" type="file" accept="image/*"></label>
+        <div id="moreLock" class="lockbox"><span><b>Want more photos?</b><small>Upgrade your store for ₦2,000 to add up to 5 photos per product and list up to 200 products.</small></span><button class="btn p sm" type="button" id="goUpgrade">See the upgrade</button></div>
+        <div id="moreBox" hidden><label class="f">More photos (up to 4 extra, 5 in total)<input id="p_more" type="file" accept="image/*" multiple></label><div class="mlist" id="moreList"></div></div>
         <label class="tick"><input type="checkbox" id="p_mega"><span>Also post on the ShopLink Mega Store<small>Optional. Shoppers browsing the Mega Store can find this product and come to your store to order.</small></span></label>
         <p class="msg" id="pMsg" role="alert"></p>
         <button class="btn p" id="pGo" type="submit">Add product</button>
@@ -119,6 +132,18 @@
         <p class="msg" id="megaMsg" role="alert"></p>
       </div>
       <div class="card"><h2>Choose what to post</h2><p class="sub">Switch a product on to show it on the Mega Store. Switch it off any time.</p><div id="megaList" style="margin-top:.6rem"></div></div>
+    </section>
+
+    <section class="view" id="v-upgrade">
+      <div class="card">
+        <h2>Upgrade your store</h2>
+        <p class="sub">Pay ₦2,000 once and show your products properly.</p>
+        <ul class="perks"><li>Up to 5 photos on every product (instead of 1)</li><li>List up to 200 products (instead of 100)</li></ul>
+        <p style="margin:1rem 0" id="upState"></p>
+        <button class="btn p" id="upPay" type="button">Pay ₦2,000 to upgrade</button>
+        <p class="msg" id="upMsg" role="alert"></p>
+        <p class="sub" style="margin-top:.8rem">After you pay, we check your upgrade and approve it. You will get a notification here when it is active.</p>
+      </div>
     </section>
 
     <section class="view" id="v-settings">
@@ -177,10 +202,11 @@
   var PAYSTACK_KEY = "pk_live_383a0e2b83c984d24a655080a848924537c4f3bc";
   var STORE_DOMAIN = "https://shoplinkng.shop";
   var ADS_WHATSAPP = "2349032473005";
-  var MAX_PRODUCTS = 100;
   var $ = function (id) { return document.getElementById(id); };
-  var user, vendor, products = [];
-  var TITLES = { overview: "Overview", products: "Products", mega: "Mega Store", settings: "Store settings", billing: "Billing", verify: "Get verified", ads: "Advertise", notices: "Notifications" };
+  var user, vendor, products = [], editMore = [];
+  function isPlus() { return !!vendor && vendor.upgrade_status === "approved"; }
+  function maxProducts() { return isPlus() ? 200 : 100; }
+  var TITLES = { overview: "Overview", products: "Products", mega: "Mega Store", upgrade: "Upgrade", settings: "Store settings", billing: "Billing", verify: "Get verified", ads: "Advertise", notices: "Notifications" };
 
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
@@ -260,8 +286,8 @@
     $("shTg").href = "https://t.me/share/url?url=" + u + "&text=" + t;
     $("shX").href = "https://twitter.com/intent/tweet?text=" + t + "&url=" + u;
     if (navigator.share) { $("shMore").hidden = false; $("shMore").onclick = function () { navigator.share({ title: vendor.store_name, text: vendor.store_name + " – shop with us here:", url: storeUrl() }).catch(function () {}); }; }
-    $("sProd").textContent = products.length + " / " + MAX_PRODUCTS;
-    $("pCount").textContent = products.length + " of " + MAX_PRODUCTS + " products used.";
+    $("sProd").textContent = products.length + " / " + maxProducts();
+    $("pCount").textContent = products.length + " of " + maxProducts() + " products used.";
     $("sDays").textContent = n > 0 ? n + (n === 1 ? " day left" : " days left") : "Expired";
     $("paidUntil").textContent = (n > 0 ? "Your store is open until " : "Your store closed on ") + fmtDate(vendor.paid_until) + ".";
     var steps = [["Upload your store logo", !!vendor.logo_url], ["Describe what you sell", !!(vendor.description || "").trim()], ["Add your WhatsApp number", !!vendor.whatsapp_number], ["Add your first product", products.length > 0]];
@@ -276,8 +302,18 @@
     else { s.className = "banner ok"; s.textContent = "Your store is live and open. " + n + (n === 1 ? " day" : " days") + " left."; }
     $("logoBox").innerHTML = vendor.logo_url ? '<img alt="Logo" src="' + esc(vendor.logo_url) + '" style="width:72px;height:72px;border-radius:16px;object-fit:cover">' : '<span class="ph" style="width:72px;height:72px;border-radius:16px">Logo</span>';
     drawVerify(); drawMega();
+    drawPlus();
     if (vendor.disabled) { $("pay").hidden = true; $("vPay").hidden = true; }
   }
+  function drawPlus() {
+    var plus = isPlus(), pend = vendor.upgrade_status === "pending";
+    $("moreBox").hidden = !plus; $("moreLock").hidden = plus;
+    $("upState").textContent = plus ? "✓ Your store is upgraded. You can add up to 5 photos per product and list up to 200 products."
+      : pend ? "Payment received. We are checking your upgrade and will approve it soon."
+      : "Your store is on the free plan: 1 photo per product, up to 100 products.";
+    $("upPay").hidden = plus || pend || !!vendor.disabled;
+  }
+  $("goUpgrade").onclick = function () { show("upgrade"); };
 
   /* visits chart */
   function loadVisits() {
@@ -347,10 +383,18 @@
     });
   }
   function editProduct(p) {
-    $("p_id").value = p.id; $("p_name").value = p.name; $("p_price").value = p.price; $("p_desc").value = p.description || ""; $("p_mega").checked = !!p.on_mega;
+    $("p_id").value = p.id; $("p_name").value = p.name; $("p_price").value = p.price; $("p_desc").value = p.description || ""; $("p_mega").checked = !!p.on_mega; editMore = (p.more_images || []).slice(); drawMore();
     $("pTitle").textContent = "Edit product"; $("pGo").textContent = "Save product"; $("pCancel").hidden = false; say("pMsg", ""); scrollTo(0, 0); $("p_name").focus();
   }
-  function resetForm() { $("prod").reset(); $("p_id").value = ""; $("pTitle").textContent = "Add a product"; $("pGo").textContent = "Add product"; $("pCancel").hidden = true; }
+  function drawMore() {
+    $("moreList").innerHTML = editMore.map(function (u, i) { return '<span class="mth"><img alt="" src="' + esc(u) + '"><button type="button" data-rm="' + i + '" aria-label="Remove photo">×</button></span>'; }).join("");
+  }
+  $("moreList").addEventListener("click", function (e) { var b = e.target.closest("button[data-rm]"); if (!b) return; editMore.splice(+b.dataset.rm, 1); drawMore(); });
+  function uploadMany(files) {
+    var out = [];
+    return files.reduce(function (p, f) { return p.then(function (ok) { if (!ok) return null; return upload(f, "p-").then(function (u) { if (!u) return null; out.push(u); return out; }); }); }, Promise.resolve(out));
+  }
+  function resetForm() { editMore = []; drawMore(); $("prod").reset(); $("p_id").value = ""; $("pTitle").textContent = "Add a product"; $("pGo").textContent = "Add product"; $("pCancel").hidden = true; }
   $("pCancel").onclick = resetForm;
 
   function upload(file, prefix) {
@@ -365,18 +409,28 @@
     var name = $("p_name").value.trim(), price = parseFloat($("p_price").value), f = $("p_img").files[0], id = $("p_id").value;
     if (!name) return say("pMsg", "Enter the product name.");
     if (isNaN(price) || price < 0) return say("pMsg", "Enter a price in naira.");
-    if (!id && products.length >= MAX_PRODUCTS) return say("pMsg", "You have reached the limit of " + MAX_PRODUCTS + " products. Delete one to add another.");
+    if (!id && products.length >= maxProducts()) return say("pMsg", "You have reached the limit of " + maxProducts() + " products. Delete one to add another.");
     if (f && f.size > 3e6) return say("pMsg", "Photo must be under 3 MB.");
+    var moreFiles = isPlus() ? Array.prototype.slice.call($("p_more").files) : [];
+    if (editMore.length + moreFiles.length > 4) return say("pMsg", "A product can have 5 photos in total: the main photo and 4 more.");
+    if (moreFiles.some(function (x) { return x.size > 3e6; })) return say("pMsg", "Each photo must be under 3 MB.");
     $("pGo").disabled = true;
     (f ? upload(f, "p-") : Promise.resolve(undefined)).then(function (url) {
       if (f && !url) { $("pGo").disabled = false; return say("pMsg", "Photo upload failed. Try again."); }
-      var row = { name: name, price: price, description: $("p_desc").value.trim(), on_mega: $("p_mega").checked };
-      if (url) row.image_url = url;
-      var q = id ? sb.from("products").update(row).eq("id", id) : sb.from("products").insert(Object.assign({ owner_id: user.id }, row));
-      return q.then(function (r) {
-        $("pGo").disabled = false;
-        if (r.error) return say("pMsg", (r.error.message || "").indexOf("limit") > -1 ? "You have reached the limit of " + MAX_PRODUCTS + " products." : "Could not save the product. Try again.");
-        resetForm(); say("pMsg", "Saved.", true); loadProducts();
+      return uploadMany(moreFiles).then(function (extra) {
+        if (!extra) { $("pGo").disabled = false; return say("pMsg", "A photo upload failed. Try again."); }
+        var row = { name: name, price: price, description: $("p_desc").value.trim(), on_mega: $("p_mega").checked };
+        if (url) row.image_url = url;
+        if (isPlus()) row.more_images = editMore.concat(extra);
+        var q = id ? sb.from("products").update(row).eq("id", id) : sb.from("products").insert(Object.assign({ owner_id: user.id }, row));
+        return q.then(function (r) {
+          $("pGo").disabled = false;
+          if (r.error) {
+            var m = r.error.message || "";
+            return say("pMsg", m.indexOf("upgrade") > -1 ? "Extra photos need the store upgrade." : m.indexOf("limit") > -1 ? "You have reached the limit of " + maxProducts() + " products." : "Could not save the product. Try again.");
+          }
+          resetForm(); say("pMsg", "Saved.", true); loadProducts();
+        });
       });
     });
   });
@@ -432,6 +486,23 @@
         sb.functions.invoke("verify-payment", { body: { reference: res.reference } }).then(function (r) {
           if (r.error) return say("vMsg", "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference);
           sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; refresh(); say("vMsg", "Payment confirmed. We will approve your badge soon.", true); });
+        });
+      }, onClose: function () {}
+    }).openIframe();
+  };
+
+  /* payment: store upgrade N2,000 (confirmed by the verify-upgrade function, then approved by the admin) */
+  $("upPay").onclick = function () {
+    say("upMsg", "");
+    if (!window.PaystackPop) return say("upMsg", "Payment could not load. Check your connection and refresh.");
+    PaystackPop.setup({
+      key: PAYSTACK_KEY, email: user.email, amount: 200000, currency: "NGN",
+      ref: "UP" + Date.now() + Math.floor(Math.random() * 1e5), metadata: { owner_id: user.id, kind: "upgrade" },
+      callback: function (res) {
+        say("upMsg", "Confirming your payment…", true);
+        sb.functions.invoke("verify-upgrade", { body: { reference: res.reference } }).then(function (r) {
+          if (r.error) return say("upMsg", "Payment received but not confirmed yet. Contact us on WhatsApp with reference " + res.reference);
+          sb.from("vendors").select("*").eq("owner_id", user.id).single().then(function (q) { vendor = q.data; refresh(); say("upMsg", "Payment received. We will approve your upgrade soon.", true); });
         });
       }, onClose: function () {}
     }).openIframe();

@@ -100,6 +100,10 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .dimg img{width:100%;height:100%;object-fit:cover;display:block}
 .zh{position:absolute;right:.7rem;bottom:.7rem;background:rgba(0,0,0,.6);color:#fff;font-size:.78rem;font-weight:500;padding:.3rem .65rem;border-radius:999px}
 .dn{font-size:clamp(1.4rem,5vw,2rem);line-height:1.2;overflow-wrap:anywhere}
+.thumbs{display:flex;gap:.5rem;margin-top:.6rem;overflow-x:auto;padding-bottom:.2rem}
+.thumbs button{flex:none;width:64px;height:64px;padding:0;border-radius:12px;overflow:hidden;border:2px solid transparent;background:var(--soft)}
+.thumbs button.on{border-color:var(--g)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .dp{font:800 1.7rem "Bricolage Grotesque";color:var(--g);margin:.3rem 0 1rem}
 .dl{font-size:1rem;margin:1.5rem 0 .3rem}
 .dd{color:#334155;white-space:pre-line;overflow-wrap:anywhere}
@@ -208,7 +212,7 @@ body.loading{overflow:hidden}
   var BASE = "https://shoplinkng.shop";
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var app = document.getElementById("app");
-  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT;
+  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT, gi = 0;
   var slug = (new URLSearchParams(location.search).get("s") || location.pathname.split("/").filter(Boolean).pop() || "").replace(/\.html$/, "").toLowerCase();
 
   /* ---------- splash: stays at least 1.5s so the animation can finish ---------- */
@@ -310,14 +314,17 @@ body.loading{overflow:hidden}
   }
 
   /* ---------- product page ---------- */
+  function galleryOf(p) { return [p.image_url].concat(p.more_images || []).filter(Boolean); }
   function detailHtml(p) {
     var id = esc(p.id), others = products.filter(function (x) { return String(x.id) !== String(p.id); }).slice(0, 6);
-    var picture = p.image_url
-      ? '<button class="dimg" type="button" data-act="zoom" aria-label="Enlarge photo"><img alt="' + esc(p.name) + '" src="' + esc(p.image_url) + '"><span class="zh">Tap to enlarge</span></button>'
+    var main = galleryOf(p)[0], picture = main
+      ? '<button class="dimg" type="button" data-act="zoom" aria-label="Enlarge photo"><img id="mainImg" alt="' + esc(p.name) + '" src="' + esc(main) + '"><span class="zh">Tap to enlarge</span></button>'
       : '<div class="dimg"><span class="ph2" style="font-size:4rem">' + esc(String(p.name).charAt(0).toUpperCase()) + "</span></div>";
+    var gal = galleryOf(p);
+    if (gal.length > 1) picture += '<div class="thumbs">' + gal.map(function (u, i) { return '<button type="button" class="' + (i === 0 ? "on" : "") + '" data-act="thumb" data-i="' + i + '" aria-label="Photo ' + (i + 1) + '"><img alt="" loading="lazy" src="' + esc(u) + '"></button>'; }).join("") + "</div>";
     var logo = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '">' : '<span class="ph">' + esc(vendor.store_name.charAt(0).toUpperCase()) + "</span>";
     return '<div class="dtop"><div class="w"><a class="back" href="#" data-act="back">' + I.back + 'Back</a><button class="ico" type="button" data-act="share" aria-label="Share this product">' + I.share + "</button></div></div>" +
-      '<div class="w"><div class="dwrap">' + picture + "<div>" +
+      '<div class="w"><div class="dwrap"><div>' + picture + "</div><div>" +
       '<h1 class="dn">' + esc(p.name) + '</h1><div class="dp">' + naira(p.price) + '</div><div class="ctl big" data-id="' + id + '"></div>' +
       '<h2 class="dl">About this product</h2><p class="dd">' + (p.description ? esc(p.description) : "The seller has not added a description yet.") + "</p>" +
       '<div class="sell">' + logo + "<div><b>" + esc(vendor.store_name) + "</b><small>" + (vendor.city ? esc(vendor.city) : "Seller") + "</small>" + badge() + '</div><a href="#" data-act="back-all">All products</a></div>' +
@@ -334,7 +341,7 @@ body.loading{overflow:hidden}
       d.innerHTML = '<div class="dtop"><div class="w"><a class="back" href="#" data-act="back-all">' + I.back + 'Back to store</a></div></div><div class="note"><h1>Product not found</h1><p>This product may have been removed by the seller.</p></div>';
       scrollTo(0, 0); return;
     }
-    cur = p;
+    cur = p; gi = 0;
     d.innerHTML = detailHtml(p); fillCtl(d);
     seo(p.name + " – " + vendor.store_name, (p.description || p.name) + " · " + naira(p.price), p.image_url || vendor.logo_url);
     scrollTo(0, 0);
@@ -411,7 +418,8 @@ body.loading{overflow:hidden}
       else if (a === "inc") setQty(id, n + 1);
       else if (a === "dec") setQty(id, n - 1);
       else if (a === "share") share();
-      else if (a === "zoom") { lb.querySelector("img").src = cur.image_url; lb.querySelector("img").alt = cur.name; lb.hidden = false; }
+      else if (a === "thumb") { gi = +b.dataset.i; $("mainImg").src = galleryOf(cur)[gi]; b.parentNode.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); }); }
+      else if (a === "zoom") { lb.querySelector("img").src = galleryOf(cur)[gi] || cur.image_url; lb.querySelector("img").alt = cur.name; lb.hidden = false; }
       else if (a === "back") { e.preventDefault(); if (depth > 0) { depth--; history.back(); } else location.hash = ""; }
       else if (a === "back-all") { e.preventDefault(); location.hash = ""; depth = 0; }
     });
@@ -438,7 +446,12 @@ body.loading{overflow:hidden}
     if (!vendor.is_live) return note(esc(vendor.store_name), "This store is being set up. Please check back soon.");
     sb.rpc("store_products", { p_slug: slug }).then(function (q) {
       if (q.error) return note("Could not load products", "Check your connection and try again.", true);
-      products = q.data || []; draw(); hideSplash(); countVisit();
+      products = q.data || [];
+      function go() { draw(); hideSplash(); countVisit(); }
+      Promise.resolve(sb.rpc("store_product_images", { p_slug: slug })).then(function (g) {
+        ((g && g.data) || []).forEach(function (x) { products.forEach(function (p) { if (String(p.id) === String(x.id)) p.more_images = x.images; }); });
+        go();
+      }, go);
     });
   }, function () { note("Could not load the store", "Check your connection and try again.", true); });
 })();

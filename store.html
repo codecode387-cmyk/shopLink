@@ -429,10 +429,11 @@ body.loading{overflow:hidden}
   }
 
   if (!slug) return note("Store not found", "Check the link and try again.");
-  sb.from("vendors").select("store_name,description,city,logo_url,whatsapp_number,paid_until,is_live,verify_status,verified_until").eq("slug", slug).maybeSingle().then(function (r) {
+  sb.from("vendors").select("store_name,description,city,logo_url,whatsapp_number,paid_until,is_live,verify_status,verified_until,disabled").eq("slug", slug).maybeSingle().then(function (r) {
     if (r.error) return note("Could not load the store", "Check your connection and try again.", true);
     if (!r.data) return note("Store not found", "This store link does not exist. Check the link and try again.");
     vendor = r.data; document.title = vendor.store_name + " – ShopLink NG";
+    if (vendor.disabled) return note("Store unavailable", esc(vendor.store_name) + " is no longer available.");
     if (new Date(vendor.paid_until) <= new Date()) return closedNote();
     if (!vendor.is_live) return note(esc(vendor.store_name), "This store is being set up. Please check back soon.");
     sb.rpc("store_products", { p_slug: slug }).then(function (q) {

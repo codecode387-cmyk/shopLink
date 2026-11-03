@@ -14,8 +14,11 @@ a{color:inherit}
 .wrap{width:min(1120px,92%);margin-inline:auto}
 h1,h2,h3{font-family:var(--display);line-height:1.05;letter-spacing:-.02em}
 
-/* nav */
-header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+/* nav
+   The header blur lives on header::before (not on header itself) so the
+   mobile menu panel inside the header can use its own glass blur. */
+header{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line)}
+header::before{content:"";position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--paper) 88%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
 .logo{font-family:var(--display);font-weight:800;font-size:1.35rem;text-decoration:none;display:flex;align-items:center;gap:.5rem}
 .logo i{width:30px;height:30px;border-radius:9px;background:var(--wa);display:grid;place-items:center}
@@ -31,7 +34,7 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper
 .btn-ghost{border-color:var(--ink);color:var(--ink);background:transparent}
 .btn-ghost:hover{background:var(--ink);color:var(--paper)}
 .btn-sm{padding:.55rem 1.1rem;font-size:.92rem}
-.menu-btn{display:none;width:44px;height:44px;border:0;background:transparent;cursor:pointer;border-radius:12px;position:relative}
+.menu-btn{display:none;width:44px;height:44px;border:0;background:transparent;cursor:pointer;border-radius:12px;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .menu-btn span,.menu-btn span::before,.menu-btn span::after{content:"";position:absolute;width:22px;height:2.5px;border-radius:2px;background:var(--ink);transition:transform .25s,top .25s,background .2s}
 .menu-btn span{top:21px;left:11px}
 .menu-btn span::before{top:-7px;left:0}
@@ -39,12 +42,37 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper
 .nav.open .menu-btn span{background:transparent}
 .nav.open .menu-btn span::before{top:0;transform:rotate(45deg)}
 .nav.open .menu-btn span::after{top:0;transform:rotate(-45deg)}
+
 @media(max-width:720px){
   .menu-btn{display:block}
-  .links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:var(--paper);border-bottom:1px solid var(--line);padding:.4rem 4% 1.3rem;box-shadow:0 24px 30px -22px rgba(16,35,27,.4)}
-  .nav.open .links{display:flex}
-  .links a:not(.btn){padding:.95rem .2rem;font-size:1.1rem;border-bottom:1px solid var(--line)}
+
+  /* glass menu panel */
+  .links{
+    display:flex;flex-direction:column;align-items:stretch;gap:0;
+    position:absolute;top:calc(100% + 10px);left:4%;right:4%;
+    padding:.4rem 1.1rem 1.2rem;
+    background:color-mix(in srgb,var(--paper) 55%,transparent);
+    -webkit-backdrop-filter:blur(18px) saturate(170%);
+    backdrop-filter:blur(18px) saturate(170%);
+    border:1px solid color-mix(in srgb,var(--white) 55%,transparent);
+    border-radius:24px;
+    box-shadow:0 20px 50px -18px rgba(16,35,27,.45),inset 0 1px 0 rgba(255,255,255,.5);
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateY(-10px) scale(.98);transform-origin:top right;
+    transition:opacity .22s,transform .22s,visibility 0s .22s;
+  }
+  .nav.open .links{
+    opacity:1;visibility:visible;pointer-events:auto;transform:none;
+    transition:opacity .22s,transform .22s;
+  }
+  .links a:not(.btn){
+    padding:.95rem .2rem;font-size:1.1rem;color:var(--ink);
+    border-bottom:1px solid color-mix(in srgb,var(--ink) 12%,transparent);
+  }
   .links .btn{margin-top:1.1rem;padding:.95rem}
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .links{background:var(--paper)}
+  }
 }
 
 /* hero */

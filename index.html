@@ -49,7 +49,70 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<script src="menu.js" defer></script>
+
+<!-- MOBILE MENU FIX: loads after styles.css so it overrides any old menu rules.
+     menu.js is no longer used. The menu logic is inline at the bottom of this page. -->
+<style>
+  header { position: sticky; top: 0; z-index: 1000; }
+
+  .menu-btn { display: none; }
+
+  @media (max-width: 820px) {
+    .menu-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      margin-left: auto;
+      background: transparent;
+      border: 0;
+      color: inherit;
+      cursor: pointer;
+      position: relative;
+      z-index: 1001;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .menu-btn span,
+    .menu-btn span::before,
+    .menu-btn span::after {
+      content: "";
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform .2s ease, opacity .2s ease, background .2s ease;
+    }
+    .menu-btn span { position: relative; }
+    .menu-btn span::before { position: absolute; top: -7px; left: 0; }
+    .menu-btn span::after  { position: absolute; top: 7px;  left: 0; }
+    .menu-btn.open span { background: transparent; }
+    .menu-btn.open span::before { transform: translateY(7px) rotate(45deg); }
+    .menu-btn.open span::after  { transform: translateY(-7px) rotate(-45deg); }
+
+    .links {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+      padding: 16px 20px 24px;
+      background: #fff;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, .12);
+      max-height: calc(100vh - 70px);
+      overflow-y: auto;
+    }
+    .links.open { display: flex; }
+    .links a { padding: 12px 4px; }
+    .links .btn { text-align: center; margin-top: 8px; }
+  }
+</style>
 </head>
 <body>
 
@@ -275,6 +338,47 @@
 
 <script>
 document.getElementById("yr").textContent = new Date().getFullYear();
+
+/* Mobile menu */
+(function () {
+  var btn = document.querySelector(".menu-btn");
+  var menu = document.getElementById("menu");
+  if (!btn || !menu) return;
+
+  function setOpen(open) {
+    menu.classList.toggle("open", open);
+    btn.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    document.body.style.overflow = open ? "hidden" : "";
+  }
+
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    setOpen(!menu.classList.contains("open"));
+  });
+
+  /* close when a link inside the menu is tapped */
+  menu.addEventListener("click", function (e) {
+    if (e.target.closest("a")) setOpen(false);
+  });
+
+  /* close when tapping anywhere outside the header */
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest("header")) setOpen(false);
+  });
+
+  /* close with the Escape key */
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") setOpen(false);
+  });
+
+  /* reset when the screen grows to desktop width */
+  var mq = window.matchMedia("(min-width: 821px)");
+  var onChange = function (m) { if (m.matches) setOpen(false); };
+  if (mq.addEventListener) mq.addEventListener("change", onChange);
+  else if (mq.addListener) mq.addListener(onChange);
+})();
 
 /* Order demo: lines appear one by one, then the vendor replies */
 (function(){

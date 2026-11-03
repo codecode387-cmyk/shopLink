@@ -1,0 +1,122 @@
+/* ShopLink NG: professional look for dashboard.html and admin.html.
+   Load AFTER styles.css and menu.css:
+     <link rel="stylesheet" href="app.css">
+   Everything is scoped to body.app so the public pages are never touched.
+   Layout rules for phones stay in menu.css. */
+
+body.app{
+  --g:#16794a; --gd:#0f5a36; --ink:#0f1f17; --mut:#667085; --line:#e6eaee; --bg:#f4f6f8; --soft:#f8fafb;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 10px 28px -18px rgba(16,24,40,.18);
+  background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+}
+body.app .main{background:var(--bg)}
+
+/* ---- sidebar (desktop only, phones keep menu.css) ---- */
+@media(min-width:801px){
+  body.app .side{width:252px;background:#0c2418;border-right:0;padding:1.5rem 1rem;gap:.15rem}
+  body.app .brand{color:#fff;font-size:1.3rem;padding:.1rem .8rem 1.5rem;letter-spacing:-.02em}
+  body.app .brand small{background:#2bb673;color:#06210f;font-weight:800}
+  body.app .side button,body.app .side a.nv{position:relative;color:#9dbbaa;font-weight:500;padding:.72rem .85rem;border-radius:10px;transition:background .15s,color .15s}
+  body.app .side button:hover,body.app .side a.nv:hover{background:rgba(255,255,255,.07);color:#fff}
+  body.app .side button.on{background:rgba(43,182,115,.16);color:#fff;font-weight:700}
+  body.app .side button.on::before{content:"";position:absolute;left:-1rem;top:22%;bottom:22%;width:4px;border-radius:0 4px 4px 0;background:#2bb673}
+  body.app .side .sp{flex:1}
+}
+
+/* ---- top bar + content ---- */
+body.app .top{background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:.95rem 1.8rem}
+body.app .top h1{font-size:1.3rem;letter-spacing:-.02em}
+body.app .content{padding:1.8rem;max-width:1120px}
+@media(max-width:800px){body.app .content{padding:1rem}}
+
+/* ---- cards and stats ---- */
+body.app .card,body.app .stat{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+body.app .card{padding:1.4rem;margin-bottom:1.2rem}
+body.app .card h2{font-size:1.1rem;letter-spacing:-.01em}
+body.app .stat{padding:1.15rem 1.2rem}
+body.app .stat span{display:block;color:var(--mut);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+body.app .stat b{font-size:1.9rem;letter-spacing:-.02em;margin-top:.25rem}
+body.app .stat small{display:block;color:var(--mut);font-size:.8rem;margin-top:.15rem}
+body.app .grid{gap:1rem;margin-bottom:1.2rem}
+
+/* ---- tables ---- */
+body.app table{border-collapse:separate;border-spacing:0}
+body.app th{background:var(--soft);color:var(--mut);font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.7rem .8rem;border-bottom:1px solid var(--line)}
+body.app th:first-child{border-radius:10px 0 0 10px}
+body.app th:last-child{border-radius:0 10px 10px 0}
+body.app td{padding:.85rem .8rem;border-bottom:1px solid #eef1f4}
+body.app tbody tr:hover td{background:#fbfcfd}
+body.app tr:last-child td{border-bottom:0}
+body.app td.r{text-align:right}
+
+/* ---- buttons and inputs ---- */
+body.app .btn{border-radius:10px;font-weight:700;letter-spacing:-.005em}
+body.app .btn.p{background:var(--g);box-shadow:0 1px 2px rgba(15,90,54,.25),inset 0 1px 0 rgba(255,255,255,.14)}
+body.app .btn.p:hover{background:var(--gd)}
+body.app .btn.o{border-color:#d7dde3}
+body.app .btn:focus-visible,body.app .side button:focus-visible{outline:3px solid #bfe6cf;outline-offset:2px}
+body.app label.f input,body.app label.f textarea{border-color:#d7dde3;border-radius:10px;transition:border-color .15s,box-shadow .15s}
+body.app label.f input:focus,body.app label.f textarea:focus{outline:0;border-color:var(--g);box-shadow:0 0 0 4px rgba(22,121,74,.12)}
+
+/* ---- pills, banners, notes ---- */
+body.app .pill{font-size:.74rem;padding:.2rem .65rem}
+body.app .banner{border-radius:12px;border:1px solid transparent;font-weight:600}
+body.app .banner.ok{border-color:#cfeadb}
+body.app .banner.bad{border-color:#f5cbc5}
+body.app .banner.wait{border-color:#f1dfa6}
+body.app .note{border-radius:12px;box-shadow:var(--shadow)}
+body.app .bars i{background:#cfeedd}
+body.app .bars i:hover,body.app .bars i.t{background:var(--g)}
+
+/* ---- admin store groups + manage dialog ---- */
+body.app .seg button{border-color:#d7dde3}
+body.app .seg button.on{background:var(--g);border-color:var(--g)}
+body.app .mbox{border-radius:20px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
+
+/* =====================================================
+   ANALYTICS + LIVE VIEWS
+   ===================================================== */
+body.app .ahead{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin:.2rem 0 1rem}
+body.app .pt{font-size:1.3rem;letter-spacing:-.02em}
+body.app .ct{font-size:1rem;margin-bottom:.9rem;letter-spacing:-.01em}
+
+/* range chips + custom days */
+body.app .range{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+body.app .chip{min-height:38px;padding:0 .95rem;border-radius:999px;border:1.5px solid #d7dde3;background:#fff;color:var(--ink);font:700 .85rem "DM Sans",system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+body.app .chip.on{background:var(--g);border-color:var(--g);color:#fff}
+body.app .rin{display:flex;align-items:center;gap:.4rem;color:var(--mut);font-size:.85rem;font-weight:500;margin-left:.2rem}
+body.app .rin input{width:64px;height:38px;border:1.5px solid #d7dde3;border-radius:10px;padding:0 .5rem;font:700 .95rem "DM Sans",system-ui,sans-serif;text-align:center;color:var(--ink)}
+body.app .rin input:focus{outline:0;border-color:var(--g);box-shadow:0 0 0 4px rgba(22,121,74,.12)}
+
+/* SVG charts */
+body.app .ch{position:relative}
+body.app .ch svg{display:block;width:100%;height:auto;touch-action:pan-y;overflow:visible}
+body.app .ch .gl{stroke:#eef1f4;stroke-width:1}
+body.app .ch .ax{fill:#8a94a1;font:500 11px "DM Sans",system-ui,sans-serif}
+body.app .ch .gd{stroke:#98a2b3;stroke-width:1;stroke-dasharray:3 3;opacity:0}
+body.app .tt{position:absolute;top:0;transform:translate(-50%,-4px);opacity:0;pointer-events:none;background:#0c2418;color:#fff;border-radius:10px;padding:.45rem .7rem;font-size:.8rem;line-height:1.45;white-space:nowrap;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);transition:opacity .12s}
+body.app .tt b{display:block;font-size:.78rem;color:#bfe6cf;font-weight:700}
+body.app .tt span{display:flex;align-items:center;gap:.4rem}
+body.app .tt i{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* live visitors card */
+body.app .lv{background:linear-gradient(135deg,#0c2418 0%,#14452d 100%);border-color:#0c2418;color:#fff}
+body.app .lv-top{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+body.app .lv-lbl{font-weight:700;letter-spacing:.02em}
+body.app .lv .sub{color:#9dbbaa;margin-left:auto;font-size:.8rem}
+body.app .dot,body.app .livepill i{width:10px;height:10px;border-radius:50%;background:#2bb673;display:inline-block;box-shadow:0 0 0 0 rgba(43,182,115,.6);animation:ping 1.8s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 10px rgba(43,182,115,0)}100%{box-shadow:0 0 0 0 rgba(43,182,115,0)}}
+body.app .lv-num{font:800 clamp(3.2rem,12vw,5rem)/1 "Bricolage Grotesque","DM Sans",sans-serif;letter-spacing:-.04em;margin:.6rem 0 1rem}
+body.app .lv-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.14)}
+body.app .lv-row b{display:block;font:800 1.5rem "Bricolage Grotesque","DM Sans",sans-serif}
+body.app .lv-row span{color:#9dbbaa;font-size:.8rem}
+@media(max-width:640px){body.app .lv-row{grid-template-columns:repeat(2,1fr)}}
+body.app .cols2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+body.app .cols2 .card{margin-bottom:1.2rem}
+@media(max-width:800px){body.app .cols2{grid-template-columns:1fr;gap:0}}
+
+/* live pill in the admin top bar */
+body.app .livepill{display:inline-flex;align-items:center;gap:.5rem;height:34px;padding:0 .85rem;border:1px solid #cfeadb;background:#ecf8f1;color:#0f5a32;border-radius:999px;font:700 .82rem "DM Sans",system-ui,sans-serif;cursor:pointer;margin-left:.6rem;white-space:nowrap}
+body.app .livepill b{font-weight:800}
+body.app .tip{font-size:.85rem;color:var(--mut);margin:.2rem 0 1.4rem}
+@media(prefers-reduced-motion:reduce){body.app .dot,body.app .livepill i{animation:none}}

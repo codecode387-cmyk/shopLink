@@ -32,6 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="live.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0}
 [hidden]{display:none!important}
@@ -212,8 +213,9 @@ body.loading{overflow:hidden}
   var BASE = "https://shoplinkng.shop";
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var app = document.getElementById("app");
-  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT, gi = 0;
+  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT, gi = 0, ordering = false;
   var slug = (new URLSearchParams(location.search).get("s") || location.pathname.split("/").filter(Boolean).pop() || "").replace(/\.html$/, "").toLowerCase();
+  window.SL_STORE = slug; /* lets live.js report this visitor as "on a store" */
 
   /* ---------- splash: stays at least 1.5s so the animation can finish ---------- */
   var t0 = Date.now();
@@ -372,11 +374,17 @@ body.loading{overflow:hidden}
   function closeSheet() { $("sheet").classList.remove("on"); document.body.style.overflow = ""; }
   function send(e) {
     e.preventDefault();
+    if (ordering) return; /* ignore a second tap while the first is being sent */
     var name = $("cn").value.trim(), addr = $("ca").value.trim();
     if (!name) { $("err").textContent = "Enter your name."; return; }
     var lines = products.filter(function (p) { return cart[p.id]; }).map(function (p) { return "- " + cart[p.id] + " x " + p.name + " (" + naira(cart[p.id] * p.price) + ")"; });
     var msg = "Hello " + vendor.store_name + ", I would like to order:\n" + lines.join("\n") + "\nTotal: " + naira(total()) + "\nName: " + name + (addr ? "\nAddress: " + addr : "") + "\nStore: " + storeUrl();
-    location.href = "https://wa.me/" + vendor.whatsapp_number + "?text=" + encodeURIComponent(msg);
+    var url = "https://wa.me/" + vendor.whatsapp_number + "?text=" + encodeURIComponent(msg), opened = false;
+    ordering = true; setTimeout(function () { ordering = false; }, 4000);
+    function go() { if (!opened) { opened = true; location.href = url; } }
+    /* count the order for the seller's analytics, then open WhatsApp (never blocks the order) */
+    Promise.resolve(sb.rpc("record_order", { p_slug: slug, p_total: total(), p_items: count() })).then(go, go);
+    setTimeout(go, 1500);
   }
 
   /* ---------- page shell ---------- */

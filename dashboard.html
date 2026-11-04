@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="menu.css">
+<link rel="stylesheet" href="app.css">
 <style>
 /* Mega Store rows */
 .mrow{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid #e5e9ee;cursor:pointer}
@@ -217,6 +218,16 @@
   function fmtDate(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" }); }
   function isVerified() { return vendor.verify_status === "approved" && vendor.verified_until && new Date(vendor.verified_until) > new Date(); }
 
+  /* what still stops shoppers from seeing the store */
+  function missingSteps() {
+    var m = [];
+    if (!vendor.logo_url) m.push("upload your store logo");
+    if (!(vendor.description || "").trim()) m.push("describe what you sell");
+    if (!vendor.whatsapp_number) m.push("add your WhatsApp number");
+    if (daysLeft() <= 0) m.push("subscribe to open your store");
+    return m;
+  }
+
   /* tabs */
   function show(v) {
     document.querySelectorAll(".view").forEach(function (s) { s.classList.toggle("on", s.id === "v-" + v); });
@@ -397,23 +408,42 @@
   function resetForm() { editMore = []; drawMore(); $("prod").reset(); $("p_id").value = ""; $("pTitle").textContent = "Add a product"; $("pGo").textContent = "Add product"; $("pCancel").hidden = true; }
   $("pCancel").onclick = resetForm;
 
+  /* big phone photos are resized before upload (products 1400px, logo 800px) */
+  function shrink(file, max) {
+    if (!/^image\/(jpe?g|png|webp)$/i.test(file.type)) return Promise.resolve(file);
+    return new Promise(function (resolve) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        if (s === 1 && file.size < 400000) return resolve(file);
+        var c = document.createElement("canvas"); c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+        var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function (b) { resolve(b && b.size < file.size ? new File([b], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" }) : file); }, "image/jpeg", 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
   function upload(file, prefix) {
-    var path = user.id + "/" + prefix + Date.now() + "-" + file.name.replace(/[^a-z0-9.]/gi, "_");
-    return sb.storage.from("products").upload(path, file).then(function (r) {
-      return r.error ? null : sb.storage.from("products").getPublicUrl(path).data.publicUrl;
+    return shrink(file, prefix === "logo-" ? 800 : 1400).then(function (f) {
+      var path = user.id + "/" + prefix + Date.now() + "-" + f.name.replace(/[^a-z0-9.]/gi, "_");
+      return sb.storage.from("products").upload(path, f, { contentType: f.type }).then(function (r) {
+        return r.error ? null : sb.storage.from("products").getPublicUrl(path).data.publicUrl;
+      });
     });
   }
 
   $("prod").addEventListener("submit", function (e) {
-    e.preventDefault(); say("pMsg", "");
+    e.preventDefault(); say("pMsg", ""); $("pMsg").style.color = "";
     var name = $("p_name").value.trim(), price = parseFloat($("p_price").value), f = $("p_img").files[0], id = $("p_id").value;
     if (!name) return say("pMsg", "Enter the product name.");
     if (isNaN(price) || price < 0) return say("pMsg", "Enter a price in naira.");
     if (!id && products.length >= maxProducts()) return say("pMsg", "You have reached the limit of " + maxProducts() + " products. Delete one to add another.");
-    if (f && f.size > 3e6) return say("pMsg", "Photo must be under 3 MB.");
+    if (f && f.size > 15e6) return say("pMsg", "Photo must be under 15 MB.");
     var moreFiles = isPlus() ? Array.prototype.slice.call($("p_more").files) : [];
     if (editMore.length + moreFiles.length > 4) return say("pMsg", "A product can have 5 photos in total: the main photo and 4 more.");
-    if (moreFiles.some(function (x) { return x.size > 3e6; })) return say("pMsg", "Each photo must be under 3 MB.");
+    if (moreFiles.some(function (x) { return x.size > 15e6; })) return say("pMsg", "Each photo must be under 15 MB.");
     $("pGo").disabled = true;
     (f ? upload(f, "p-") : Promise.resolve(undefined)).then(function (url) {
       if (f && !url) { $("pGo").disabled = false; return say("pMsg", "Photo upload failed. Try again."); }
@@ -429,7 +459,12 @@
             var m = r.error.message || "";
             return say("pMsg", m.indexOf("upgrade") > -1 ? "Extra photos need the store upgrade." : m.indexOf("limit") > -1 ? "You have reached the limit of " + maxProducts() + " products." : "Could not save the product. Try again.");
           }
-          resetForm(); say("pMsg", "Saved.", true); loadProducts();
+          resetForm();
+          loadProducts().then(function () {
+            var miss = missingSteps();
+            say("pMsg", miss.length ? "Saved. Shoppers cannot see your store yet. Still to do: " + miss.join(", ") + "." : "Saved. It is now on your store.", !miss.length);
+            $("pMsg").style.color = miss.length ? "#7a5600" : "";
+          });
         });
       });
     });
@@ -441,7 +476,7 @@
     var wa = normPhone($("whatsapp_number").value), f = $("logo").files[0];
     if ($("store_name").value.trim().length < 2) return say("bizMsg", "Enter your store name.");
     if (!/^234[789][01]\d{8}$/.test(wa)) return say("bizMsg", "Enter a valid Nigerian WhatsApp number.");
-    if (f && f.size > 2e6) return say("bizMsg", "Logo must be under 2 MB.");
+    if (f && f.size > 10e6) return say("bizMsg", "Logo must be under 10 MB.");
     (f ? upload(f, "logo-") : Promise.resolve(undefined)).then(function (url) {
       if (f && !url) return say("bizMsg", "Logo upload failed. Try again.");
       var row = { store_name: $("store_name").value.trim(), description: $("description").value.trim(), city: $("city").value.trim(), whatsapp_number: wa };
@@ -533,6 +568,7 @@
   });
 })();
 </script>
+<script src="analytics.js"></script>
 <script src="menu.js"></script>
 </body>
 </html>

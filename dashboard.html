@@ -46,6 +46,17 @@
 #setup.ok h2{color:#0f5a32;font-size:1.25rem}
 #setup.ok .check{display:none}
 #setup.fade{opacity:0;transform:translateY(-8px)}
+/* floating "Add product" button (Overview) */
+body.app .content{padding-bottom:6rem}
+.fab{position:fixed;right:1.1rem;bottom:calc(1.1rem + env(safe-area-inset-bottom,0px));z-index:40;display:inline-flex;align-items:center;gap:.55rem;height:54px;padding:0 1.3rem 0 1.05rem;border:0;border-radius:999px;background:#16794a;color:#fff;font:700 1rem "DM Sans",system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 26px -8px rgba(15,90,54,.65),0 2px 6px rgba(0,0,0,.18);touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .15s,background .15s}
+.fab:hover{background:#0f5a36}
+.fab:active{transform:scale(.96)}
+.fab:focus-visible{outline:3px solid #bfe6cf;outline-offset:3px}
+.fab[hidden]{display:none}
+.fab svg{width:22px;height:22px;flex:none}
+.fab.nudge{animation:fabpulse 1.9s ease-out infinite}
+@keyframes fabpulse{0%{box-shadow:0 10px 26px -8px rgba(15,90,54,.65),0 0 0 0 rgba(43,182,115,.55)}70%{box-shadow:0 10px 26px -8px rgba(15,90,54,.65),0 0 0 16px rgba(43,182,115,0)}100%{box-shadow:0 10px 26px -8px rgba(15,90,54,.65),0 0 0 0 rgba(43,182,115,0)}}
+@media(prefers-reduced-motion:reduce){.fab.nudge{animation:none}}
 </style>
 </head>
 <body class="app">
@@ -201,6 +212,11 @@
   </div>
 </div>
 
+<button class="fab" id="fab" type="button" aria-label="Add a product to your store" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+  <span id="fabText">Add product</span>
+</button>
+
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
@@ -334,7 +350,7 @@
     $("steps").innerHTML = steps.map(function (x) { return '<li class="' + (x[1] ? "done" : "") + '">' + x[0] + "</li>"; }).join("");
     $("progBar").style.width = (done / steps.length * 100) + "%";
     $("setupSub").textContent = all ? "Your store is live and ready for customers." : done + " of " + steps.length + " steps done. Your store goes live as soon as all four are finished.";
-    drawSetup(all);
+    drawSetup(all); drawFab();
     if (all !== vendor.is_live) sb.from("vendors").update({ is_live: all }).eq("owner_id", user.id).then(function (r) { if (!r.error) { vendor.is_live = all; drawMega(); } });
     if (vendor.disabled) { s.className = "banner bad"; s.textContent = "Your store has been permanently disabled. Please contact ShopLink NG on WhatsApp for help."; }
     else if (n <= 0) { s.className = "banner bad"; s.textContent = "Your store is closed. Shoppers see \"Store closed\". Go to Billing and pay ₦1,000 to reopen it."; }
@@ -354,6 +370,19 @@
     $("upPay").hidden = plus || pend || !!vendor.disabled;
   }
   $("goUpgrade").onclick = function () { show("upgrade"); };
+
+  /* floating "Add product" button: shown on the Overview, takes the seller straight to the add-product form */
+  function drawFab() {
+    var f = $("fab");
+    f.hidden = !$("v-overview").classList.contains("on") || !vendor || !!vendor.disabled;
+    $("fabText").textContent = products.length ? "Add product" : "Add your first product";
+    f.classList.toggle("nudge", !products.length);
+  }
+  $("fab").onclick = function () {
+    if ($("p_id").value) resetForm();            /* never open in "edit" mode by accident */
+    show("products"); $("p_name").focus();
+  };
+  new MutationObserver(drawFab).observe($("v-overview"), { attributes: true, attributeFilter: ["class"] });
 
   /* visits chart */
   function loadVisits() {

@@ -2,7 +2,8 @@
    Used by dashboard.html (vendor "Analytics" tab) and admin.html ("Live & orders" tab).
    Load it AFTER the Supabase script and BEFORE menu.js:
      <script src="analytics.js"></script>
-*/
+   Vendor side also adds: weekly growth tip, most-viewed products, and sidebar links
+   to services.html (bookings) and advertise.html (ad packages). */
 (function () {
   if (!window.supabase) return;
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
@@ -19,6 +20,15 @@
   function pad(a, n) { a = a.map(Number); while (a.length < n) a.unshift(0); return tail(a, n); }
   function dlabel(s) { var d = new Date(s + "T00:00:00"); return isNaN(d) ? String(s) : d.toLocaleDateString("en-NG", { day: "numeric", month: "short" }); }
   function stat(label, value, note) { return '<div class="stat"><span>' + label + "</span><b>" + value + "</b>" + (note ? "<small>" + note + "</small>" : "") + "</div>"; }
+
+  /* ---------- weekly growth tip (plain advice from the last 7 days) ---------- */
+  function growthTip(visits, orders) {
+    if (!visits) return ["No visitors this week", "Share your store link on your WhatsApp status, Instagram bio and with past customers. Post one product photo with your link every day."];
+    if (visits >= 20 && orders === 0) return ["Your store received " + visits + " visitors this week, but nobody ordered", "Try clearer product pictures, a short description and a price on every product. Reply quickly when customers message you."];
+    if (visits >= 20 && orders / visits < 0.05) return ["Your store received " + visits + " visitors this week, but only " + orders + (orders === 1 ? " person ordered" : " people ordered"), "Improve your product pictures, descriptions and prices. Put your best sellers first and post them on the Mega Store."];
+    if (orders > 0) return ["Good week: " + orders + (orders === 1 ? " order" : " orders") + " from " + visits + (visits === 1 ? " visitor" : " visitors"), "Keep it up. Post new products often and share your link again to bring in more visitors."];
+    return ["Only " + visits + (visits === 1 ? " visitor" : " visitors") + " this week", "Share your link in more places and post your products on the Mega Store so new shoppers can find you."];
+  }
 
   /* ---------- SVG chart: type "line" (area) or "bar", with hover tooltip ---------- */
   function chart(box, labels, series, o) {
@@ -101,13 +111,21 @@
      VENDOR DASHBOARD: Analytics tab
      ===================================================== */
   function vendorModule() {
+    /* sidebar links to the booking and advertising pages */
+    var sp = $(".side .sp");
+    if (sp) [["Bookings", "services.html"], ["Ad packages", "advertise.html"]].forEach(function (l) {
+      var a = document.createElement("a"); a.className = "nv"; a.href = l[1]; a.textContent = l[0]; sp.parentNode.insertBefore(a, sp);
+    });
+
     var tab = addTab("Analytics", "analytics", "Analytics"); if (!tab) return;
-    var root = tab.view, V = [], O = [], days = 7, loaded = false;
+    var root = tab.view, V = [], O = [], TP = [], days = 7, loaded = false;
     root.innerHTML =
+      '<div class="card" id="aTip" style="border-left:4px solid #16794a" hidden><h3 class="ct" id="aTipH" style="margin-bottom:.3rem"></h3><p class="sub" id="aTipP"></p></div>' +
       '<div class="ahead"><div><h2 class="pt">Store analytics</h2><p class="sub">How many people visit your store and how many orders reach your WhatsApp.</p></div><div class="range" id="aRg"></div></div>' +
       '<div class="grid four" id="aK"></div>' +
       '<div class="card"><h3 class="ct">Visitors, last 30 days</h3><div id="aV"></div></div>' +
       '<div class="card"><h3 class="ct" id="aOt"></h3><div id="aO"></div></div>' +
+      '<div class="card"><h3 class="ct">Most viewed products</h3><p class="sub">Last 30 days. Counted when shoppers open your products from the Mega Store.</p><div class="tw"><table><thead><tr><th>Product</th><th>Views</th></tr></thead><tbody id="aTP"></tbody></table></div></div>' +
       '<div class="card"><h3 class="ct">Day by day</h3><div class="tw"><table><thead><tr><th>Date</th><th>Visitors</th><th>Orders sent</th><th>Order value</th></tr></thead><tbody id="aT"></tbody></table></div></div>' +
       '<p class="tip">An order is counted when a shopper taps "Send order on WhatsApp". Confirm the sale with your customer in the chat.</p>';
 
@@ -119,6 +137,8 @@
       var vis = pad(V.map(function (r) { return r.visits; }), n);
       var vN = tail(vis, days), oN = tail(ov, days), aN = tail(oa, days), lN = tail(labels, days);
       var visits = sum(vN), orders = sum(oN), value = sum(aN);
+      var tip = growthTip(sum(tail(vis, 7)), sum(tail(ov, 7)));
+      $("#aTipH").textContent = "💡 " + tip[0]; $("#aTipP").textContent = tip[1]; $("#aTip").hidden = false;
       $("#aK").innerHTML =
         stat("Visitors, 30 days", num(sum(vis))) +
         stat("Visitors, last " + days + (days === 1 ? " day" : " days"), num(visits)) +
@@ -127,15 +147,17 @@
       chart($("#aV"), labels, [{ name: "Visitors", color: GREEN, values: vis }], { label: "Visitors per day" });
       $("#aOt").textContent = "WhatsApp orders, last " + days + (days === 1 ? " day" : " days");
       chart($("#aO"), lN, [{ name: "Orders", color: MINT, values: oN }], { type: "bar", label: "Orders per day" });
+      $("#aTP").innerHTML = TP.map(function (p) { return "<tr><td>" + esc(p.name) + "</td><td>" + num(p.views) + "</td></tr>"; }).join("") || '<tr><td colspan="2" class="sub" style="padding:1rem 0">No product views yet. Post your products on the Mega Store to get views.</td></tr>';
       $("#aT").innerHTML = lN.map(function (l, i) { return "<tr><td>" + esc(l) + "</td><td>" + num(vN[i]) + "</td><td>" + num(oN[i]) + "</td><td>" + naira(aN[i]) + "</td></tr>"; }).reverse().join("");
     }
     rangeControl($("#aRg", root), 7, function (d) { days = d; draw(); });
 
     sb.auth.getSession().then(function (s) {
       if (!s.data.session) return;
-      Promise.all([sb.rpc("vendor_visits"), sb.rpc("vendor_orders", { p_days: MAXDAYS })]).then(function (res) {
+      Promise.all([sb.rpc("vendor_visits"), sb.rpc("vendor_orders", { p_days: MAXDAYS }), sb.rpc("vendor_top_products", { p_days: 30 })]).then(function (res) {
         V = res[0].error ? [] : (res[0].data || []);
         O = res[1].error ? [] : (res[1].data || []);
+        TP = res[2].error ? [] : (res[2].data || []);
         loaded = true; draw();
       });
     });

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Services &amp; bookings – ShopLink NG</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="nav.js" defer></script>
+<script src="live.js" defer></script>
+<style>
+.pick{display:block;margin-top:.7rem;padding:.9rem 1rem;border:1.5px solid var(--line);border-radius:14px;background:var(--white);cursor:pointer}
+.pick:has(input:checked){border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 10%,var(--white))}
+.pick input{margin-right:.6rem;accent-color:var(--leaf)}
+.pick small{display:block;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem}
+.chips button{min-height:44px;padding:0 .9rem;border:1.5px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink);font:700 .92rem var(--body);cursor:pointer}
+.chips button.on{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.chips button:disabled{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.stp{margin:1.6rem 0 .2rem;font-size:1.25rem}
+.pill{display:inline-block;padding:.15rem .65rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#fff7e0;color:#7a5a00}
+.pill.ok{background:#e8f6ee;color:#0f5a32}.pill.bad{background:#fdecea;color:#9b2318}
+.okmsg{color:var(--leaf)}
+</style>
+</head><body>
+<header><div class="wrap nav"><a class="logo" href="index.html" aria-label="ShopLink NG home"><img src="logo-icon.png" alt="" width="36" height="36" style="width:36px;height:36px;border-radius:9px;display:block"> ShopLink <small>NG</small></a><button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span></button><nav class="links" id="menu" aria-label="Main"><a href="how-it-works.html">How it works</a><a href="mega.html">Mega Store</a><a href="login.html">Log in</a><a class="btn btn-main btn-sm" href="signup.html">Create your store</a></nav></div></header>
+<main><div class="wrap" style="max-width:820px;padding:2rem 0 3rem">
+<h1 style="font-size:clamp(1.8rem,5vw,2.6rem)">Services &amp; bookings</h1>
+<p class="msg okmsg" id="top" role="status"></p>
+<div class="card" style="margin-top:1rem"><h2>Your booking link</h2><p style="color:var(--muted);margin:.4rem 0 .8rem">Share it on WhatsApp, Instagram and flyers. Customers pick a service and a free time slot.</p><code id="blink" style="word-break:break-all"></code><div style="margin-top:.8rem"><button class="btn btn-ghost btn-sm" id="bcopy" type="button">Copy link</button> <a class="btn btn-ghost btn-sm" href="dashboard.html">Back to dashboard</a></div></div>
+<div class="card" style="margin-top:1.2rem"><h2>Add a service</h2>
+<form id="sf" novalidate>
+<label class="field">Service name<input id="s_name" maxlength="80" placeholder="Full makeup, Haircut, Photo shoot"></label>
+<label class="field">Description (optional)<input id="s_desc" maxlength="200"></label>
+<label class="field">Price in naira<input id="s_price" type="number" inputmode="numeric" min="0"></label>
+<label class="field">How long it takes (minutes)<input id="s_dur" type="number" inputmode="numeric" min="5" value="60"></label>
+<label class="field">Deposit in naira (optional)<input id="s_dep" type="number" inputmode="numeric" min="0" value="0"></label>
+<p class="msg" id="s_msg" role="alert"></p><button class="btn btn-main" type="submit" style="margin-top:1rem">Add service</button></form>
+<div id="slist" style="margin-top:1.2rem"></div></div>
+<div class="card" style="margin-top:1.2rem"><h2>Opening hours</h2>
+<form id="af" novalidate><p style="color:var(--muted);margin-top:.4rem">Days you take bookings</p><div class="chips" id="adays"></div>
+<label class="field">Opens<input id="a_open" type="time" value="09:00"></label><label class="field">Closes<input id="a_close" type="time" value="17:00"></label>
+<label class="field">Length of each slot<select id="a_slot"><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60" selected>1 hour</option><option value="90">1 hour 30 minutes</option><option value="120">2 hours</option><option value="180">3 hours</option></select></label>
+<p class="msg" id="a_msg" role="alert"></p><button class="btn btn-main" type="submit" style="margin-top:1rem">Save hours</button></form></div>
+<div class="card" style="margin-top:1.2rem"><h2>Bookings</h2><div class="chips" id="bf"><button type="button" data-f="up" class="on">Upcoming</button><button type="button" data-f="all">All</button></div><div id="blist" style="margin-top:.8rem"></div></div>
+</div></main>
+<footer><div class="wrap"><span>© <span id="yr">2026</span> ShopLink NG. Made in Nigeria.</span><nav aria-label="Footer"><a href="about.html">About</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="contact.html">Contact</a></nav></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script>
+(function () {
+  var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
+  var $ = function (id) { return document.getElementById(id); }, user, vendor, services = [], settings = null, bookings = [], filter = "up";
+  var DAYS = [["Mon", 1], ["Tue", 2], ["Wed", 3], ["Thu", 4], ["Fri", 5], ["Sat", 6], ["Sun", 0]], chosen = [1, 2, 3, 4, 5, 6];
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function naira(n) { return "₦" + Number(n || 0).toLocaleString("en-NG"); }
+  function say(id, t, ok) { var m = $(id); m.textContent = t; m.className = "msg" + (ok ? " okmsg" : ""); }
+  function fdate(d) { return new Date(d + "T12:00:00").toLocaleDateString("en-NG", { weekday: "short", day: "numeric", month: "short" }); }
+  function nice(t) { var p = t.split(":"), h = +p[0]; return (h % 12 || 12) + ":" + p[1] + " " + (h >= 12 ? "PM" : "AM"); }
+  function today() { var d = new Date(); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  var link = function () { return "https://shoplinkng.shop/book.html?s=" + vendor.slug; };
+
+  function drawDays() {
+    $("adays").innerHTML = DAYS.map(function (d) { return '<button type="button" data-n="' + d[1] + '" class="' + (chosen.indexOf(d[1]) > -1 ? "on" : "") + '">' + d[0] + "</button>"; }).join("");
+  }
+  $("adays").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-n]"); if (!b) return; var n = +b.dataset.n, i = chosen.indexOf(n);
+    if (i > -1) chosen.splice(i, 1); else chosen.push(n); drawDays();
+  });
+  function drawServices() {
+    $("slist").innerHTML = services.map(function (s) {
+      return '<div style="display:flex;gap:1rem;justify-content:space-between;align-items:center;padding:.7rem 0;border-top:1px solid var(--line)"><div><b>' + esc(s.name) + "</b> · " + naira(s.price) + '<br><small style="color:var(--muted)">' + s.duration_min + " min" + (s.deposit > 0 ? " · deposit " + naira(s.deposit) : "") + '</small></div><button class="btn btn-ghost btn-sm" type="button" data-del="' + s.id + '">Delete</button></div>';
+    }).join("") || '<p style="color:var(--muted)">No services yet. Add your first one above.</p>';
+  }
+  function drawBookings() {
+    var count = {}; bookings.forEach(function (b) { if (b.status !== "cancelled") count[b.customer_phone] = (count[b.customer_phone] || 0) + 1; });
+    var t = today(), list = bookings.filter(function (b) { return filter === "all" || (b.booking_date >= t && b.status !== "cancelled"); });
+    if (filter === "up") list = list.slice().sort(function (a, b) { return (a.booking_date + a.start_time) < (b.booking_date + b.start_time) ? -1 : 1; });
+    $("blist").innerHTML = list.map(function (b) {
+      var cls = b.status === "confirmed" || b.status === "completed" ? "ok" : b.status === "cancelled" ? "bad" : "";
+      var btns = b.status === "pending" ? '<button class="btn btn-main btn-sm" data-st="confirmed" data-id="' + b.id + '">Confirm</button> ' : "";
+      if (b.status === "confirmed") btns += '<button class="btn btn-ghost btn-sm" data-st="completed" data-id="' + b.id + '">Mark done</button> ';
+      if (b.status === "pending" || b.status === "confirmed") btns += '<button class="btn btn-ghost btn-sm" data-st="cancelled" data-id="' + b.id + '">Cancel</button>';
+      return '<div style="padding:.9rem 0;border-top:1px solid var(--line)"><b>' + fdate(b.booking_date) + ", " + nice(b.start_time) + '</b> <span class="pill ' + cls + '">' + esc(b.status) + "</span><br>" + esc(b.service_name) + " · " + naira(b.price) + (b.deposit > 0 ? " (deposit " + naira(b.deposit) + ")" : "") + "<br>" + esc(b.customer_name) + " · " + esc(b.customer_phone) +
+        (count[b.customer_phone] > 1 ? ' <small style="color:var(--muted)">(booking #' + count[b.customer_phone] + " from this customer)</small>" : "") + (b.note ? '<br><small style="color:var(--muted)">Note: ' + esc(b.note) + "</small>" : "") + '<div style="margin-top:.5rem">' + btns + "</div></div>";
+    }).join("") || '<p style="color:var(--muted)">No bookings yet.</p>';
+  }
+  function load() {
+    return Promise.all([
+      sb.from("services").select("*").eq("owner_id", user.id).order("id"),
+      sb.from("booking_settings").select("*").eq("owner_id", user.id).maybeSingle(),
+      sb.from("bookings").select("*").eq("owner_id", user.id).order("booking_date", { ascending: false }).order("start_time", { ascending: false }).limit(300)
+    ]).then(function (r) {
+      if (r[0].error || r[2].error) { say("top", "Could not load. Ask the site owner to run setup-12.sql."); return; }
+      services = r[0].data || []; settings = r[1].data; bookings = r[2].data || [];
+      if (settings) { chosen = settings.days.slice(); $("a_open").value = settings.open_time.slice(0, 5); $("a_close").value = settings.close_time.slice(0, 5); $("a_slot").value = String(settings.slot_min); }
+      drawDays(); drawServices(); drawBookings();
+    });
+  }
+  $("sf").addEventListener("submit", function (e) {
+    e.preventDefault(); say("s_msg", "");
+    var name = $("s_name").value.trim(), price = parseFloat($("s_price").value), dur = parseInt($("s_dur").value, 10), dep = parseFloat($("s_dep").value) || 0;
+    if (!name) return say("s_msg", "Enter the service name.");
+    if (isNaN(price) || price < 0) return say("s_msg", "Enter a price in naira.");
+    if (isNaN(dur) || dur < 5) return say("s_msg", "Enter how many minutes it takes.");
+    if (dep > price) return say("s_msg", "The deposit cannot be more than the price.");
+    sb.from("services").insert({ owner_id: user.id, name: name, description: $("s_desc").value.trim(), price: price, duration_min: dur, deposit: dep }).then(function (r) {
+      if (r.error) return say("s_msg", "Could not save. Try again.");
+      $("sf").reset(); $("s_dur").value = 60; $("s_dep").value = 0; say("s_msg", "Service added.", true); load();
+    });
+  });
+  $("slist").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-del]"); if (!b || !confirm("Delete this service?")) return;
+    sb.from("services").delete().eq("id", b.dataset.del).then(load);
+  });
+  $("af").addEventListener("submit", function (e) {
+    e.preventDefault(); say("a_msg", "");
+    if (!chosen.length) return say("a_msg", "Choose at least one day.");
+    if ($("a_open").value >= $("a_close").value) return say("a_msg", "Closing time must be after opening time.");
+    sb.from("booking_settings").upsert({ owner_id: user.id, days: chosen, open_time: $("a_open").value, close_time: $("a_close").value, slot_min: +$("a_slot").value }, { onConflict: "owner_id" }).then(function (r) {
+      say("a_msg", r.error ? "Could not save. Try again." : "Saved.", !r.error);
+    });
+  });
+  $("bf").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-f]"); if (!b) return; filter = b.dataset.f;
+    this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); }); drawBookings();
+  });
+  $("blist").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-st]"); if (!b) return;
+    var bk = bookings.filter(function (x) { return String(x.id) === b.dataset.id; })[0], st = b.dataset.st;
+    if (st === "cancelled" && !confirm("Cancel this booking? The customer will be told on WhatsApp.")) return;
+    if (st === "confirmed" || st === "cancelled") {   /* open WhatsApp first so the browser does not block it */
+      var text = st === "confirmed"
+        ? "Hello " + bk.customer_name + ", your booking with " + vendor.store_name + " is confirmed.\nService: " + bk.service_name + "\nDate: " + fdate(bk.booking_date) + ", " + nice(bk.start_time) + (bk.deposit > 0 ? "\nPlease send the deposit of " + naira(bk.deposit) + " to hold your slot." : "") + "\nSee you then!"
+        : "Hello " + bk.customer_name + ", I am sorry, I have to cancel your booking for " + bk.service_name + " on " + fdate(bk.booking_date) + ", " + nice(bk.start_time) + ". Please book another time at " + link();
+      window.open("https://wa.me/" + bk.customer_phone + "?text=" + encodeURIComponent(text), "_blank", "noopener");
+    }
+    sb.from("bookings").update({ status: st }).eq("id", bk.id).then(function (r) { if (r.error) say("top", "Could not update. Try again."); else load(); });
+  });
+  $("bcopy").onclick = function () { var b = this; (navigator.clipboard ? navigator.clipboard.writeText(link()) : Promise.reject()).then(function () { b.textContent = "Copied"; }, function () { b.textContent = "Copy not available"; }); };
+
+  sb.auth.getSession().then(function (r) {
+    if (!r.data.session) { location.href = "login.html"; return; }
+    user = r.data.session.user;
+    sb.from("vendors").select("slug,store_name").eq("owner_id", user.id).maybeSingle().then(function (q) {
+      if (!q.data) { say("top", "We could not find your store."); return; }
+      vendor = q.data; $("blink").textContent = link(); drawDays(); load();
+    });
+  });
+})();
+</script>
+</body></html>

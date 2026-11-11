@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book – ShopLink NG</title>
+<meta name="description" content="Book a service online and confirm on WhatsApp. Powered by ShopLink NG.">
+<meta name="theme-color" content="#1b7a4b">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="live.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+:root{--g:#1b7a4b;--gd:#145c38;--wa:#25d366;--ink:#14231b;--mut:#64748b;--line:#e5e9ee;--soft:#f1f4f2}
+body{font:400 15px/1.55 "DM Sans",system-ui,sans-serif;color:var(--ink);background:#fff;padding-bottom:3rem}
+h1,h2{font-family:"Bricolage Grotesque","DM Sans",sans-serif;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+.w{width:min(640px,92%);margin-inline:auto}
+.head{border-bottom:1px solid var(--line);padding:1.4rem 0}
+.head .w{display:flex;gap:1rem;align-items:center}
+.head img,.head .ph{width:72px;height:72px;border-radius:18px;object-fit:cover;background:#e8f6ee;color:var(--g);font:800 1.8rem "Bricolage Grotesque";display:grid;place-items:center;flex:none}
+.head h1{font-size:clamp(1.4rem,5vw,2rem);line-height:1.15}
+.mut{color:var(--mut)}
+h2{font-size:1.2rem;margin:1.6rem 0 .6rem}
+.svc{display:flex;gap:.8rem;align-items:flex-start;padding:.9rem;border:1.5px solid var(--line);border-radius:14px;margin-bottom:.6rem;cursor:pointer}
+.svc input{margin-top:.25rem;width:18px;height:18px;accent-color:var(--g);flex:none}
+.svc.on{border-color:var(--g);background:#f3faf6}
+.svc b{display:block}.svc small{color:var(--mut)}
+.svc .pr{margin-left:auto;font-weight:800;color:var(--g);white-space:nowrap}
+input[type=date],input[type=text],input[type=tel]{display:block;width:100%;font:inherit;padding:.75rem .85rem;border:1px solid #cfd6de;border-radius:10px;background:#fff}
+label.l{display:block;font-weight:700;font-size:.88rem;margin-top:.9rem}
+label.l input{margin-top:.3rem;font-weight:400}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:.5rem;margin-top:.7rem}
+.slot{min-height:44px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font:700 .95rem inherit;font-family:inherit;cursor:pointer}
+.slot.on{background:var(--g);border-color:var(--g);color:#fff}
+.go{display:flex;align-items:center;justify-content:center;width:100%;height:50px;margin-top:1.2rem;border:0;border-radius:12px;background:var(--g);color:#fff;font:700 1rem "DM Sans",sans-serif;cursor:pointer}
+.go.wa{background:var(--wa);color:#06210f}
+.go:disabled{opacity:.6}
+.err{color:#d93f2f;font-weight:700;margin-top:.7rem;min-height:1.2em}
+.note{text-align:center;padding:4rem 1rem}.note h1{font-size:1.9rem;margin-bottom:.5rem}.note p{color:var(--mut)}
+.done{margin-top:1.5rem;padding:1.4rem;border:1.5px dashed var(--g);border-radius:16px;background:#f3faf6;text-align:center}
+.done h2{margin-top:0}
+.foot{text-align:center;color:var(--mut);font-size:.85rem;margin-top:2rem}.foot a{color:var(--g);font-weight:700}
+</style>
+</head>
+<body>
+<div id="app"><p class="note mut">Loading…</p></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<script>
+(function () {
+  var BASE = "https://shoplinkng.shop";
+  var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
+  var app = document.getElementById("app");
+  var slug = (new URLSearchParams(location.search).get("s") || "").toLowerCase();
+  window.SL_STORE = slug;
+  var info, sel = "", date = "", time = "", tok = 0, busy = false;
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
+  function ymd(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function nice(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" }); }
+  function toMin(t) { var p = t.split(":"); return +p[0] * 60 + +p[1]; }
+  function fmt(m) { return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"); }
+  function normPhone(v) { var d = v.replace(/\D/g, ""); if (d.indexOf("234") === 0) return d; if (d.charAt(0) === "0") return "234" + d.slice(1); return d.length === 10 ? "234" + d : d; }
+  function note(h, p) { app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + '</p><p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p></div>'; }
+  function svc() { return info.services.filter(function (x) { return String(x.id) === sel; })[0]; }
+
+  function loadSlots() {
+    var el = $("slots"); time = "";
+    if (!date) { el.innerHTML = '<p class="mut">Choose a date to see free times.</p>'; return; }
+    var p = date.split("-"), dow = new Date(+p[0], +p[1] - 1, +p[2]).getDay();
+    if (info.days.indexOf(dow) < 0) { el.innerHTML = '<p class="mut">Closed on this day. Pick another date.</p>'; return; }
+    el.innerHTML = '<p class="mut">Loading times…</p>';
+    var my = ++tok;
+    sb.rpc("booked_slots", { p_slug: slug, p_date: date }).then(function (r) {
+      if (my !== tok) return;
+      var taken = (r && r.data) || [], step = +info.slot || 60, o = toMin(info.open), c = toMin(info.close), n = new Date(), nowMin = n.getHours() * 60 + n.getMinutes(), out = [];
+      for (var t = o; t + step <= c; t += step) { var s = fmt(t); if (taken.indexOf(s) > -1 || (date === ymd(n) && t <= nowMin)) continue; out.push(s); }
+      el.innerHTML = out.length ? '<div class="slots">' + out.map(function (s) { return '<button type="button" class="slot" data-t="' + s + '">' + s + "</button>"; }).join("") + "</div>" : '<p class="mut">No free times left on this day. Try another date.</p>';
+    });
+  }
+
+  function draw() {
+    var logo = info.logo_url ? '<img alt="" src="' + esc(info.logo_url) + '">' : '<span class="ph">' + esc(info.store_name.charAt(0).toUpperCase()) + "</span>";
+    var min = ymd(new Date()), mx = new Date(); mx.setDate(mx.getDate() + 60);
+    app.innerHTML = '<div class="head"><div class="w">' + logo + "<div><h1>" + esc(info.store_name) + '</h1><p class="mut">Book an appointment' + (info.city ? " · " + esc(info.city) : "") + "</p></div></div></div>" +
+      '<div class="w" id="form"><h2>1. Choose a service</h2>' +
+      (info.services.length ? info.services.map(function (s) {
+        return '<label class="svc"><input type="radio" name="svc" value="' + esc(s.id) + '"><span><b>' + esc(s.name) + "</b><small>" + s.duration + " min" + (s.description ? " · " + esc(s.description) : "") + (Number(s.deposit) > 0 ? " · deposit " + naira(s.deposit) : "") + '</small></span><span class="pr">' + naira(s.price) + "</span></label>";
+      }).join("") : '<p class="mut">No services have been added yet. Please check back soon.</p>') +
+      '<h2>2. Pick a date</h2><input type="date" id="d" min="' + min + '" max="' + ymd(mx) + '">' +
+      '<h2>3. Pick a time</h2><div id="slots"><p class="mut">Choose a date to see free times.</p></div>' +
+      '<h2>4. Your details</h2><label class="l">Your name<input type="text" id="cn" autocomplete="name"></label>' +
+      '<label class="l">WhatsApp number<input type="tel" id="cp" autocomplete="tel" inputmode="tel" placeholder="0803 000 0000"></label>' +
+      '<label class="l">Note for the seller (optional)<input type="text" id="cx" maxlength="300"></label>' +
+      '<p class="err" id="err" role="alert"></p><button class="go" id="bk" type="button">Book now</button>' +
+      '<p class="foot">Booking page powered by <a href="' + BASE + '/">ShopLink NG</a></p></div>';
+    app.addEventListener("change", function (e) {
+      if (e.target.name === "svc") { sel = e.target.value; app.querySelectorAll(".svc").forEach(function (l) { l.classList.toggle("on", l.contains(e.target)); }); }
+      if (e.target.id === "d") { date = e.target.value; loadSlots(); }
+    });
+    app.addEventListener("click", function (e) {
+      var s = e.target.closest(".slot"); if (!s) return;
+      time = s.dataset.t; app.querySelectorAll(".slot").forEach(function (x) { x.classList.toggle("on", x === s); });
+    });
+    $("bk").onclick = submit;
+  }
+
+  function submit() {
+    var err = $("err"), name = $("cn").value.trim(), ph = normPhone($("cp").value), nt = $("cx").value.trim();
+    if (busy) return;
+    if (!sel) { err.textContent = "Choose a service."; return; }
+    if (!date) { err.textContent = "Pick a date."; return; }
+    if (!time) { err.textContent = "Pick a time."; return; }
+    if (name.length < 2) { err.textContent = "Enter your name."; return; }
+    if (!/^234[789][01]\d{8}$/.test(ph)) { err.textContent = "Enter a valid Nigerian WhatsApp number."; return; }
+    err.textContent = ""; busy = true; $("bk").disabled = true;
+    sb.rpc("create_booking", { p_slug: slug, p_service: Number(sel), p_name: name, p_phone: ph, p_date: date, p_time: time, p_note: nt }).then(function (r) {
+      busy = false; $("bk").disabled = false;
+      if (r.error) { err.textContent = r.error.message || "Could not book. Try again."; if (/booked/i.test(err.textContent)) loadSlots(); return; }
+      var s = svc() || { name: "service", price: 0, deposit: 0 }, dep = Number(s.deposit) > 0;
+      var msg = "Hello " + info.store_name + ", I have booked:\n" + s.name + " (" + naira(s.price) + ")\nDate: " + nice(date) + "\nTime: " + time + "\nName: " + name + "\nPhone: " + ph + (nt ? "\nNote: " + nt : "") + (dep ? "\nPlease send your account details for the " + naira(s.deposit) + " deposit." : "");
+      $("form").innerHTML = '<div class="done"><h2>Booking received</h2><p>' + esc(s.name) + "<br><b>" + esc(nice(date)) + " at " + esc(time) + "</b></p>" +
+        (dep ? '<p class="mut" style="margin-top:.6rem">This service needs a deposit of ' + naira(s.deposit) + ". The seller will send payment details on WhatsApp.</p>" : "") +
+        '<p class="mut" style="margin-top:.6rem">Tap below to send your booking to the seller on WhatsApp so they can confirm it.</p>' +
+        '<a class="go wa" href="https://wa.me/' + esc(info.whatsapp) + "?text=" + encodeURIComponent(msg) + '" target="_blank" rel="noopener">Send booking on WhatsApp</a></div><p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p>';
+      scrollTo(0, 0);
+    });
+  }
+
+  if (!slug) return note("Page not found", "Check the link and try again.");
+  sb.rpc("booking_info", { p_slug: slug }).then(function (r) {
+    if (r.error) return note("Could not load the page", "Check your connection and try again.");
+    if (!r.data) return note("Page not found", "This booking link is not available right now. Check the link and try again.");
+    info = r.data; document.title = "Book " + info.store_name + " – ShopLink NG"; draw();
+    try { var k = "v:" + slug + ":" + new Date().toISOString().slice(0, 10); if (!localStorage.getItem(k)) { localStorage.setItem(k, "1"); sb.rpc("record_visit", { p_slug: slug }).then(function () {}); } } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>

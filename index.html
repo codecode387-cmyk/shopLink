@@ -10,15 +10,11 @@
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="theme-color" content="#0a3da8">
 <link rel="canonical" href="https://shoplinkng.shop/">
-
-<!-- Favicons and app icons -->
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-
-<!-- Open Graph: Facebook, WhatsApp, LinkedIn, Instagram, Telegram -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ShopLink NG">
 <meta property="og:locale" content="en_NG">
@@ -31,26 +27,20 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="ShopLink NG logo: a blue shopping bag with an orange S and a click cursor. Shop smarter, link easier.">
-
-<!-- X (Twitter) -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ShopLink NG – Your shop in one link. Orders land on WhatsApp.">
 <meta name="twitter:description" content="Free online store for Nigerian sellers. Share one link, get orders on WhatsApp. No monthly fees.">
 <meta name="twitter:image" content="https://shoplinkng.shop/og-image.jpg?v=2">
 <meta name="twitter:image:alt" content="ShopLink NG logo: shop smarter, link easier.">
-<!-- <meta name="twitter:site" content="@yourhandle"> add once you have your X handle -->
-
-<!-- Structured data for Google -->
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "@id": "https://shoplinkng.shop/#org", "name": "ShopLink NG", "alternateName": "ShopLink", "url": "https://shoplinkng.shop/", "logo": {"@type": "ImageObject", "url": "https://shoplinkng.shop/icon-512.png", "width": 512, "height": 512}, "slogan": "Shop smarter. Link easier.", "areaServed": "NG"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "@id": "https://shoplinkng.shop/#website", "url": "https://shoplinkng.shop/", "name": "ShopLink NG", "inLanguage": "en-NG", "publisher": {"@id": "https://shoplinkng.shop/#org"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ShopLink NG", "applicationCategory": "BusinessApplication", "operatingSystem": "Web", "description": "Create a free online store in Nigeria in 5 minutes. Share one link, customers pick products, and orders land on your WhatsApp. No monthly fees, no app for buyers.", "url": "https://shoplinkng.shop/", "image": "https://shoplinkng.shop/og-image.jpg", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "NGN"}}</script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="nav.js" defer></script>
 <script src="live.js" defer></script>
-
 </head>
 <body>
 
@@ -64,6 +54,7 @@
     <nav class="links" id="menu" aria-label="Main">
       <a href="how-it-works.html">How it works</a>
       <a href="why-shoplink.html">Why ShopLink</a>
+      <a href="mega.html">Mega Store</a>
       <a href="login.html">Log in</a>
       <a class="btn btn-main btn-sm" href="signup.html">Create your store</a>
     </nav>
@@ -75,7 +66,7 @@
   <div class="wrap">
     <div>
       <h1>Your shop in one link.<span>Orders land on WhatsApp.</span></h1>
-      <p class="lead">Create a free online store in Nigeria. Add your products, share your store link, and get every order in your WhatsApp. Free to start, with no monthly fees.</p>
+      <p class="lead">Create a free online store in Nigeria. Add your products or services, share your store link, and get every order and booking in your WhatsApp. Free to start, with no monthly fees.</p>
       <div class="cta">
         <a class="btn btn-main" href="signup.html">Create your free store</a>
         <a class="btn btn-ghost" href="how-it-works.html">See how it works</a>
@@ -86,7 +77,6 @@
         <span><b>No app</b> for buyers to install</span>
       </div>
     </div>
-
     <div class="stage" aria-hidden="true">
       <div class="phone">
         <div class="screen">
@@ -126,6 +116,20 @@
   </div>
 </section>
 
+<section class="alt" id="benefits">
+  <div class="wrap">
+    <div class="sec-head"><h2>What your store does for you</h2><p>Less chatting, more selling.</p></div>
+    <div class="reasons">
+      <div class="reason"><h3>No more “How much?”</h3><p>Prices and photos are on your store, so customers stop asking one by one.</p></div>
+      <div class="reason"><h3>Open all day</h3><p>Customers browse your products anytime, even when you are asleep.</p></div>
+      <div class="reason"><h3>Organised orders</h3><p>Every order arrives on WhatsApp with items, total, name and address.</p></div>
+      <div class="reason"><h3>Take bookings</h3><p>Hair stylists, photographers, caterers and tutors can let customers book a free time slot.</p></div>
+      <div class="reason"><h3>Get discovered</h3><p>Post on the <a href="mega.html" style="color:var(--leaf);font-weight:700">Mega Store</a> and reach shoppers who do not know you yet.</p></div>
+      <div class="reason"><h3>See what works</h3><p>Track visitors and orders, and get a weekly tip on how to sell more.</p></div>
+    </div>
+  </div>
+</section>
+
 <section class="why" id="why">
   <div class="wrap">
     <div class="sec-head">
@@ -142,117 +146,21 @@
   </div>
 </section>
 
-<!-- SAMPLE REVIEWS: replace with real customer reviews before launch -->
 <section id="reviews">
   <div class="wrap">
-    <div class="sec-head">
-      <h2>What vendors and buyers say</h2>
-      <p>Small sellers and their customers on how ordering through WhatsApp feels.</p>
-    </div>
-    <div class="marquee"><div class="track">
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I used to pay a developer every month just to keep my shop online. Now my orders come straight to WhatsApp and I pay nothing.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">NO</div><div><b>Ngozi Okafor</b><small>Bag seller, Lagos</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“My customers can see every product and price before they message me. I answer far fewer “how much is this?” chats.”</p>
-        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">KA</div><div><b>Kemi Adeyemi</b><small>Food supplier, Ibadan</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I set up my store on my phone while waiting for a customer. It took less than ten minutes.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">TB</div><div><b>Tunde Bakare</b><small>Thrift seller, Abuja</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“No more sending product screenshots one by one. I send my link and people pick what they want.”</p>
-        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">AY</div><div><b>Amina Yusuf</b><small>Beauty products, Kano</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I picked three items, tapped send, and my order was already written out in WhatsApp. No account, no stress.”</p>
-        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">CE</div><div><b>Chiamaka Eze</b><small>Buyer, Enugu</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I used to pay a developer every month just to keep my shop online. Now my orders come straight to WhatsApp and I pay nothing.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">NO</div><div><b>Ngozi Okafor</b><small>Bag seller, Lagos</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“My customers can see every product and price before they message me. I answer far fewer “how much is this?” chats.”</p>
-        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">KA</div><div><b>Kemi Adeyemi</b><small>Food supplier, Ibadan</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I set up my store on my phone while waiting for a customer. It took less than ten minutes.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">TB</div><div><b>Tunde Bakare</b><small>Thrift seller, Abuja</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“No more sending product screenshots one by one. I send my link and people pick what they want.”</p>
-        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">AY</div><div><b>Amina Yusuf</b><small>Beauty products, Kano</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I picked three items, tapped send, and my order was already written out in WhatsApp. No account, no stress.”</p>
-        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">CE</div><div><b>Chiamaka Eze</b><small>Buyer, Enugu</small></div></figcaption>
-      </figure>
-</div></div>
-<div class="marquee rev"><div class="track">
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
-        <p>“The message arrives with the customer’s name and address, so I do not have to ask twice.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">BS</div><div><b>Bola Salami</b><small>Caterer, Abeokuta</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“The store opened fast even on my small phone with bad network.”</p>
-        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">IM</div><div><b>Ibrahim Musa</b><small>Buyer, Kaduna</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
-        <p>“I would like to pay inside the app, but paying the seller directly is how I already do it, so it works for me.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">FJ</div><div><b>Folake Johnson</b><small>Buyer, Port Harcourt</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I put the link in my Instagram bio and people now order without DMing me five times.”</p>
-        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">SW</div><div><b>Sade Williams</b><small>Hair vendor, Lagos</small></div></figcaption>
-      </figure>
-<figure class="review" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I sell snacks to students and could not afford a monthly plan. This is the first one that fits my budget.”</p>
-        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">EN</div><div><b>Emeka Nwosu</b><small>Snack seller, Nsukka</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
-        <p>“The message arrives with the customer’s name and address, so I do not have to ask twice.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffc83d" aria-hidden="true">BS</div><div><b>Bola Salami</b><small>Caterer, Abeokuta</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“The store opened fast even on my small phone with bad network.”</p>
-        <figcaption class="who"><div class="av" style="background:#7be0a4" aria-hidden="true">IM</div><div><b>Ibrahim Musa</b><small>Buyer, Kaduna</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="4 out of 5 stars">★★★★☆</div>
-        <p>“I would like to pay inside the app, but paying the seller directly is how I already do it, so it works for me.”</p>
-        <figcaption class="who"><div class="av" style="background:#ffb29a" aria-hidden="true">FJ</div><div><b>Folake Johnson</b><small>Buyer, Port Harcourt</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I put the link in my Instagram bio and people now order without DMing me five times.”</p>
-        <figcaption class="who"><div class="av" style="background:#a9d4ff" aria-hidden="true">SW</div><div><b>Sade Williams</b><small>Hair vendor, Lagos</small></div></figcaption>
-      </figure>
-<figure class="review dup" aria-hidden="true" style="margin-inline:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>“I sell snacks to students and could not afford a monthly plan. This is the first one that fits my budget.”</p>
-        <figcaption class="who"><div class="av" style="background:#e4c1ff" aria-hidden="true">EN</div><div><b>Emeka Nwosu</b><small>Snack seller, Nsukka</small></div></figcaption>
-      </figure>
-</div></div>
+    <div class="sec-head"><h2>What vendors and buyers say</h2><p>Real words from people who use ShopLink NG.</p></div>
+    <div class="reasons" id="revList"></div>
+    <details class="card" id="revForm" style="margin-top:1.2rem;max-width:34rem">
+      <summary style="cursor:pointer;font-weight:700">Used ShopLink NG? Share your experience</summary>
+      <form id="rf" novalidate>
+        <label class="field">Your name<input id="r_name" maxlength="60" autocomplete="name"></label>
+        <label class="field">What you do (optional)<input id="r_role" maxlength="80" placeholder="Bag seller, Lagos"></label>
+        <label class="field">Rating<select id="r_stars"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></label>
+        <label class="field">Your review<textarea id="r_body" maxlength="400" placeholder="How has ShopLink NG helped you?"></textarea></label>
+        <p class="msg" id="r_msg" role="alert"></p>
+        <button class="btn btn-main" type="submit" style="margin-top:1rem">Send review</button>
+      </form>
+    </details>
   </div>
 </section>
 
@@ -275,46 +183,49 @@
 </footer>
 
 <script>
-document.getElementById("yr").textContent = new Date().getFullYear();
-
-/* Mobile menu: toggles .open on .nav, which styles.css already targets */
-(function () {
-  var nav = document.querySelector("header .nav");
-  var btn = document.querySelector(".menu-btn");
-  if (!nav || !btn) return;
-
-  function setOpen(open) {
-    nav.classList.toggle("open", open);
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-    btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-  }
-
-  btn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    setOpen(!nav.classList.contains("open"));
-  });
-  nav.addEventListener("click", function (e) {
-    if (e.target.closest(".links a")) setOpen(false);
-  });
-  document.addEventListener("click", function (e) {
-    if (!e.target.closest("header")) setOpen(false);
-  });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") setOpen(false);
-  });
-  var mq = window.matchMedia("(min-width: 721px)");
-  var onChange = function (m) { if (m.matches) setOpen(false); };
-  if (mq.addEventListener) mq.addEventListener("change", onChange);
-  else if (mq.addListener) mq.addListener(onChange);
-})();
-
-/* Order demo: lines appear one by one, then the vendor replies */
+/* Order demo */
 (function(){
   const lines = document.querySelectorAll("#order div");
   const reply = document.getElementById("reply");
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) { reply.classList.add("on"); return; }
   lines.forEach((el,i)=>setTimeout(()=>el.classList.add("on"), 700 + i*650));
   setTimeout(()=>reply.classList.add("on"), 700 + lines.length*650 + 500);
+})();
+
+/* Real reviews: only reviews you approve in Supabase are shown */
+(function () {
+  var U = "https://grrotfpoalxvkkrkgzpg.supabase.co/rest/v1/rpc/", K = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
+  function rpc(n, b) {
+    return fetch(U + n, { method: "POST", headers: { "Content-Type": "application/json", apikey: K }, body: JSON.stringify(b || {}) })
+      .then(function (r) { return r.text().then(function (t) { var d = t ? JSON.parse(t) : null; if (!r.ok) throw new Error((d && d.message) || "error"); return d; }); });
+  }
+  var COL = ["#ffc83d", "#7be0a4", "#ffb29a", "#a9d4ff", "#e4c1ff"];
+  var list = document.getElementById("revList");
+  rpc("site_reviews_list").then(function (rows) {
+    rows = rows || [];
+    if (!rows.length) { list.innerHTML = '<p style="color:var(--muted)">No reviews yet. Be the first to share yours below.</p>'; return; }
+    rows.forEach(function (r, i) {
+      var f = document.createElement("figure"); f.className = "review"; f.style.marginInline = "0";
+      f.innerHTML = '<div class="stars"></div><p></p><figcaption class="who"><div class="av" aria-hidden="true"></div><div><b></b><small></small></div></figcaption>';
+      f.querySelector(".stars").textContent = "★★★★★".slice(0, r.stars) + "☆☆☆☆☆".slice(0, 5 - r.stars);
+      f.querySelector(".stars").setAttribute("aria-label", r.stars + " out of 5 stars");
+      f.querySelector("p").textContent = "“" + r.body + "”";
+      var av = f.querySelector(".av"); av.style.background = COL[i % COL.length]; av.textContent = r.name.trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase();
+      f.querySelector("b").textContent = r.name; f.querySelector("small").textContent = r.role || "";
+      list.appendChild(f);
+    });
+  }).catch(function () { list.innerHTML = ""; });
+
+  var msg = document.getElementById("r_msg");
+  document.getElementById("rf").addEventListener("submit", function (e) {
+    e.preventDefault(); msg.style.color = ""; msg.textContent = "";
+    var name = document.getElementById("r_name").value.trim(), body = document.getElementById("r_body").value.trim();
+    if (name.length < 2) { msg.textContent = "Enter your name."; return; }
+    if (body.length < 15) { msg.textContent = "Write a short review (at least 15 characters)."; return; }
+    rpc("submit_review", { p_name: name, p_role: document.getElementById("r_role").value.trim(), p_body: body, p_stars: +document.getElementById("r_stars").value })
+      .then(function () { document.getElementById("rf").reset(); msg.style.color = "var(--leaf)"; msg.textContent = "Thank you. Your review will appear after we approve it."; })
+      .catch(function (er) { msg.textContent = er.message || "Could not send. Try again."; });
+  });
 })();
 </script>
 </body>

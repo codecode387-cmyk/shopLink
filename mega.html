@@ -31,8 +31,6 @@ h1,h2{font-family:"Bricolage Grotesque","DM Sans",sans-serif;letter-spacing:-.01
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;border:0;border-radius:12px;touch-action:manipulation;color:inherit;background:none}
 .w{width:min(1100px,92%);margin-inline:auto}
-
-/* hero */
 .hero{position:relative;overflow:hidden;color:#fff;background:radial-gradient(circle at 80% 0%,#26a066 0%,#1b7a4b 45%,#0d3f27 100%);padding:calc(1.2rem + env(safe-area-inset-top,0px)) 0 1.6rem}
 .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
 .hero:before{width:240px;height:240px;top:-90px;left:-70px}
@@ -44,8 +42,6 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .sell{display:inline-flex;align-items:center;min-height:40px;padding:0 1rem;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);font-size:.85rem;font-weight:700}
 .hero h1{font-size:clamp(1.9rem,7vw,3rem);line-height:1.08;margin-top:1.4rem}
 .hero p{margin-top:.5rem;max-width:34rem;color:rgba(255,255,255,.88)}
-
-/* search */
 .sbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:calc(.6rem + env(safe-area-inset-top,0px)) 0 .6rem;border-bottom:1px solid var(--line)}
 .search{display:flex;align-items:center;gap:.6rem;height:46px;padding:0 .8rem;background:var(--soft);border:1.5px solid transparent;border-radius:14px}
 .search:focus-within{border-color:var(--g);background:#fff}
@@ -53,7 +49,18 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .search input{flex:1;min-width:0;height:100%;border:0;background:none;outline:0;font-family:inherit;font-size:1rem;color:var(--ink);-webkit-appearance:none;appearance:none}
 .search input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
 .qx{width:28px;height:28px;flex:none;border-radius:50%;background:#c5cdd6;color:#fff;font-size:1.1rem;line-height:1;display:grid;place-items:center}
-
+/* categories, featured, trending */
+.chips{display:flex;gap:.5rem;overflow-x:auto;padding:.7rem 0 .1rem;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;min-height:38px;padding:0 .95rem;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:.85rem}
+.chips button.on{background:var(--g);border-color:var(--g);color:#fff}
+.fh{font-size:1.2rem;margin:1.3rem 0 .1rem}
+.feat{display:flex;gap:.7rem;overflow-x:auto;padding:.6rem 0 .3rem;scrollbar-width:none}
+.feat a{flex:none;display:flex;align-items:center;gap:.5rem;padding:.5rem .85rem;border:1px solid var(--line);border-radius:14px;background:#fff;font-weight:700;font-size:.9rem}
+.feat img,.feat .sl{width:32px;height:32px;border-radius:9px;object-fit:cover;background:#e8f6ee;color:var(--g);display:grid;place-items:center;font:800 .9rem "Bricolage Grotesque"}
+.feat i{font-style:normal;color:#f5a623}
+.rowx{display:flex;gap:.8rem;overflow-x:auto;padding:.6rem 0 .3rem;scrollbar-width:none}
+.rowx .mc{width:160px;flex:none}
 /* grid */
 .st{color:var(--mut);margin:1.1rem 0 .2rem;min-height:1.2em}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:.6rem}
@@ -78,12 +85,9 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .empty a{display:inline-block;margin-top:1rem;background:var(--g);color:#fff;padding:.7rem 1.3rem;border-radius:12px;font-weight:700}
 .foot{text-align:center;color:var(--mut);font-size:.85rem;padding:2.5rem 0 calc(2rem + env(safe-area-inset-bottom,0px))}
 .foot a{color:var(--g);font-weight:700}
-
-/* ---------- splash loader ---------- */
+/* splash */
 body.loading{overflow:hidden}
-#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;color:#fff;
-  background:radial-gradient(circle at 50% 38%,#26a066 0%,#1b7a4b 45%,#0d3f27 100%);
-  transition:opacity .55s ease,transform .7s ease,visibility .55s}
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 50% 38%,#26a066 0%,#1b7a4b 45%,#0d3f27 100%);transition:opacity .55s ease,transform .7s ease,visibility .55s}
 #splash.out{opacity:0;visibility:hidden;transform:scale(1.06)}
 #splash .blob{position:absolute;border-radius:50%;background:rgba(255,255,255,.07);filter:blur(2px);animation:float 7s ease-in-out infinite}
 #splash .b1{width:260px;height:260px;top:-70px;left:-60px}
@@ -145,9 +149,14 @@ body.loading{overflow:hidden}
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
   <input id="q" type="search" placeholder="Search products or stores" autocomplete="off" autocorrect="off" enterkeyhint="search" aria-label="Search products or stores">
   <button class="qx" id="qx" type="button" aria-label="Clear search" hidden>×</button>
-</label></div></div>
+</label>
+<div class="chips" id="chips" role="group" aria-label="Categories"></div></div></div>
 
 <main class="w">
+  <div id="extra">
+    <div id="featBox" hidden><h2 class="fh">Featured stores</h2><div class="feat" id="feat"></div></div>
+    <div id="trBox" hidden><h2 class="fh">Trending now</h2><div class="rowx" id="tr"></div></div>
+  </div>
   <p class="st" id="st" role="status"></p>
   <div class="grid" id="g"></div>
   <button class="more" id="more" type="button" hidden>Show more</button>
@@ -157,13 +166,14 @@ body.loading{overflow:hidden}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
 <script>
 (function () {
-  var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
-  var PAGE = 24, offset = 0, q = "", token = 0, failed = false, timer;
+  var URL_ = "https://grrotfpoalxvkkrkgzpg.supabase.co", KEY = "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw";
+  var sb = window.supabase.createClient(URL_, KEY);
+  var PAGE = 24, offset = 0, q = "", cat = "", token = 0, failed = false, timer;
+  var CATS = ["Fashion and clothing", "Food and groceries", "Beauty and skincare", "Electronics and gadgets", "Hair and wigs", "Home appliances", "Cakes and pastries", "Shoes and accessories", "Other"];
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
 
-  /* splash: stays at least 1.5s so the animation can finish */
   var t0 = Date.now();
   function hideSplash() {
     var s = $("splash"); if (!s) return;
@@ -177,15 +187,46 @@ body.loading{overflow:hidden}
     var href = "/" + encodeURIComponent(p.slug) + "#p=" + encodeURIComponent(p.id);
     var img = p.image_url ? '<img alt="' + esc(p.name) + '" loading="lazy" src="' + esc(p.image_url) + '">' : '<span class="ph2">' + esc(String(p.name).charAt(0).toUpperCase()) + "</span>";
     var logo = p.logo_url ? '<img alt="" loading="lazy" src="' + esc(p.logo_url) + '">' : '<span class="sl">' + esc(String(p.store_name).charAt(0).toUpperCase()) + "</span>";
-    return '<a class="mc" href="' + href + '"><span class="mi">' + img + '</span><span class="mb"><span class="mn">' + esc(p.name) + '</span><span class="mp">' + naira(p.price) + '</span><span class="ms">' + logo + '<span class="nm">' + esc(p.store_name) + "</span>" + (p.verified ? '<i title="Top &amp; Trusted Seller" aria-label="Top and Trusted Seller">★</i>' : "") + "</span></span></a>";
+    return '<a class="mc" data-id="' + esc(p.id) + '" href="' + href + '"><span class="mi">' + img + '</span><span class="mb"><span class="mn">' + esc(p.name) + '</span><span class="mp">' + naira(p.price) + '</span><span class="ms">' + logo + '<span class="nm">' + esc(p.store_name) + "</span>" + (p.verified ? '<i title="Top &amp; Trusted Seller" aria-label="Top and Trusted Seller">★</i>' : "") + "</span></span></a>";
   }
+
+  /* count a product view when a shopper taps it (powers Trending and the vendor's "most viewed") */
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("a.mc[data-id]"); if (!a) return;
+    try {
+      fetch(URL_ + "/rest/v1/rpc/record_product_view", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json", apikey: KEY }, body: JSON.stringify({ p_product: String(a.dataset.id) }) }).catch(function () {});
+    } catch (er) {}
+  });
+
+  /* categories */
+  $("chips").innerHTML = ["All"].concat(CATS).map(function (c) { return '<button type="button" data-c="' + (c === "All" ? "" : esc(c)) + '"' + (c === "All" ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + ">" + esc(c) + "</button>"; }).join("");
+  $("chips").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-c]"); if (!b) return;
+    cat = b.dataset.c;
+    this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    load(true);
+  });
+
+  /* featured stores + trending products (shown only when not searching or filtering) */
+  sb.rpc("mega_featured_stores").then(function (r) {
+    var rows = (r && r.data) || []; if (!rows.length) return;
+    $("feat").innerHTML = rows.map(function (s) {
+      return '<a href="/' + encodeURIComponent(s.slug) + '">' + (s.logo_url ? '<img alt="" src="' + esc(s.logo_url) + '">' : '<span class="sl">' + esc(String(s.store_name).charAt(0).toUpperCase()) + "</span>") + esc(s.store_name) + (s.verified ? " <i>★</i>" : "") + "</a>";
+    }).join("");
+    $("featBox").hidden = false;
+  }, function () {});
+  sb.rpc("mega_trending", { p_limit: 8 }).then(function (r) {
+    var rows = (r && r.data) || []; if (!rows.length) return;
+    $("tr").innerHTML = rows.map(card).join(""); $("trBox").hidden = false;
+  }, function () {});
 
   function load(reset) {
     if (reset) { offset = 0; $("g").innerHTML = ""; }
+    $("extra").hidden = !!(q || cat);
     var my = ++token; failed = false;
     $("more").hidden = true;
     $("st").textContent = reset ? "Loading products…" : "";
-    sb.rpc("mega_products", { p_q: q, p_limit: PAGE, p_offset: offset }).then(function (r) {
+    sb.rpc("mega_products_v2", { p_q: q, p_category: cat, p_limit: PAGE, p_offset: offset }).then(function (r) {
       if (my !== token) return;
       hideSplash();
       if (r.error) {
@@ -197,11 +238,11 @@ body.loading{overflow:hidden}
       offset += rows.length;
       if (!offset) {
         $("st").textContent = "";
-        $("g").innerHTML = q
-          ? '<div class="empty"><h2>No match found</h2><p>No product matches “' + esc(q) + '”. Try a different word.</p></div>'
+        $("g").innerHTML = (q || cat)
+          ? '<div class="empty"><h2>No match found</h2><p>' + (q ? "No product matches “" + esc(q) + "”" : "No products in this category yet") + ". Try a different word or category.</p></div>"
           : '<div class="empty"><h2>The Mega Store is opening soon</h2><p>Sellers are adding their products. Check back shortly.</p><a href="/">Start selling on ShopLink NG</a></div>';
       } else {
-        $("st").textContent = q ? offset + (offset === 1 ? " result" : "+ results") : "";
+        $("st").textContent = (q || cat) ? offset + (offset === 1 ? " result" : "+ results") : "";
       }
       $("more").textContent = "Show more"; $("more").hidden = rows.length < PAGE;
     });

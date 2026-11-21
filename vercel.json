@@ -1,1 +1,1 @@
-{ "rewrites": [{ "source": "/:slug", "destination": "/store.html" }] }
+{ "rewrites": [{ "source": "/:slug", "destination": "/api/store?slug=:slug" }] }

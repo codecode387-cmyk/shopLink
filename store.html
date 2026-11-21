@@ -51,9 +51,12 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .head h1{font-size:clamp(1.4rem,5vw,2.1rem);line-height:1.15}
 .head p{color:var(--mut)}
 
-/* verified badge */
-.vb{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;padding:.3rem .75rem;border-radius:999px;background:#fff8e1;border:1px solid #f2d27a;color:#7a5600;font-size:.82rem;font-weight:700;line-height:1.3}
+/* badges */
+.vb{display:inline-flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;margin-right:.4rem;padding:.3rem .75rem;border-radius:999px;background:#fff8e1;border:1px solid #f2d27a;color:#7a5600;font-size:.82rem;font-weight:700;line-height:1.3}
 .vb i{font-style:normal;color:#f5a623;letter-spacing:.05em}
+.vb.top{background:#fdeccf;border-color:#f0b865;color:#8a4b00}
+.vb.trusted{background:#e8f6ee;border-color:#9fd6b6;color:#0f5a32}
+.vb.hot{background:#fff1e6;border-color:#f5b98a;color:#9a3d00}
 
 /* search */
 .sbar{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:calc(.6rem + env(safe-area-inset-top,0px)) 0 .6rem;border-bottom:1px solid var(--line)}
@@ -69,8 +72,9 @@ button{font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;borde
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:.6rem}
 @media(min-width:620px){.grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.1rem}}
 .p{border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;background:#fff}
-.pimg{display:block;aspect-ratio:1;background:var(--soft)}
+.pimg{display:block;position:relative;aspect-ratio:1;background:var(--soft)}
 .pimg img{width:100%;height:100%;object-fit:cover;display:block}
+.tp{position:absolute;left:.45rem;top:.45rem;z-index:1;background:#f5a623;color:#3b2500;font-size:.7rem;font-weight:800;line-height:1;padding:.3rem .55rem;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
 .ph2{width:100%;height:100%;display:grid;place-items:center;font:800 2.2rem "Bricolage Grotesque";color:#7fae94;background:#e8f6ee}
 .pi{padding:.65rem .65rem .75rem;display:flex;flex-direction:column;gap:.2rem;flex:1}
 .pn{font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -213,7 +217,7 @@ body.loading{overflow:hidden}
   var BASE = "https://shoplinkng.shop";
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var app = document.getElementById("app");
-  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT, gi = 0, ordering = false;
+  var cart = {}, vendor, products = [], byId = {}, cur = null, query = "", listY = 0, depth = 0, toastT, gi = 0, ordering = false, sellerBadge = "";
   var slug = (new URLSearchParams(location.search).get("s") || location.pathname.split("/").filter(Boolean).pop() || "").replace(/\.html$/, "").toLowerCase();
   window.SL_STORE = slug; /* lets live.js report this visitor as "on a store" */
 
@@ -242,7 +246,10 @@ body.loading{overflow:hidden}
   function naira(n) { return "₦" + Number(n).toLocaleString("en-NG"); }
   function storeUrl() { return BASE + "/" + slug; }
   function isVerified() { return vendor.verify_status === "approved" && vendor.verified_until && new Date(vendor.verified_until) > new Date(); }
-  function badge() { return isVerified() ? '<span class="vb">✓ Top &amp; Trusted Seller <i aria-label="5 stars">★★★★★</i></span>' : ""; }
+  function badge() {
+    return (sellerBadge === "top" ? '<span class="vb top">🏆 Top Seller</span>' : sellerBadge === "trusted" ? '<span class="vb trusted">✓ Trusted Seller</span>' : "") +
+      (isVerified() ? '<span class="vb">✓ Top &amp; Trusted Seller <i aria-label="5 stars">★★★★★</i></span>' : "");
+  }
   function note(h, p, retry) {
     app.innerHTML = '<div class="note"><h1>' + h + "</h1><p>" + p + "</p>" + (retry ? '<button type="button" onclick="location.reload()">Try again</button>' : "") + '<p class="foot"><a href="' + BASE + '/">Open your own store on ShopLink NG</a></p></div>';
     hideSplash();
@@ -301,7 +308,7 @@ body.loading{overflow:hidden}
   }
   function cardHtml(p) {
     var id = esc(p.id), href = "#p=" + encodeURIComponent(p.id);
-    return '<article class="p"><a class="pimg" href="' + href + '" aria-label="View ' + esc(p.name) + '">' + imgHtml(p) + '</a><div class="pi"><a class="pn" href="' + href + '">' + esc(p.name) + "</a>" +
+    return '<article class="p"><a class="pimg" href="' + href + '" aria-label="View ' + esc(p.name) + '">' + (p.top ? '<span class="tp">Top product</span>' : "") + imgHtml(p) + '</a><div class="pi"><a class="pn" href="' + href + '">' + esc(p.name) + "</a>" +
       (p.description ? '<span class="pd">' + esc(p.description) + "</span>" : "") + '<span class="pr">' + naira(p.price) + '</span><div class="ctl" data-id="' + id + '"></div></div></article>';
   }
 
@@ -327,7 +334,7 @@ body.loading{overflow:hidden}
     var logo = vendor.logo_url ? '<img alt="" src="' + esc(vendor.logo_url) + '">' : '<span class="ph">' + esc(vendor.store_name.charAt(0).toUpperCase()) + "</span>";
     return '<div class="dtop"><div class="w"><a class="back" href="#" data-act="back">' + I.back + 'Back</a><button class="ico" type="button" data-act="share" aria-label="Share this product">' + I.share + "</button></div></div>" +
       '<div class="w"><div class="dwrap"><div>' + picture + "</div><div>" +
-      '<h1 class="dn">' + esc(p.name) + '</h1><div class="dp">' + naira(p.price) + '</div><div class="ctl big" data-id="' + id + '"></div>' +
+      '<h1 class="dn">' + esc(p.name) + "</h1>" + (p.top ? '<span class="vb hot">🔥 Top product</span>' : "") + '<div class="dp">' + naira(p.price) + '</div><div class="ctl big" data-id="' + id + '"></div>' +
       '<h2 class="dl">About this product</h2><p class="dd">' + (p.description ? esc(p.description) : "The seller has not added a description yet.") + "</p>" +
       '<div class="sell">' + logo + "<div><b>" + esc(vendor.store_name) + "</b><small>" + (vendor.city ? esc(vendor.city) : "Seller") + "</small>" + badge() + '</div><a href="#" data-act="back-all">All products</a></div>' +
       '<ul class="tips"><li>Your order goes straight to the seller on WhatsApp.</li><li>Pay the seller directly by transfer or on delivery.</li></ul>' +
@@ -456,8 +463,18 @@ body.loading{overflow:hidden}
       if (q.error) return note("Could not load products", "Check your connection and try again.", true);
       products = q.data || [];
       function go() { draw(); hideSplash(); countVisit(); }
-      Promise.resolve(sb.rpc("store_product_images", { p_slug: slug })).then(function (g) {
+      /* extra photos, seller badge and top products load together; if any fails the store still opens */
+      Promise.all([
+        Promise.resolve(sb.rpc("store_product_images", { p_slug: slug })),
+        Promise.resolve(sb.rpc("store_badge", { p_slug: slug })),
+        Promise.resolve(sb.rpc("top_product_ids", { p_slug: slug }))
+      ]).then(function (res) {
+        var g = res[0], b = res[1], t = res[2], topIds = {};
         ((g && g.data) || []).forEach(function (x) { products.forEach(function (p) { if (String(p.id) === String(x.id)) p.more_images = x.images; }); });
+        sellerBadge = (b && !b.error && b.data) || "";
+        ((t && !t.error && t.data) || []).forEach(function (x) { topIds[String(x.id)] = 1; });
+        products.forEach(function (p) { p.top = !!topIds[String(p.id)]; });
+        products = products.filter(function (p) { return p.top; }).concat(products.filter(function (p) { return !p.top; })); /* Top products first */
         go();
       }, go);
     });

@@ -73,9 +73,14 @@ module.exports = async (req, res) => {
       html = html.replace(/(<link rel="canonical" href=")[^"]*(")/, (_, a, b) => a + esc(url) + b);
 
       if (img) {
-        html = setTag(html, "property", "og:image", img);
-        html = setTag(html, "name", "twitter:image", img);
-        html = html.replace(/<meta property="og:image:(width|height|type|alt)"[^>]*>\n?/g, "");
+        /* run the photo through /api/og so it is a small JPEG that WhatsApp accepts */
+        const ogImg = SITE + "/api/og?u=" + encodeURIComponent(img);
+        html = setTag(html, "property", "og:image", ogImg);
+        html = setTag(html, "name", "twitter:image", ogImg);
+        html = setTag(html, "property", "og:image:type", "image/jpeg");
+        html = setTag(html, "property", "og:image:width", "1200");
+        html = setTag(html, "property", "og:image:height", "630");
+        html = setTag(html, "property", "og:image:alt", title);
         debug += "|img-set";
       } else debug += "|no-image";
     }

@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
   let html;
   try {
     const r = await fetch("https://" + host + "/store.html", { redirect: "follow" });
+    if (!r.ok) throw new Error("page-" + r.status);
     html = await r.text();
     debug = "page-" + r.status;
   } catch (e) {

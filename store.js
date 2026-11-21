@@ -17,6 +17,7 @@ module.exports = async (req, res) => {
   const pid = req.query.p ? String(req.query.p) : "";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "www.shoplinkng.shop";
   let debug = "start";
+  const info = { slug, pid };
 
   /* read the store page from this same deployment (no redirect to www needed) */
   let html;
@@ -39,6 +40,7 @@ module.exports = async (req, res) => {
     const rows = await vr.json();
     const vendor = Array.isArray(rows) ? rows[0] : null;
     debug += vendor ? "|vendor-ok" : "|vendor-none";
+    info.vendor = vendor ? { store_name: vendor.store_name, logo_url: vendor.logo_url || null } : null;
 
     if (vendor) {
       let title = vendor.store_name + " – ShopLink NG";
@@ -53,6 +55,7 @@ module.exports = async (req, res) => {
         const list = await pr.json();
         const p = (Array.isArray(list) ? list : []).find((x) => String(x.id) === pid);
         debug += p ? "|product-ok" : "|product-none";
+        info.product = p ? { name: p.name, image_url: p.image_url || null } : null;
         if (p) {
           title = p.name + " – " + vendor.store_name;
           desc = (p.description || p.name) + " · ₦" + Number(p.price).toLocaleString("en-NG");
@@ -75,6 +78,7 @@ module.exports = async (req, res) => {
       if (img) {
         /* run the photo through /api/og so it is a small JPEG that WhatsApp accepts */
         const ogImg = SITE + "/api/og?u=" + encodeURIComponent(img);
+        info.image = img; info.og_image = ogImg;
         html = setTag(html, "property", "og:image", ogImg);
         html = setTag(html, "name", "twitter:image", ogImg);
         html = setTag(html, "property", "og:image:type", "image/jpeg");
@@ -86,6 +90,21 @@ module.exports = async (req, res) => {
     }
   } catch (e) {
     debug += "|error-" + String(e && e.message).slice(0, 60);
+  }
+
+  /* add &debug=1 to the link to see what is going wrong with the image */
+  if (req.query.debug) {
+    const probe = async (u) => {
+      try {
+        const r = await fetch(u, { redirect: "manual" });
+        const b = Buffer.from(await r.arrayBuffer());
+        return { status: r.status, type: r.headers.get("content-type"), kb: Math.round(b.length / 1024), location: r.headers.get("location"), error: r.headers.get("x-og-error") };
+      } catch (e) { return { error: String(e && e.message) }; }
+    };
+    if (info.image) { info.original_image_check = await probe(info.image); info.og_image_check = await probe(info.og_image); }
+    info.debug = debug;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    return res.status(200).send(JSON.stringify(info, null, 2));
   }
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");

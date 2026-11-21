@@ -3,13 +3,14 @@
 module.exports = async (req, res) => {
   let target;
   try { target = new URL(String(req.query.u || "")); } catch (e) { return res.status(400).end("bad url"); }
-  /* only allow images from your Supabase storage */
-  if (target.protocol !== "https:" || !/\.supabase\.co$/.test(target.hostname)) return res.status(400).end("not allowed");
+  /* any public https image host is fine, but nothing local */
+  if (target.protocol !== "https:" || /^(localhost|127\.|10\.|192\.168\.|169\.254\.)/.test(target.hostname)) return res.status(400).end("not allowed");
 
   try {
     const r = await fetch(target.href);
     if (!r.ok) throw new Error("fetch " + r.status);
     const input = Buffer.from(await r.arrayBuffer());
+    if (input.length > 25 * 1024 * 1024) throw new Error("too big");
     const sharp = require("sharp");
 
     let out, q = 80;
@@ -28,6 +29,7 @@ module.exports = async (req, res) => {
     res.status(200).send(out);
   } catch (e) {
     /* if resizing fails for any reason, hand over the original image */
+    res.setHeader("X-Og-Error", String(e && e.message).slice(0, 120));
     res.statusCode = 302;
     res.setHeader("Location", target.href);
     res.end();

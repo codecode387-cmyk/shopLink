@@ -342,6 +342,13 @@ body.loading{overflow:hidden}
       (others.length ? '<div class="more"><h2>More from ' + esc(vendor.store_name) + '</h2><div class="grid">' + others.map(cardHtml).join("") + "</div></div>" : "") +
       "</div>";
   }
+  /* current address with ?p=ID set (or removed), so a copied link always carries the product */
+  function withP(id) {
+    var u = new URLSearchParams(location.search);
+    if (id) u.set("p", id); else u.delete("p");
+    var q = u.toString();
+    return location.pathname + (q ? "?" + q : "");
+  }
   function showProduct(id) {
     var p = byId[id], d = $("detail");
     $("listView").hidden = true; d.hidden = false;
@@ -353,10 +360,12 @@ body.loading{overflow:hidden}
     cur = p; gi = 0;
     d.innerHTML = detailHtml(p); fillCtl(d);
     seo(p.name + " – " + vendor.store_name, (p.description || p.name) + " · " + naira(p.price), p.image_url || vendor.logo_url);
+    try { history.replaceState(null, "", withP(id) + location.hash); } catch (e) {}
     scrollTo(0, 0);
   }
   function showList() {
     cur = null; $("detail").hidden = true; $("listView").hidden = false;
+    try { history.replaceState(null, "", withP("") + location.hash); } catch (e) {}
     seo(vendor.store_name + " – ShopLink NG", vendor.description || ("Shop " + vendor.store_name + " online and send your order on WhatsApp."), vendor.logo_url);
     scrollTo(0, listY);
   }
@@ -442,7 +451,7 @@ body.loading{overflow:hidden}
 
     /* a shared product link looks like /store-name?p=ID: turn it into the in-app #p=ID route and drop the query */
     var qp = new URLSearchParams(location.search).get("p");
-    if (qp && !location.hash) history.replaceState(null, "", location.pathname + "#p=" + encodeURIComponent(qp));
+    if (qp && !location.hash) history.replaceState(null, "", location.pathname + location.search + "#p=" + encodeURIComponent(qp));
 
     window.addEventListener("hashchange", route);
     route();

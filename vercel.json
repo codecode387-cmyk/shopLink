@@ -1,1 +1,16 @@
-{ "rewrites": [{ "source": "/:slug", "destination": "/api/store?slug=:slug" }] }
+{
+  "rewrites": [
+    {
+      "source": "/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(whatsapp|facebookexternalhit|facebot|twitterbot|telegrambot|slackbot|linkedinbot|discordbot|skypeuripreview|pinterest).*"
+        }
+      ],
+      "destination": "/api/store?slug=:slug"
+    },
+    { "source": "/:slug", "destination": "/store.html" }
+  ]
+}

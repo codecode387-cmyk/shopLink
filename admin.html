@@ -26,6 +26,13 @@
 .seg button.on{background:#1b7a4b;border-color:#1b7a4b;color:#fff}
 .seg .cnt{min-width:22px;padding:0 .4rem;border-radius:99px;background:rgba(0,0,0,.08);font-size:.78rem;line-height:22px;text-align:center}
 .seg button.on .cnt{background:rgba(255,255,255,.25)}
+/* badges and top products */
+.brow{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem}
+.brow .f{margin:0}
+.pth{width:44px;height:44px;border-radius:10px;object-fit:cover;background:#f1f4f2;display:block}
+.bt{background:#fff7e0;color:#7a5a00}
+.bt.top{background:#fdeccf;color:#8a4b00}
+.bt.trusted{background:#e8f6ee;color:#0f5a32}
 </style>
 </head>
 <body class="app">
@@ -36,6 +43,7 @@
   <button data-v="payments">Payments</button>
   <button data-v="verify">Verification <span class="badge" id="vb" hidden></span></button>
   <button data-v="upgrades">Upgrades <span class="badge" id="ub" hidden></span></button>
+  <button data-v="badges">Badges &amp; Top</button>
   <button data-v="news">Announcements</button>
   <span class="sp"></span>
   <a class="nv" href="mega.html" target="_blank" rel="noopener">View Mega Store</a>
@@ -97,6 +105,27 @@
       </div>
     </section>
 
+    <section class="view" id="v-badges">
+      <div class="card">
+        <h2>Seller badges</h2>
+        <p class="sub">Give a store the Top Seller or the Trusted Seller badge. The badge shows on their store and on the Mega Store. The vendor gets a notification and an email.</p>
+        <label class="f" style="max-width:340px;margin:0 0 1rem">Search stores<input id="bq" placeholder="Store name, email or link"></label>
+        <p class="msg" id="bMsg" role="alert"></p>
+        <div class="tw"><table style="min-width:640px"><thead><tr><th>Store</th><th>Badge</th><th></th></tr></thead><tbody id="brows"></tbody></table></div>
+      </div>
+      <div class="card">
+        <h2>Top products</h2>
+        <p class="sub">Make a product a Top Product for a number of days. It shows first on the store with a "Top product" tag and in the Mega Store's Top products row. The vendor gets a notification and an email.</p>
+        <div class="brow">
+          <label class="f" style="flex:1;min-width:220px">Search products<input id="tq" placeholder="Product name, store name or link"></label>
+          <label class="f" style="width:130px">Number of days<input id="tdays" type="number" inputmode="numeric" min="1" max="90" value="7"></label>
+          <button class="btn o sm" id="tOnly" type="button">Show current top products</button>
+        </div>
+        <p class="msg" id="tMsg" role="alert"></p>
+        <div class="tw"><table style="min-width:720px"><thead><tr><th></th><th>Product</th><th>Store</th><th>Status</th><th></th></tr></thead><tbody id="trows"></tbody></table></div>
+      </div>
+    </section>
+
     <section class="view" id="v-news">
       <form class="card" id="nf" novalidate>
         <h2>Post an announcement</h2><p class="sub">Every vendor sees it in Notifications on their dashboard.</p>
@@ -137,7 +166,7 @@
 (function () {
   var sb = window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw");
   var $ = function (id) { return document.getElementById(id); }, users = [], managing = null;
-  var TITLES = { overview: "Overview", users: "Users", payments: "Payments", verify: "Verification", upgrades: "Upgrades", news: "Announcements" };
+  var TITLES = { overview: "Overview", users: "Users", payments: "Payments", verify: "Verification", upgrades: "Upgrades", badges: "Badges & Top", news: "Announcements" };
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
   function num(n) { return Number(n || 0).toLocaleString("en-NG"); }
   function day(d) { return new Date(d).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" }); }
@@ -195,6 +224,7 @@
     }).join("") || '<tr><td colspan="9" class="sub" style="padding:1.4rem">No ' + (segNow === "off" ? "permanently disabled" : segNow) + " stores" + (q ? " match your search" : "") + ".</td></tr>";
     var top = users.filter(function (u) { return !u.disabled && u.visits_30 > 0; }).sort(function (a, b) { return b.visits_30 - a.visits_30; }).slice(0, 5);
     $("top").innerHTML = top.map(function (u) { return "<tr><td>" + esc(u.store_name) + "</td><td>" + u.visits_30 + "</td></tr>"; }).join("") || '<tr><td colspan="2" class="sub" style="padding:1.2rem">No store visits yet.</td></tr>';
+    drawBadges();
   }
   $("seg").addEventListener("click", function (e) { var b = e.target.closest("button[data-s]"); if (!b) return; segNow = b.dataset.s; drawUsers(); });
   $("q").addEventListener("input", drawUsers);
@@ -207,6 +237,72 @@
       drawUsers();
     });
   }
+
+  /* ---------- seller badges: Top Seller / Trusted Seller ---------- */
+  var badges = {}, BLABEL = { top: "Top Seller", trusted: "Trusted Seller" };
+  function loadBadges() {
+    sb.rpc("public_badges").then(function (r) {
+      badges = {}; (r.data || []).forEach(function (b) { badges[b.slug] = b.badge_type; });
+      drawBadges();
+    });
+  }
+  function drawBadges() {
+    var q = $("bq").value.toLowerCase().trim();
+    var list = users.filter(function (u) { return !u.disabled && (!q || [u.store_name, u.email, u.slug].join(" ").toLowerCase().indexOf(q) > -1); });
+    list.sort(function (a, b) { return (badges[b.slug] ? 1 : 0) - (badges[a.slug] ? 1 : 0); });
+    list = list.slice(0, 30);
+    $("brows").innerHTML = list.map(function (u) {
+      var cur = badges[u.slug] || "";
+      return "<tr><td><b>" + esc(u.store_name) + "</b><br><span class='sub'>/" + esc(u.slug) + " · " + esc(u.email) + "</span></td><td>" +
+        (cur ? '<span class="pill bt ' + cur + '">' + BLABEL[cur] + "</span>" : '<span class="sub">None</span>') + "</td><td class='act'>" +
+        (cur === "top" ? "" : '<button class="btn p sm" type="button" data-slug="' + esc(u.slug) + '" data-b="top">Top Seller</button>') +
+        (cur === "trusted" ? "" : '<button class="btn p sm" type="button" data-slug="' + esc(u.slug) + '" data-b="trusted">Trusted Seller</button>') +
+        (cur ? '<button class="btn d sm" type="button" data-slug="' + esc(u.slug) + '" data-b="">Remove</button>' : "") + "</td></tr>";
+    }).join("") || '<tr><td colspan="3" class="sub" style="padding:1.4rem">No stores found.</td></tr>';
+  }
+  $("bq").addEventListener("input", drawBadges);
+  $("brows").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-slug]"); if (!b) return;
+    var slug = b.dataset.slug, kind = b.dataset.b, name = slug;
+    users.forEach(function (u) { if (u.slug === slug) name = u.store_name; });
+    if (!confirm(kind ? "Give " + name + " the " + BLABEL[kind] + " badge? They will get a notification and an email." : "Remove the badge from " + name + "?")) return;
+    say("bMsg", "Saving…", true);
+    sb.rpc("admin_set_badge", { p_slug: slug, p_badge: kind }).then(function (r) {
+      if (r.error) return say("bMsg", "Could not save: " + (r.error.message || "unknown error") + ". Make sure setup-11.sql has been run.");
+      say("bMsg", kind ? name + " is now a " + BLABEL[kind] + ". They have been notified." : "Badge removed from " + name + ".", true);
+      loadBadges();
+    });
+  });
+
+  /* ---------- top products ---------- */
+  var tTimer;
+  function loadTop(onlyTop) {
+    sb.rpc("admin_products", { p_q: $("tq").value.trim(), p_only_top: !!onlyTop }).then(function (r) {
+      if (r.error) { $("trows").innerHTML = '<tr><td colspan="5" class="sub" style="padding:1.4rem">Could not load products. Run setup-11.sql in Supabase, then refresh.</td></tr>'; return; }
+      var rows = r.data || [];
+      $("trows").innerHTML = rows.map(function (p) {
+        var isTop = !!p.top_until;
+        return "<tr><td>" + (p.image_url ? '<img class="pth" alt="" src="' + esc(p.image_url) + '">' : '<span class="pth"></span>') + "</td><td><b>" + esc(p.name) + "</b><br><span class='sub'>₦" + num(p.price) + "</span></td><td>" + esc(p.store_name) + "<br><span class='sub'>/" + esc(p.slug) + "</span></td><td>" +
+          (isTop ? '<span class="pill ok">Top until ' + day(p.top_until) + "</span>" : '<span class="sub">Normal</span>') + "</td><td class='act'>" +
+          '<button class="btn p sm" type="button" data-id="' + esc(p.id) + '" data-n="' + esc(p.name) + '" data-a="set">' + (isTop ? "Change days" : "Make top") + "</button>" +
+          (isTop ? '<button class="btn d sm" type="button" data-id="' + esc(p.id) + '" data-n="' + esc(p.name) + '" data-a="del">Remove</button>' : "") + "</td></tr>";
+      }).join("") || '<tr><td colspan="5" class="sub" style="padding:1.4rem">No products found.</td></tr>';
+    });
+  }
+  $("tq").addEventListener("input", function () { clearTimeout(tTimer); tTimer = setTimeout(function () { loadTop(false); }, 350); });
+  $("tOnly").onclick = function () { $("tq").value = ""; loadTop(true); };
+  $("trows").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-id]"); if (!b) return;
+    var del = b.dataset.a === "del", d = parseInt($("tdays").value, 10);
+    if (!del && (isNaN(d) || d < 1 || d > 90)) return say("tMsg", "Enter a number of days from 1 to 90.");
+    if (!confirm(del ? "Remove " + b.dataset.n + " from Top products?" : "Make " + b.dataset.n + " a Top product for " + d + (d === 1 ? " day" : " days") + "? The vendor will get a notification and an email.")) return;
+    say("tMsg", "Saving…", true);
+    sb.rpc("admin_set_top_product", { p_product: b.dataset.id, p_days: del ? 0 : d }).then(function (r) {
+      if (r.error) return say("tMsg", "Could not save: " + (r.error.message || "unknown error") + ". Make sure setup-11.sql has been run.");
+      say("tMsg", del ? "Removed from Top products." : b.dataset.n + " is a Top product for " + d + (d === 1 ? " day." : " days."), true);
+      loadTop(false);
+    });
+  });
 
   /* ---------- manage a store: open / close / set paid-until date ---------- */
   function ymd(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
@@ -375,7 +471,7 @@
     loadStats().then(function (ok) {
       if (!ok) return;
       $("stamp").textContent = new Date().toLocaleDateString("en-NG", { weekday: "long", day: "numeric", month: "long" });
-      loadVisits(); loadUsers(); loadPayments(); loadVerify(); loadUpgrades(); loadNews();
+      loadVisits(); loadUsers(); loadBadges(); loadTop(false); loadPayments(); loadVerify(); loadUpgrades(); loadNews();
     });
   });
 })();

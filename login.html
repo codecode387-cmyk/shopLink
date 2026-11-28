@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<script src="menu.js" defer></script>
+<script src="nav.js" defer></script>
 </head>
 <body>
 <header>
@@ -55,15 +55,33 @@
 (function () {
   var sb = window.supabase ? window.supabase.createClient("https://grrotfpoalxvkkrkgzpg.supabase.co", "sb_publishable_rHcD1gDpdwT5jT1CscnGGA_2rV8baSw") : null;
   var $ = function (id) { return document.getElementById(id); };
+  var wantsAdmin = /[?&]admin(=|&|$)/.test(location.search);
+
   function fail(t, id) { $("msg").textContent = t; if (id) $(id).focus(); return false; }
   function busy(b) { $("go").disabled = b; $("go").textContent = b ? "Logging in…" : "Log in"; }
 
-  // Admins land on the admin page, vendors on their dashboard
-  function route() {
-    return sb.rpc("admin_stats").then(function (r) { location.href = r.error ? "dashboard.html" : "admin.html"; });
+  // Is the signed-in user an admin? Uses is_admin(), falls back to admin_stats.
+  function checkAdmin() {
+    return sb.rpc("is_admin").then(function (r) {
+      if (!r.error) return r.data === true;
+      return sb.rpc("admin_stats").then(function (s) { return !s.error; });
+    }).catch(function () { return false; });
   }
 
-  if (sb) sb.auth.getSession().then(function (r) { if (r.data.session) route(); });
+  // Admins land on the admin page, vendors on their dashboard
+  function route() {
+    return checkAdmin().then(function (isAdmin) {
+      if (isAdmin) { location.href = "admin.html"; return; }
+      if (wantsAdmin) {
+        $("msg").textContent = "This account is not an admin. Taking you to your dashboard…";
+        setTimeout(function () { location.href = "dashboard.html"; }, 1800);
+        return;
+      }
+      location.href = "dashboard.html";
+    });
+  }
+
+  if (sb) sb.auth.getSession().then(function (r) { if (r.data && r.data.session) route(); });
 
   $("show").addEventListener("change", function () { $("pw").type = this.checked ? "text" : "password"; });
 
